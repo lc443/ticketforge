@@ -22,6 +22,11 @@ spring:
     serialization:
       indent-output: true
 
+
+jwt:
+  secret: 1234567890123456789012345678901234567890123456789012345678901234
+  expiration: 86400000
+
 management:
   endpoints:
     web:
