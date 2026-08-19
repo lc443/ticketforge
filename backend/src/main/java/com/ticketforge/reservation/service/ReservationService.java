@@ -26,8 +26,8 @@ public class ReservationService {
             UUID eventId,
             CreateReservationRequest request
     ) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+       Event event = eventRepository.findWithLockById(eventId)
+        .orElseThrow(() -> new RuntimeException("Event not found"));
 
         if (event.getAvailableTickets() < request.quantity()) {
             throw new RuntimeException("Not enough tickets available");
