@@ -1,6 +1,7 @@
 package com.ticketforge.shared.config;
 
 import com.ticketforge.auth.security.JwtAuthenticationFilter;
+import com.ticketforge.shared.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -23,22 +25,26 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/actuator/**"
                         )
-
                         .permitAll()
-
                         .anyRequest()
-
                         .authenticated()
                 )
 
+                // Rate limiting runs first
                 .addFilterBefore(
-                        jwtAuthenticationFilter,
+                        rateLimitFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+
+                // JWT validation runs after rate limiting,
+                // but still before Spring's username/password filter
+                .addFilterAfter(
+                        jwtAuthenticationFilter,
+                        RateLimitFilter.class
                 );
 
         return http.build();
