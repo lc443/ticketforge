@@ -1,55 +1,118 @@
-<h1>Redis Cache Lab</h1>
+<!-- src/app/features/lab/event-cache/event-cache.html -->
 
-<div>
-  <label for="token">JWT Token</label>
-  <textarea
-    id="token"
-    [(ngModel)]="token"
-    rows="5"
-    placeholder="Paste JWT token"
-  ></textarea>
+<div class="lab-container">
+  <app-lab-breadcrumb path="/lab/cache" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">TicketForge Learning Lab</span>
+
+      <h1>Redis Cache Lab</h1>
+
+      <p>
+        Load the same event a few times in a row. The first request goes to
+        PostgreSQL; every request after that should be answered by Redis instead.
+      </p>
+    </div>
+  </header>
+
+  <div class="card form-card">
+    <div class="section-title">
+      <span class="concept-label">Request</span>
+      <h2>Fetch an event</h2>
+      <p>Paste a JWT and an event UUID, then load it a few times.</p>
+    </div>
+
+    <div class="field">
+      <label for="token">JWT token</label>
+      <textarea
+        id="token"
+        [(ngModel)]="token"
+        rows="4"
+        placeholder="Paste JWT token"
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label for="eventId">Event ID</label>
+      <input
+        id="eventId"
+        [(ngModel)]="eventId"
+        type="text"
+        placeholder="Event UUID"
+      />
+    </div>
+
+    <button
+      class="create-btn"
+      type="button"
+      (click)="loadEvent()"
+    >
+      Load Event
+    </button>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-tile">
+      <span class="stat-label">Request count</span>
+      <span class="stat-value">{{ requestCount() }}</span>
+    </div>
+
+    <div
+      class="stat-tile"
+      [class.hit]="requestCount() > 1"
+    >
+      <span class="stat-label">Response time</span>
+      <span class="stat-value">{{ responseTime() }} ms</span>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert">
+      {{ error() }}
+    </div>
+  }
+
+  @if (event()) {
+    <div class="card event-card-detail reveal">
+      <div class="section-title">
+        <span class="concept-label">Response</span>
+        <h2>{{ event().name }}</h2>
+      </div>
+
+      <dl class="event-detail-grid">
+        <dt>Venue</dt>
+        <dd>{{ event().venue }}</dd>
+
+        <dt>Available tickets</dt>
+        <dd>{{ event().availableTickets }}</dd>
+      </dl>
+    </div>
+  }
+
+  <div class="card expected-card">
+    <div class="section-title">
+      <span class="concept-label">Cache-Aside</span>
+      <h2>Expected behavior</h2>
+      <p>Watch the response time drop once Redis starts answering.</p>
+    </div>
+
+    <ol class="expected-flow">
+      <li>
+        <span class="req-num">Request #1</span>
+        <span class="arrow">→</span>
+        <span class="pill db">PostgreSQL</span>
+      </li>
+      <li>
+        <span class="req-num">Request #2</span>
+        <span class="arrow">→</span>
+        <span class="pill cache">Redis</span>
+      </li>
+      <li>
+        <span class="req-num">Request #3</span>
+        <span class="arrow">→</span>
+        <span class="pill cache">Redis</span>
+      </li>
+    </ol>
+  </div>
 </div>
-
-<div>
-  <label for="eventId">Event ID</label>
-  <input
-    id="eventId"
-    [(ngModel)]="eventId"
-    type="text"
-    placeholder="Event UUID"
-  />
-</div>
-
-<button
-  type="button"
-  (click)="loadEvent()"
->
-  Load Event
-</button>
-
-<hr />
-
-<p>Request count: {{ requestCount() }}</p>
-<p>Response time: {{ responseTime() }} ms</p>
-
-@if (error()) {
-  <p>{{ error() }}</p>
-}
-
-@if (event()) {
-  <h2>Event</h2>
-
-  <p>Name: {{ event().name }}</p>
-  <p>Venue: {{ event().venue }}</p>
-  <p>Available tickets: {{ event().availableTickets }}</p>
-}
-
-<hr />
-
-<h2>Expected behavior</h2>
-
-<pre>
-Request #1 → PostgreSQL
-Request #2 → Redis
-Request #3 → Redis
-</pre>

@@ -1,0 +1,301 @@
+/* src/app/features/lab/event-cache/event-cache.scss */
+
+:host {
+  display: block;
+}
+
+.lab-container {
+  width: min(760px, calc(100% - 48px));
+
+  margin: 0 auto;
+
+  padding: 40px 0 80px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero {
+  margin-bottom: 8px;
+
+  h1 {
+    margin: 6px 0 12px;
+
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.05;
+
+    color: var(--ink);
+  }
+
+  p {
+    max-width: 60ch;
+
+    margin: 0;
+
+    color: var(--ink-soft);
+
+    font-size: 15px;
+    line-height: 1.65;
+  }
+}
+
+.eyebrow,
+.concept-label {
+  color: var(--stamp);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.card {
+  padding: 26px;
+
+  border: 1px solid var(--line);
+
+  border-radius: var(--radius-lg);
+
+  background: var(--paper-raised);
+
+  box-shadow: var(--shadow);
+}
+
+.section-title {
+  margin-bottom: 18px;
+
+  h2 {
+    margin: 5px 0 5px;
+
+    color: var(--ink);
+
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--ink-soft);
+
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  margin-bottom: 16px;
+
+  label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  textarea,
+  input {
+    padding: 11px 13px;
+
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+
+    background: var(--paper);
+    color: var(--ink);
+
+    font-family: var(--font-mono);
+    font-size: 13px;
+
+    resize: vertical;
+
+    transition: border-color 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--stamp);
+    }
+
+    &::placeholder {
+      color: var(--ink-soft);
+      opacity: 0.7;
+    }
+  }
+}
+
+.create-btn {
+  padding: 12px 20px;
+
+  border: 0;
+  border-radius: var(--radius);
+
+  background: var(--ink);
+  color: var(--paper-raised);
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-tile {
+  padding: 16px 18px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  background: var(--paper-raised);
+
+  box-shadow: var(--shadow-sm);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+
+  &.hit {
+    border-color: var(--stamp);
+    background: var(--stamp-soft);
+  }
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.alert {
+  padding: 14px 18px;
+
+  border: 1px solid var(--gap-bg);
+  border-radius: var(--radius);
+
+  background: var(--gap-bg);
+  color: var(--gap);
+
+  font-size: 14px;
+}
+
+.event-detail-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+
+  margin: 0;
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14px;
+  }
+}
+
+.expected-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.req-num {
+  min-width: 96px;
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.arrow {
+  color: var(--ink-soft);
+}
+
+.pill {
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+
+  &.db {
+    background: var(--next-bg);
+    color: var(--next);
+  }
+
+  &.cache {
+    background: var(--stamp-soft);
+    color: var(--stamp);
+  }
+}
+
+.reveal {
+  animation: reveal-step 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes reveal-step {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

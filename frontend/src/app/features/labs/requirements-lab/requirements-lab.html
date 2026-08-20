@@ -1,0 +1,91 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/requirements" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 0</span>
+      <span class="badge warn">Partial</span>
+      <h1>Requirements & Architecture Lab</h1>
+      <p>No code in this sprint. Just the document that everything else has to trace back to.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 0 · in progress"
+    title="Why write it down before building it"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>"Build a ticketing app" isn't a spec.</h3>
+        <p>
+          Availability, latency, RPO/RTO, who can do what — none of it is obvious from a feature
+          list. Skip this step and every later decision (locking strategy, cache TTL, AWS
+          instance size) is a guess with nothing to check it against.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Requirements doc, diagrams, and an ADR — before line one.</h3>
+        <p>
+          Functional requirements, non-functional targets, a system context diagram, and
+          <code>ADR-001</code> justifying the modular monolith. Every sprint after this one is
+          allowed to reference it.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>Traceability.</strong> "Why Redis?" has an answer that isn't "because it's popular."</li>
+        <li><strong>Forces numbers.</strong> "Fast" becomes "p95 &lt; 500ms" — testable, not vibes.</li>
+        <li><strong>Shared context.</strong> An ADR lets someone new understand a decision without asking you.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Reference</span>
+      <h2>ADR template</h2>
+      <p>The shape every architecture decision in this project follows.</p>
+    </div>
+
+    <pre class="adr-template">ADR-XXX: &lt;Decision Title&gt;
+
+Context:       Why is a decision needed here?
+Decision:      What are we doing?
+Alternatives:  What else did we consider?
+Consequences:  What does this make easier or harder?
+Tradeoffs:     What are we giving up?</pre>
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

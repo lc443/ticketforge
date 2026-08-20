@@ -1,0 +1,157 @@
+.detail-page {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.88rem;
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.status {
+  color: var(--ink-soft);
+
+  &.error {
+    color: var(--gap);
+  }
+}
+
+.stub-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stamp);
+  background: var(--stamp-soft);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+
+  &.stamp {
+    color: var(--done);
+    background: var(--done-bg);
+  }
+}
+
+.detail-card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+}
+
+.venue,
+.date {
+  margin: 0 0 4px;
+  color: var(--ink-soft);
+}
+
+.availability {
+  margin: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+
+  .count {
+    color: var(--accent);
+    font-weight: 700;
+  }
+}
+
+.reserve-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  max-width: 160px;
+}
+
+input {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+button {
+  align-self: flex-start;
+  padding: 11px 22px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+}
+
+.error {
+  color: var(--gap);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.confirmation {
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+
+  p {
+    margin: 6px 0;
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .gap-note {
+    margin-top: 12px;
+    font-size: 0.82rem;
+    color: var(--gap);
+    background: var(--gap-bg);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+}

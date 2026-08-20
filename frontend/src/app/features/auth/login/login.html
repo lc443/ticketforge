@@ -1,0 +1,29 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <span class="stub-tag">Sign In</span>
+    <h1>Welcome back</h1>
+    <p class="sub">Log in to reserve tickets.</p>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+      </label>
+
+      <label>
+        Password
+        <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? 'Signing in…' : 'Sign In' }}
+      </button>
+    </form>
+
+    <p class="switch">No account? <a routerLink="/register">Register</a></p>
+  </div>
+</section>

@@ -1,0 +1,168 @@
+@use '../../../shared/styles/lab-kit';
+
+:host {
+  display: block;
+}
+
+.lab-container {
+  width: min(880px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  margin-bottom: 28px;
+
+  .badge {
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  h1 {
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 4vw, 40px);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.load-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+
+  button {
+    padding: 9px 16px;
+
+    border: 1px solid var(--line);
+    border-radius: 999px;
+
+    background: var(--paper);
+    color: var(--ink-soft);
+
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.15s ease;
+
+    &.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--paper-raised);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.run-btn {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+
+  margin-bottom: 14px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 14px 10px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+
+  text-align: center;
+
+  &.warn {
+    border-color: var(--next);
+    background: var(--next-bg);
+
+    .metric-value {
+      color: var(--next);
+    }
+  }
+
+  &.bad {
+    border-color: var(--gap);
+    background: var(--gap-bg);
+
+    .metric-value {
+      color: var(--gap);
+    }
+  }
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.metric-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.load-note {
+  margin: 0;
+  padding: 12px 16px;
+
+  border-left: 3px solid var(--gap);
+  border-radius: var(--radius-sm);
+  background: var(--gap-bg);
+
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.quiz-card .quiz:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.reveal {
+  animation: reveal 0.35s ease both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

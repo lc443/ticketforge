@@ -1,0 +1,57 @@
+<section class="detail-page">
+  <a class="back-link" routerLink="/events">← Back to events</a>
+
+  @if (loading()) {
+    <p class="status">Loading…</p>
+  } @else if (error()) {
+    <p class="status error">{{ error() }}</p>
+  } @else if (event(); as ev) {
+    <div class="detail-card">
+      <span class="stub-tag">Event</span>
+      <h1>{{ ev.name }}</h1>
+      <p class="venue">{{ ev.venue }}</p>
+      <p class="date">{{ ev.eventDate | date: 'full' }}</p>
+
+      <div class="availability">
+        <span class="count">{{ ev.availableTickets }}</span> / {{ ev.totalTickets }} tickets available
+      </div>
+
+      @if (confirmation(); as c) {
+        <div class="confirmation">
+          <span class="stub-tag stamp">Confirmed</span>
+          <p>
+            Reserved <strong>{{ c.quantity }}</strong> ticket(s) — status
+            <strong>{{ c.status }}</strong>.
+          </p>
+          <p class="meta">Reservation ID: {{ c.id }}</p>
+          <p class="gap-note">
+            Note: this backend has no endpoint to list your past reservations —
+            this confirmation is the only record of it once you leave the page.
+          </p>
+        </div>
+      } @else {
+        <form class="reserve-form" (ngSubmit)="reserve()">
+          <label>
+            Quantity
+            <input
+              type="number"
+              name="quantity"
+              [(ngModel)]="quantity"
+              min="1"
+              [max]="ev.availableTickets"
+              required
+            />
+          </label>
+
+          @if (reserveError()) {
+            <p class="error">{{ reserveError() }}</p>
+          }
+
+          <button type="submit" [disabled]="reserving() || ev.availableTickets === 0">
+            {{ reserving() ? 'Reserving…' : ev.availableTickets === 0 ? 'Sold out' : 'Reserve tickets' }}
+          </button>
+        </form>
+      }
+    </div>
+  }
+</section>

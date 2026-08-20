@@ -1,0 +1,48 @@
+<header class="header">
+  <a class="brand" routerLink="/">
+    <span class="brand-mark">TF</span>
+
+    <div>
+      <strong>TicketForge</strong>
+      <span>Architecture Lab</span>
+    </div>
+  </a>
+
+  <nav class="nav">
+    <a
+      routerLink="/events"
+      routerLinkActive="active"
+    >
+      Events
+    </a>
+
+    <a
+      routerLink="/reservations"
+      routerLinkActive="active"
+    >
+      Reservations
+    </a>
+
+    <a
+      routerLink="/labs"
+      routerLinkActive="active"
+    >
+      Labs
+    </a>
+
+    <a
+      routerLink="/roadmap"
+      routerLinkActive="active"
+      class="roadmap-link"
+    >
+      Roadmap
+    </a>
+
+    @if (auth.isLoggedIn()) {
+      <span class="auth-email">{{ auth.email() }}</span>
+      <button class="auth-action" type="button" (click)="logout()">Sign Out</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active" class="auth-action">Sign In</a>
+    }
+  </nav>
+</header>

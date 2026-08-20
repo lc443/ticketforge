@@ -1,1 +1,78 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* ---------- ticket-stub palette ---------- */
+  --ink: #1c2130;
+  --ink-soft: #6b7280;
+  --paper: #f8fafc;
+  --paper-raised: #ffffff;
+  --line: #e5e7eb;
+
+  --accent: #d9631e; /* ticket-stub amber */
+  --accent-soft: #fbe7d6;
+  --stamp: #2f6f68; /* validation-stamp teal */
+  --stamp-soft: #e3efed;
+
+  --done: #2f7a4f;
+  --done-bg: #e3f1e7;
+  --next: #b8791a;
+  --next-bg: #faedd6;
+  --partial: #8a6b1f;
+  --partial-bg: #f3ecd6;
+  --todo: #8a8470;
+  --todo-bg: #efece2;
+  --gap: #b5432f;
+  --gap-bg: #fae3dd;
+
+  --shadow-sm: 0 1px 2px rgba(28, 33, 48, 0.05);
+  --shadow: 0 1px 2px rgba(28, 33, 48, 0.05), 0 8px 20px -12px rgba(28, 33, 48, 0.14);
+  --shadow-lg: 0 4px 8px rgba(28, 33, 48, 0.06), 0 16px 36px -14px rgba(28, 33, 48, 0.2);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --font-display: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-body);
+}

@@ -1,0 +1,902 @@
+<!-- src/app/features/kafka-lab/kafka-lab.html -->
+
+<div class="lab-container">
+  <app-lab-breadcrumb path="/lab/kafka" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">TicketForge Learning Lab</span>
+
+      <h1>Kafka Architecture Lab</h1>
+
+      <p>
+        Follow one reservation event through Kafka, answer a quick check after each concept, then
+        play with the sandboxes below to see partitioning and consumer scaling for yourself.
+      </p>
+    </div>
+
+    <div class="lesson-controls">
+      <div
+        class="mode-toggle"
+        role="group"
+        aria-label="Lesson mode"
+      >
+        <button
+          type="button"
+          [class.active]="mode() === 'auto'"
+          [disabled]="isRunning()"
+          (click)="setMode('auto')"
+        >
+          Auto-play
+        </button>
+        <button
+          type="button"
+          [class.active]="mode() === 'manual'"
+          [disabled]="isRunning()"
+          (click)="setMode('manual')"
+        >
+          Step-by-step
+        </button>
+      </div>
+
+      @if (mode() === 'auto') {
+        <div
+          class="speed-toggle"
+          role="group"
+          aria-label="Lesson speed"
+        >
+          @for (s of speeds; track s) {
+            <button
+              type="button"
+              [class.active]="speed() === s"
+              (click)="setSpeed(s)"
+            >
+              {{ s }}
+            </button>
+          }
+        </div>
+      }
+
+      <div class="lesson-buttons">
+        <button
+          class="create-btn"
+          type="button"
+          [disabled]="isRunning()"
+          (click)="createReservation()"
+        >
+          @if (isRunning()) {
+            Lesson Running...
+          } @else {
+            Create Reservation Event
+          }
+        </button>
+
+        @if (isRunning() && mode() === 'auto') {
+          <button
+            class="pause-btn"
+            type="button"
+            (click)="togglePause()"
+          >
+            @if (isPaused()) {
+              Resume Lesson
+            } @else {
+              Pause Lesson
+            }
+          </button>
+        }
+
+        @if (waitingForNext()) {
+          <button
+            class="next-btn"
+            type="button"
+            (click)="nextStep()"
+          >
+            Next Step →
+          </button>
+        }
+
+        @if (!isRunning() && stage() !== 'idle') {
+          <button
+            class="restart-btn"
+            type="button"
+            (click)="restartLesson()"
+          >
+            Restart
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 9–14 · already built"
+    title="Why the reservation needed Kafka"
+  >
+    <div class="scenario-recap">
+      <p>
+        One ticket left. User hits <strong>Reserve</strong>. Locking already guarantees only one
+        buyer wins — that part's solved. This is about what happens <em>after</em> the reservation
+        succeeds.
+      </p>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Everything runs in the same request.</h3>
+
+        <pre class="scenario-chain">
+Purchase
+  ↓
+Save Order       (fast)
+  ↓
+Send Email       (slow, third-party)
+  ↓
+Generate Ticket
+  ↓
+Update Analytics
+  ↓
+Notify Admin
+  ↓
+Return Response  (customer still waiting)</pre>
+
+        <p>
+          The reservation was safe the moment the lock committed — but the response doesn't
+          return until every step below it finishes. A slow email provider makes a
+          <em>successful</em> reservation look like a failed purchase.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Publish an event, return immediately.</h3>
+
+        <pre class="scenario-chain">
+Purchase
+  ↓
+Save Order + Publish Event   (still fast)
+  ↓
+Return Response
+
+── off the request thread ──
+Kafka: reservation-created
+  ├── EmailWorker
+  └── AnalyticsWorker</pre>
+
+        <p>
+          Exactly what <code>ReservationProducer</code> →
+          <code>KafkaConfig</code> → <code>EmailWorker</code> / <code>AnalyticsWorker</code> do
+          today. The request only waits on the DB write and the publish.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why Kafka solves this</span>
+
+      <p class="scenario-pattern-name">
+        The pattern: <strong>event-driven architecture</strong> — services react to published
+        events instead of calling each other directly.
+      </p>
+
+      <ul>
+        <li><strong>Decoupling.</strong> Reservation no longer depends on email being up.</li>
+        <li><strong>Durability.</strong> A published event survives a worker crash.</li>
+        <li><strong>Independent scaling.</strong> Scale EmailWorker alone, not the whole API.</li>
+        <li><strong>Failure isolation.</strong> Retry + DLQ mean a broken event is delayed, not lost.</li>
+      </ul>
+
+      <p class="scenario-note">
+        Not part of this pipeline: <strong>authentication</strong> (JWT — who's making the
+        request) and <strong>authorization</strong> (RBAC — are they allowed to). Both already
+        ran before <code>ReservationService</code> touched this event. Auth guards the request;
+        it has no place inside the event pipeline.
+      </p>
+    </div>
+
+    <div class="glossary">
+      <span class="scenario-label">Interview vocabulary</span>
+      <div class="glossary-grid">
+        <div class="glossary-term">
+          <strong>Event-driven architecture</strong>
+          <span>Services react to events instead of calling each other directly.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Decoupling</strong>
+          <span>One service's failure can't directly block another's.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Consumer group</strong>
+          <span>Consumers that share a topic's work instead of duplicating it.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Horizontal scaling</strong>
+          <span>More instances of a service, not a bigger one.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>At-least-once delivery</strong>
+          <span>A message may be redelivered — why idempotency matters.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Idempotency</strong>
+          <span>Processing an event twice = processing it once.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Dead-letter queue</strong>
+          <span>Where permanently-failing messages go to be preserved, not lost.</span>
+        </div>
+        <div class="glossary-term">
+          <strong>Authentication / Authorization</strong>
+          <span>Who you are (JWT) vs. what you're allowed to do (RBAC).</span>
+        </div>
+      </div>
+    </div>
+  </app-scenario-card>
+
+  <section
+    class="explanation-panel"
+    [class.paused]="isPaused()"
+  >
+    <div class="explanation-heading">
+      <span
+        class="pulse-dot"
+        [class.paused]="isPaused()"
+      ></span>
+
+      <span class="explanation-label">
+        @if (isPaused()) {
+          Lesson Paused
+        } @else if (waitingForNext()) {
+          Waiting for you
+        } @else {
+          What is happening?
+        }
+      </span>
+    </div>
+
+    <p>
+      {{ explanation() }}
+    </p>
+  </section>
+
+  @if (hasReached('producer')) {
+    <section class="lesson-step reveal" data-stage="producer">
+      <div class="step-marker">
+        <span>01</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label">Producer</span>
+
+          <h2>ReservationProducer</h2>
+
+          <p>The producer creates an event and sends it into Kafka.</p>
+        </div>
+
+        <div
+          class="architecture-box"
+          [class.active]="stage() === 'producer'"
+        >
+          <div class="architecture-icon">P</div>
+
+          <div class="architecture-content">
+            <strong>ReservationProducer</strong>
+            <span>Publishes ReservationCreatedEvent</span>
+          </div>
+
+          @if (stage() === 'producer') {
+            <div class="event-chip">ReservationCreatedEvent</div>
+          }
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Real-world</span>
+          <p>
+            Kafka was built at LinkedIn (Jay Kreps, Neha Narkhede, Jun Rao, around 2010–2011)
+            because their existing messaging systems couldn't keep up with activity-stream data at
+            LinkedIn's scale. It's now the same mechanism underneath event pipelines at Uber,
+            Netflix, and Airbnb.
+          </p>
+        </div>
+
+        @if (hasReached('topic')) {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['producer'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['producer'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('producer') === i"
+                  [class.correct]="wasAnswered('producer') && isCorrect(quiz['producer'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('producer') && selectedAnswer('producer') === i && i !== quiz['producer'].correct
+                  "
+                  [disabled]="wasAnswered('producer')"
+                  (click)="answerQuiz('producer', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (hasReached('topic')) {
+    <div class="flow-arrow reveal-arrow">
+      <span>↓</span>
+      <small>publish</small>
+    </div>
+
+    <section class="lesson-step reveal" data-stage="topic">
+      <div class="step-marker">
+        <span>02</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label">Topic</span>
+
+          <h2>reservation-created</h2>
+
+          <p>A Kafka topic is a named stream that stores related messages.</p>
+        </div>
+
+        <div
+          class="architecture-box"
+          [class.active]="stage() === 'topic'"
+        >
+          <div class="architecture-icon">T</div>
+
+          <div class="architecture-content">
+            <strong>reservation-created</strong>
+            <span>Reservation event stream</span>
+          </div>
+
+          @if (stage() === 'topic') {
+            <div class="event-chip">Event received</div>
+          }
+        </div>
+
+        @if (hasReached('partition')) {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['topic'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['topic'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('topic') === i"
+                  [class.correct]="wasAnswered('topic') && isCorrect(quiz['topic'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('topic') && selectedAnswer('topic') === i && i !== quiz['topic'].correct
+                  "
+                  [disabled]="wasAnswered('topic')"
+                  (click)="answerQuiz('topic', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (hasReached('partition')) {
+    <div class="flow-arrow reveal-arrow">
+      <span>↓</span>
+      <small>route</small>
+    </div>
+
+    <section class="lesson-step reveal" data-stage="partition">
+      <div class="step-marker">
+        <span>03</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label">Partitions</span>
+
+          <h2>Kafka divides the topic</h2>
+
+          <p>Partitions let Kafka distribute messages and process work in parallel.</p>
+        </div>
+
+        <div class="partition-grid">
+          @for (p of [0, 1, 2]; track p) {
+            <div
+              class="partition"
+              [class.active]="activePartition() === p"
+            >
+              <div class="partition-header">
+                <div>
+                  <span class="partition-id">P{{ p }}</span>
+                  <strong>Partition {{ p }}</strong>
+                </div>
+
+                <span class="partition-status">
+                  {{ activePartition() === p ? 'Selected' : 'Waiting' }}
+                </span>
+              </div>
+
+              <div class="partition-body">
+                @if (activePartition() === p) {
+                  <div class="event-card">ReservationCreatedEvent</div>
+                } @else {
+                  <span>Waiting for message</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Why it matters</span>
+          <p>
+            The producer hashes the message <strong>key</strong> — here, the reservation ID — to
+            pick a partition. The same key always lands on the same partition, which is what gives
+            Kafka ordering guarantees per key even though the topic as a whole is unordered. Try
+            it yourself in the Partition Key sandbox below.
+          </p>
+        </div>
+
+        @if (hasReached('consumer')) {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['partition'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['partition'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('partition') === i"
+                  [class.correct]="wasAnswered('partition') && isCorrect(quiz['partition'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('partition') && selectedAnswer('partition') === i && i !== quiz['partition'].correct
+                  "
+                  [disabled]="wasAnswered('partition')"
+                  (click)="answerQuiz('partition', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (hasReached('consumer')) {
+    <div class="flow-arrow reveal-arrow">
+      <span>↓</span>
+      <small>consume</small>
+    </div>
+
+    <section class="lesson-step reveal" data-stage="consumer">
+      <div class="step-marker">
+        <span>04</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label">Consumer Group</span>
+
+          <h2>email-workers</h2>
+
+          <p>
+            Consumers in the same group share the work instead of all processing the same
+            message.
+          </p>
+        </div>
+
+        <div class="consumer-grid">
+          @for (i of [0, 1, 2]; track i) {
+            <div
+              class="consumer"
+              [class.active]="stage() === 'consumer' && activePartition() === i"
+            >
+              <div class="consumer-header">
+                <strong>API-{{ i + 1 }}</strong>
+                <span>
+                  {{ stage() === 'consumer' && activePartition() === i ? 'Processing' : 'Idle' }}
+                </span>
+              </div>
+
+              <p>EmailWorker</p>
+            </div>
+          }
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Why it matters</span>
+          <p>
+            This is how TicketForge absorbs a 100,000-purchase spike without touching a single
+            line of producer code — you add workers, and Kafka rebalances partitions across them
+            automatically. Try the Consumer Scaling sandbox below to see what happens when workers
+            outnumber partitions.
+          </p>
+        </div>
+
+        @if (hasReached('retry-1')) {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['consumer'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['consumer'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('consumer') === i"
+                  [class.correct]="wasAnswered('consumer') && isCorrect(quiz['consumer'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('consumer') && selectedAnswer('consumer') === i && i !== quiz['consumer'].correct
+                  "
+                  [disabled]="wasAnswered('consumer')"
+                  (click)="answerQuiz('consumer', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (hasReached('retry-1')) {
+    <div class="flow-arrow warning reveal-arrow">
+      <span>↓</span>
+      <small>failure</small>
+    </div>
+
+    <section class="lesson-step reveal" data-stage="retry">
+      <div class="step-marker warning-marker">
+        <span>05</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label warning-text">Retry Policy</span>
+
+          <h2>Temporary failure handling</h2>
+
+          <p>
+            Retry logic gives temporary failures another chance before the event is considered
+            permanently unsuccessful.
+          </p>
+        </div>
+
+        <div class="retry-grid">
+          <div
+            class="retry-step"
+            [class.active]="stage() === 'retry-1'"
+            [class.complete]="hasReached('retry-2')"
+          >
+            <span>Attempt 1</span>
+            <strong>{{ hasReached('retry-2') ? 'Failed' : 'Processing' }}</strong>
+          </div>
+
+          @if (hasReached('retry-2')) {
+            <div class="retry-arrow reveal-arrow">→</div>
+
+            <div
+              class="retry-step reveal"
+              [class.active]="stage() === 'retry-2'"
+              [class.complete]="hasReached('retry-3')"
+            >
+              <span>Attempt 2</span>
+              <strong>{{ hasReached('retry-3') ? 'Failed' : 'Processing' }}</strong>
+            </div>
+          }
+
+          @if (hasReached('retry-3')) {
+            <div class="retry-arrow reveal-arrow">→</div>
+
+            <div
+              class="retry-step reveal"
+              [class.active]="stage() === 'retry-3'"
+              [class.complete]="hasReached('dlq')"
+            >
+              <span>Attempt 3</span>
+              <strong>{{ hasReached('dlq') ? 'Failed' : 'Processing' }}</strong>
+            </div>
+          }
+        </div>
+
+        @if (hasReached('dlq')) {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['retry'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['retry'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('retry') === i"
+                  [class.correct]="wasAnswered('retry') && isCorrect(quiz['retry'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('retry') && selectedAnswer('retry') === i && i !== quiz['retry'].correct
+                  "
+                  [disabled]="wasAnswered('retry')"
+                  (click)="answerQuiz('retry', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (hasReached('dlq')) {
+    <div class="flow-arrow danger-arrow reveal-arrow">
+      <span>↓</span>
+      <small>exhausted</small>
+    </div>
+
+    <section class="lesson-step reveal" data-stage="dlq">
+      <div class="step-marker danger-marker">
+        <span>06</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="concept-label danger-text">Dead Letter Queue</span>
+
+          <h2>reservation-created-dlq</h2>
+
+          <p>The failed event is preserved so it is not silently lost.</p>
+        </div>
+
+        <div
+          class="dlq"
+          [class.active]="stage() === 'dlq'"
+          [class.replayed]="hasReached('replayed')"
+        >
+          <div class="dlq-icon">{{ hasReached('replayed') ? '✓' : '!' }}</div>
+
+          <div class="dlq-content">
+            <strong>ReservationCreatedEvent</strong>
+            <span>
+              {{ hasReached('replayed') ? 'Reprocessed successfully' : 'Retry policy exhausted' }}
+            </span>
+          </div>
+
+          <div class="dlq-status">
+            {{ hasReached('replayed') ? 'Replayed' : 'Stored in DLQ' }}
+          </div>
+        </div>
+
+        @if (stage() === 'dlq' && !isRunning()) {
+          <button
+            class="replay-btn"
+            type="button"
+            (click)="replayFromDlq()"
+          >
+            Replay from DLQ
+          </button>
+        }
+
+        <div class="callout">
+          <span class="callout-label">Real-world</span>
+          <p>
+            AWS SQS ships dead-letter queues as a first-class managed feature rather than
+            something every team builds from scratch — a strong signal that "messages will
+            sometimes fail permanently" is a universal design constraint, not an edge case.
+          </p>
+        </div>
+
+        @if (hasReached('replayed') || stage() === 'dlq') {
+          <div class="quiz">
+            <p class="quiz-question">{{ quiz['dlq'].question }}</p>
+            <div class="quiz-options">
+              @for (option of quiz['dlq'].options; track option; let i = $index) {
+                <button
+                  type="button"
+                  class="quiz-option"
+                  [class.selected]="selectedAnswer('dlq') === i"
+                  [class.correct]="wasAnswered('dlq') && isCorrect(quiz['dlq'].correct, i)"
+                  [class.incorrect]="
+                    wasAnswered('dlq') && selectedAnswer('dlq') === i && i !== quiz['dlq'].correct
+                  "
+                  [disabled]="wasAnswered('dlq')"
+                  (click)="answerQuiz('dlq', i)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    @if (hasReached('replayed')) {
+      <section class="takeaway reveal">
+        <span class="eyebrow">Lesson Complete</span>
+
+        <h2>One event. Six Kafka concepts.</h2>
+
+        <div class="takeaway-flow">
+          <span>Producer</span>
+          <strong>→</strong>
+          <span>Topic</span>
+          <strong>→</strong>
+          <span>Partition</span>
+          <strong>→</strong>
+          <span>Consumer</span>
+          <strong>→</strong>
+          <span>Retry</span>
+          <strong>→</strong>
+          <span>DLQ</span>
+          <strong>→</strong>
+          <span>Replay</span>
+        </div>
+      </section>
+    }
+  }
+
+  <!-- ---------- sandboxes ---------- -->
+
+  <section class="sandbox-section">
+    <div class="sandbox-heading">
+      <span class="eyebrow">Try it yourself</span>
+      <h2>Sandboxes</h2>
+      <p>No lesson run needed — these react instantly to your input.</p>
+    </div>
+
+    <div class="sandbox-grid">
+      <div class="card sandbox-card">
+        <div class="section-title">
+          <span class="concept-label">Consumer Scaling</span>
+          <h2>Partitions vs. consumers</h2>
+          <p>
+            3 fixed partitions. Change the number of consumers in the group and watch who's
+            actually working.
+          </p>
+        </div>
+
+        <div class="stepper">
+          <button
+            type="button"
+            (click)="adjustConsumers(-1)"
+            [disabled]="sandboxConsumerCount() <= 1"
+          >
+            −
+          </button>
+          <span class="stepper-value">{{ sandboxConsumerCount() }} consumers</span>
+          <button
+            type="button"
+            (click)="adjustConsumers(1)"
+            [disabled]="sandboxConsumerCount() >= 6"
+          >
+            +
+          </button>
+        </div>
+
+        <div class="assignment-list">
+          @for (row of sandboxAssignment().assignment; track row.consumer) {
+            <div
+              class="assignment-row"
+              [class.idle]="row.partition === null"
+            >
+              <span class="assignment-consumer">API-{{ row.consumer + 1 }}</span>
+              <span class="assignment-arrow">→</span>
+              @if (row.partition !== null) {
+                <span class="assignment-partition">Partition {{ row.partition }}</span>
+              } @else {
+                <span class="assignment-partition idle-label">Idle — no partition free</span>
+              }
+            </div>
+          }
+        </div>
+
+        <p class="sandbox-readout">
+          @if (sandboxAssignment().idle > 0) {
+            {{ sandboxAssignment().idle }} consumer{{ sandboxAssignment().idle === 1 ? '' : 's' }}
+            sitting idle — a partition can only be owned by one consumer at a time within a group.
+          } @else if (sandboxAssignment().unassignedPartitions > 0) {
+            {{ sandboxAssignment().unassignedPartitions }} partition{{
+              sandboxAssignment().unassignedPartitions === 1 ? '' : 's'
+            }}
+            with no dedicated consumer — some workers are handling more than one partition.
+          } @else {
+            Every partition has exactly one consumer. This is the maximum useful parallelism for 3
+            partitions.
+          }
+        </p>
+      </div>
+
+      <div class="card sandbox-card">
+        <div class="section-title">
+          <span class="concept-label">Partition Keys</span>
+          <h2>Same key, same partition</h2>
+          <p>Type a reservation ID and see which partition it's routed to — every time.</p>
+        </div>
+
+        <div class="field">
+          <label for="keyInput">Message key</label>
+          <input
+            id="keyInput"
+            type="text"
+            [(ngModel)]="keyInput"
+            placeholder="e.g. reservation-4821"
+          />
+        </div>
+
+        <div class="example-keys">
+          @for (k of ['reservation-4821', 'reservation-9002', 'reservation-4821']; track $index) {
+            <button
+              type="button"
+              class="example-key"
+              (click)="tryExampleKey(k)"
+            >
+              {{ k }}
+            </button>
+          }
+        </div>
+
+        @if (keyPartition() !== null) {
+          <div class="key-result reveal">
+            <span class="key-result-label">Routed to</span>
+            <span class="key-result-partition">Partition {{ keyPartition() }}</span>
+          </div>
+        }
+
+        <p class="sandbox-readout">
+          Notice the two <code>reservation-4821</code> buttons both land on the same partition —
+          that's the ordering guarantee. A different key can land anywhere.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-quiz-section">
+    <div class="sandbox-heading">
+      <span class="eyebrow">Final check</span>
+      <h2>Put it together</h2>
+      <p>
+        Five scenario-based questions covering the whole lab — not just definitions, but how these
+        concepts play out inside TicketForge.
+      </p>
+    </div>
+
+    <div class="card final-quiz-card">
+      @for (q of finalQuiz; track q.question; let qi = $index) {
+        <div class="quiz final-quiz-item">
+          <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+          <div class="quiz-options">
+            @for (option of q.options; track option; let i = $index) {
+              <button
+                type="button"
+                class="quiz-option"
+                [class.selected]="selectedAnswer(finalKey(qi)) === i"
+                [class.correct]="wasAnswered(finalKey(qi)) && isCorrect(q.correct, i)"
+                [class.incorrect]="
+                  wasAnswered(finalKey(qi)) && selectedAnswer(finalKey(qi)) === i && i !== q.correct
+                "
+                [disabled]="wasAnswered(finalKey(qi))"
+                (click)="answerQuiz(finalKey(qi), i)"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (finalAnsweredCount() === finalQuiz.length) {
+        <div class="final-score reveal">
+          Score: {{ finalScore() }} / {{ finalQuiz.length }}
+        </div>
+      }
+    </div>
+  </section>
+</div>

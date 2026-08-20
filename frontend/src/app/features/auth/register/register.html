@@ -1,0 +1,39 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <span class="stub-tag">Register</span>
+    <h1>Create your account</h1>
+    <p class="sub">Sign up to start reserving tickets.</p>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        First name
+        <input type="text" name="firstName" [(ngModel)]="firstName" required autocomplete="given-name" />
+      </label>
+
+      <label>
+        Last name
+        <input type="text" name="lastName" [(ngModel)]="lastName" required autocomplete="family-name" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+      </label>
+
+      <label>
+        Password
+        <input type="password" name="password" [(ngModel)]="password" required autocomplete="new-password" />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? 'Creating account…' : 'Register' }}
+      </button>
+    </form>
+
+    <p class="switch">Already have an account? <a routerLink="/login">Sign In</a></p>
+  </div>
+</section>

@@ -1,0 +1,33 @@
+<section class="info-page">
+  <div class="info-card">
+    <span class="stub-tag gap">Gap</span>
+    <h1>My Reservations isn't buildable yet</h1>
+
+    <p>
+      Reserving tickets works — <a routerLink="/events">try it here</a>. But there's no
+      "My Reservations" page, because the backend can't support one yet:
+    </p>
+
+    <ul>
+      <li><code>POST /api/events/{{ '{' }}eventId{{ '}' }}/reservations</code> exists and works.</li>
+      <li>There's no <code>GET</code> endpoint to list reservations — for anyone.</li>
+      <li>
+        The <code>Reservation</code> entity has no link to a <code>User</code> at all, so even
+        with a list endpoint, there'd be no way to filter it to "yours".
+      </li>
+    </ul>
+
+    <p>
+      Fixing this means adding a <code>userId</code> column to <code>Reservation</code>, wiring
+      it from the authenticated principal on create, and adding a
+      <code>GET /api/reservations/mine</code> endpoint — real backend/data-model work, not a UI
+      task. Rather than fake a list with data the API can't actually provide, this page says so
+      plainly instead.
+    </p>
+
+    <p class="right-now">
+      For now: each reservation's confirmation is shown once, right after you make it, on the
+      event page.
+    </p>
+  </div>
+</section>

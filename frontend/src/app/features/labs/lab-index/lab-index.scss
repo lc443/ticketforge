@@ -1,0 +1,111 @@
+@use '../../../shared/styles/lab-kit';
+
+:host {
+  display: block;
+}
+
+.index-container {
+  width: min(1000px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  margin-bottom: 28px;
+
+  h1 {
+    margin: 6px 0 8px;
+    font-size: clamp(30px, 4vw, 42px);
+    color: var(--ink);
+    font-family: var(--font-display);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+}
+
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.lab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 20px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  background: var(--paper-raised);
+  box-shadow: var(--shadow);
+
+  text-decoration: none;
+  color: inherit;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--stamp);
+  }
+
+  h2 {
+    margin: 2px 0 0;
+    font-size: 17px;
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.55;
+    flex: 1;
+  }
+}
+
+.lab-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lab-sprint {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lab-open {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--stamp);
+}
+
+@media (max-width: 800px) {
+  .lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .lab-grid {
+    grid-template-columns: 1fr;
+  }
+}
