@@ -5,6 +5,8 @@ import com.ticketforge.auth.dto.LoginRequest;
 import com.ticketforge.auth.dto.RegisterRequest;
 import com.ticketforge.auth.entity.Role;
 import com.ticketforge.auth.entity.User;
+import com.ticketforge.auth.exception.EmailAlreadyExistsException;
+import com.ticketforge.auth.exception.InvalidCredentialsException;
 import com.ticketforge.auth.repository.UserRepository;
 import com.ticketforge.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class AuthService {
     public void register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists.");
+            throw new EmailAlreadyExistsException("Email already exists.");
         }
 
         User user = User.builder()
@@ -44,14 +46,14 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(
-                        () -> new RuntimeException("Invalid credentials.")
+                        () -> new InvalidCredentialsException("Invalid credentials.")
                 );
 
         if (!passwordEncoder.matches(
                 request.password(),
                 user.getPassword()
         )) {
-            throw new RuntimeException("Invalid credentials.");
+            throw new InvalidCredentialsException("Invalid credentials.");
         }
 
         String token = jwtService.generateToken(

@@ -45,6 +45,43 @@
     </div>
   </app-scenario-card>
 
+  <app-scenario-card
+    eyebrow="Live now · real bug, real fix"
+    title="Validating a token isn't the same as authenticating a request"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Every protected call 401'd — even with a valid token.</h3>
+        <p>
+          <code>JwtAuthenticationFilter</code> checked the signature and let the request through,
+          but never told Spring Security who the request was. With no <code>Authentication</code>
+          in the <code>SecurityContext</code>, <code>anyRequest().authenticated()</code> rejected
+          it anyway.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Set the SecurityContext after validating.</h3>
+        <p>
+          On a valid token, extract the email from the subject claim and call
+          <code>SecurityContextHolder.getContext().setAuthentication(...)</code> before the
+          filter chain continues.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>Authentication</strong> answers "is this token genuine and unexpired" — <code>validateToken()</code> alone.</li>
+        <li><strong>Authorization</strong> is a separate downstream check — Spring's filter chain reads the <code>SecurityContext</code>, not the raw header.</li>
+        <li>Skipping the second step is a common real bug: the filter runs, nothing throws, and the request still 401s.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
   <div class="card">
     <div class="section-title">
       <span class="eyebrow">Try it</span>
@@ -126,6 +163,35 @@
         </div>
       }
     }
+
+    <div class="callout">
+      <span class="badge bad">Gap</span>
+      <p>
+        This role/ADMIN demo is illustrative of JWT authorization generally — TicketForge's real
+        token only carries <code>sub</code>, <code>iat</code>, and <code>exp</code>:
+      </p>
+      <pre class="real-token">{{ realPayload | json }}</pre>
+      <p>
+        No role claim, and <code>POST /api/events</code> has no role check today — any logged-in
+        user can create an event. Real role-based authorization would mean adding a role claim to
+        the token and checking it in <code>SecurityConfig</code>.
+      </p>
+    </div>
+  </div>
+
+  <div class="card live-card">
+    <div class="section-title">
+      <span class="eyebrow">Now live</span>
+      <h2>Register and log in for real</h2>
+      <p>
+        Account creation and login run against the actual backend — register a throwaway account
+        and inspect the real token this app issues.
+      </p>
+    </div>
+    <div class="live-actions">
+      <a class="primary-btn" routerLink="/register">Create an account</a>
+      <a class="secondary-btn" routerLink="/login">Sign in</a>
+    </div>
   </div>
 
   <div class="card quiz-card">

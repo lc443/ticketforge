@@ -2,6 +2,7 @@
 
 import { Component, computed, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
 
@@ -10,7 +11,7 @@ type Role = 'CUSTOMER' | 'ADMIN';
 @Component({
   selector: 'app-auth-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb, JsonPipe],
+  imports: [ScenarioCard, LabBreadcrumb, JsonPipe, RouterLink],
   templateUrl: './auth-lab.html',
   styleUrl: './auth-lab.scss',
 })
@@ -28,6 +29,9 @@ export class AuthLab {
     role: this.tampered() ? 'ADMIN' : this.role(),
     exp: '1h',
   }));
+
+  // What TicketForge's real token looks like today — no role claim.
+  realPayload = { sub: 'jane@ticketforge.dev', iat: 1734000000, exp: 1734086400 };
 
   signatureValid = computed(() => !this.tampered());
 
@@ -56,6 +60,25 @@ export class AuthLab {
         'It makes tokens smaller',
         'Any API instance can verify a token on its own — no shared session store needed',
         'JWTs automatically load-balance requests',
+      ],
+      correct: 1,
+    },
+    {
+      question:
+        "TicketForge's JwtAuthenticationFilter validated every token's signature correctly, yet every protected endpoint still returned 401. Why?",
+      options: [
+        'The filter validated the signature but never populated SecurityContextHolder — Spring Security had no Authentication to check, so anyRequest().authenticated() failed regardless',
+        'The JWT secret was wrong',
+        'CORS was blocking the request before it reached the filter',
+      ],
+      correct: 0,
+    },
+    {
+      question: 'What is the difference between "validating" a token and "authenticating" a request?',
+      options: [
+        'They are the same operation',
+        'Validating proves the token is genuine (signature/expiry); authenticating means telling the security framework who this request is, so downstream authorization checks pass',
+        'Authenticating happens before validating',
       ],
       correct: 1,
     },

@@ -106,6 +106,33 @@
   }
 }
 
+.real-token {
+  margin: 10px 0;
+  padding: 10px 14px;
+
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  border: 1px solid var(--line);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.live-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  a.primary-btn,
+  a.secondary-btn {
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+  }
+}
+
 .quiz-card .quiz:first-child {
   margin-top: 0;
   padding-top: 0;

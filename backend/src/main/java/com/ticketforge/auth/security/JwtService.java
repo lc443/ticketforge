@@ -50,4 +50,20 @@ public class JwtService {
             return false;
         }
     }
+
+    // The token's subject is the user's email — this is the only identity
+    // claim we mint (no role claim), so this is all the filter needs to
+    // populate the SecurityContext.
+    public String extractEmail(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 }
