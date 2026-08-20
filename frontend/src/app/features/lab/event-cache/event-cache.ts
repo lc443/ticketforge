@@ -1,7 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EventLabService } from '../../../core/services/event-lab.service';
+
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { JsonPipe } from '@angular/common';
+import { EventLabService } from '../../../core/services/event-lab.service';
 
 @Component({
   selector: 'app-event-cache',
