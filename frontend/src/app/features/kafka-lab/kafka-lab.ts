@@ -96,6 +96,46 @@ const FINAL_QUIZ: QuizQuestion[] = [
     ],
     correct: 1,
   },
+  {
+    question:
+      'A Kafka rebalance causes EmailWorker to receive the same ReservationCreatedEvent twice. What actually stops a duplicate confirmation email — the retry/DLQ setup from Sprint 12, or something else?',
+    options: [
+      'Retry/DLQ handles it — a redelivered message is treated as a retry',
+      'Nothing does today unless the consumer is idempotent — retries and redelivery are about not losing a message, not about processing it only once',
+      'Kafka deduplicates messages with the same key automatically before delivering them',
+    ],
+    correct: 1,
+  },
+  {
+    question:
+      "TicketForge's idempotency fix inserts a ProcessedEvent row (consumer name + event ID, unique constraint) before running the worker's side effect, and catches the constraint violation if two deliveries race. Why insert first instead of checking existsBy... first and only then inserting?",
+    options: [
+      "It's faster to write one query instead of two",
+      'Check-then-insert has a race window — two concurrent deliveries can both pass the check before either inserts; the unique constraint is what actually guarantees only one wins',
+      'Because JPA does not support existsBy... queries in Kafka listeners',
+    ],
+    correct: 1,
+  },
+  {
+    question:
+      "ReservationService saves the Reservation, then calls the Kafka producer, all inside one @Transactional method. Why doesn't @Transactional make that publish atomic with the save?",
+    options: [
+      '@Transactional only manages resources registered with the transaction manager — the database — and has no authority over Kafka, a completely separate system with its own commit protocol',
+      'It does make it atomic, as long as the Kafka call happens before the method returns',
+      '@Transactional only works for read operations, not for calls that write to an external system',
+    ],
+    correct: 0,
+  },
+  {
+    question:
+      "The Transactional Outbox pattern writes an OutboxEvent row in the same transaction as the Reservation, then a separate OutboxPublisher sends it to Kafka afterward. What actually guarantees the reservation and its event stay consistent?",
+    options: [
+      'The OutboxPublisher retries fast enough that inconsistency is never observable',
+      "Postgres's normal single-transaction atomicity — the reservation row and the outbox row commit together or not at all, which is the one guarantee a database already provides",
+      'Kafka checks the database before accepting a publish',
+    ],
+    correct: 1,
+  },
 ];
 
 const QUIZ: Record<string, QuizQuestion> = {

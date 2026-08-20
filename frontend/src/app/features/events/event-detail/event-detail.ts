@@ -24,7 +24,10 @@ export class EventDetail implements OnInit {
   reserveError = signal<string | null>(null);
   confirmation = signal<ReservationResponse | null>(null);
 
-  private eventId!: string;
+  // The route param is always a string — Angular's router doesn't know or
+  // care what type an ID is, it's just a URL segment. We convert once here
+  // rather than at every call site.
+  private eventId!: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +36,7 @@ export class EventDetail implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.eventId = this.route.snapshot.paramMap.get('id')!;
+    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
     this.eventService.getById(this.eventId).subscribe({
       next: (event) => {
         this.event.set(event);

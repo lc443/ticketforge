@@ -7,7 +7,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class EventService {
     }
 
     @Cacheable(value = "events", key = "#id")
-    public Event findById(UUID id) {
+    public Event findById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
     }

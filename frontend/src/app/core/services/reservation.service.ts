@@ -8,7 +8,7 @@ import { CreateReservationRequest, ReservationResponse } from '../../shared/mode
 export class ReservationService {
   constructor(private http: HttpClient) {}
 
-  create(eventId: string, payload: CreateReservationRequest) {
+  create(eventId: number, payload: CreateReservationRequest) {
     return this.http.post<ReservationResponse>(
       `${API_BASE}/events/${eventId}/reservations`,
       payload

@@ -138,14 +138,14 @@ export class Roadmap {
         {
           num: '13',
           name: 'Idempotency',
-          note: 'Explicitly flagged as next in the Sprint 6 review',
-          status: 'next',
+          note: 'ProcessedEvent unique-constraint dedup wired into EmailWorker + AnalyticsWorker, reviewed',
+          status: 'done',
         },
         {
           num: '14',
           name: 'Transactional Outbox',
-          note: 'Save + publish are still two unguarded steps',
-          status: 'todo',
+          note: 'OutboxEvent written in the same transaction as the reservation; OutboxPublisher polls and sends, reviewed',
+          status: 'done',
         },
       ],
     },
@@ -156,7 +156,7 @@ export class Roadmap {
           num: '15',
           name: 'Docker',
           note: 'docker-compose.yml and Dockerfile.api exist; not reviewed as its own sprint',
-          status: 'partial',
+          status: 'next',
         },
         {
           num: '16',

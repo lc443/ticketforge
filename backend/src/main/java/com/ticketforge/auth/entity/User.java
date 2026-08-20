@@ -3,8 +3,6 @@ package com.ticketforge.auth.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "users")
 @Getter
@@ -15,8 +13,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String firstName;

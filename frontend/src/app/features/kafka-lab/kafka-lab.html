@@ -233,6 +233,124 @@ Kafka: reservation-created
     </div>
   </app-scenario-card>
 
+  <app-scenario-card
+    eyebrow="Live now · real bug, real fix"
+    title="Redelivery isn't the same as duplicate processing"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>At-least-once delivery means "at least," not "exactly."</h3>
+        <p>
+          A consumer rebalance, a slow <code>EmailWorker</code>, or a retry after a transient
+          failure can hand the same <code>ReservationCreatedEvent</code> to a worker more than
+          once. Nothing in Kafka — and nothing in <code>EmailWorker</code> or
+          <code>AnalyticsWorker</code> as written — stopped that from sending a second
+          confirmation email or double-counting a sale.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Claim the event before acting on it.</h3>
+        <p>
+          A new <code>processed_events</code> table with a unique constraint on
+          <code>(consumer_name, event_id)</code>. Each worker checks it first, then inserts a
+          claim row <em>before</em> running its side effect. If the insert violates the
+          constraint, the worker lost a race with itself and backs off instead of duplicating
+          the work.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why insert-first, not check-then-insert</span>
+      <ul>
+        <li>
+          <strong>Check-then-insert has a race window.</strong> Two redeliveries can both pass
+          <code>existsByConsumerNameAndEventId</code> before either has inserted — both would
+          then process the event.
+        </li>
+        <li>
+          <strong>The unique constraint is the actual guarantee.</strong> The database enforces
+          it atomically; the existence check beforehand is only a cheap fast path to skip most
+          duplicates without paying for a failed insert.
+        </li>
+        <li>
+          <strong>Retry/DLQ (Sprint 12) solves a different problem.</strong> It guarantees a
+          message isn't lost. It says nothing about a message being delivered twice — that's
+          what idempotency handles.
+        </li>
+      </ul>
+
+      <p class="scenario-note">
+        <code>ddl-auto: update</code> creates <code>processed_events</code> automatically the
+        next time the backend starts — no manual migration needed.
+      </p>
+    </div>
+  </app-scenario-card>
+
+  <app-scenario-card
+    eyebrow="Live now · real bug, real fix"
+    title="Saving and publishing aren't one operation just because they're next to each other"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>@Transactional only covers the database.</h3>
+        <p>
+          <code>ReservationService.createReservation()</code> saved the reservation, then called
+          <code>reservationProducer.publish(...)</code> straight to Kafka — inside the same
+          method, but not inside the same transaction. Postgres and Kafka are two separate
+          systems with two separate commit protocols. If the process dies between the DB commit
+          and the Kafka send, the reservation exists but no event ever goes out — no email, no
+          analytics, and nothing retries it, because nothing failed from the database's point of
+          view.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Write the event as a row, in the same transaction.</h3>
+        <p>
+          <code>ReservationService</code> now writes an <code>OutboxEvent</code> row —
+          the event, already serialized to JSON — inside the exact same
+          <code>@Transactional</code> method as the reservation. A separate
+          <code>OutboxPublisher</code>, on its own schedule, reads unpublished rows and sends
+          them to Kafka afterward.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why this is the fix, not just a workaround</span>
+      <ul>
+        <li>
+          <strong>The database is what actually guarantees atomicity here.</strong> The
+          reservation row and its outbox row commit together or not at all — that's a normal
+          single-transaction commit, nothing Kafka-specific about it.
+        </li>
+        <li>
+          <strong>Publishing becomes a separate, retryable concern.</strong> If Kafka is briefly
+          unreachable, the outbox row just sits there unpublished — the reservation itself
+          already succeeded and returned a response.
+        </li>
+        <li>
+          <strong>This leans on Sprint 13, not around it.</strong> If <code>OutboxPublisher</code>
+          crashes after Kafka acks a send but before marking the row published, the next poll
+          resends it — a duplicate delivery. That's a no-op downstream because
+          <code>EmailWorker</code>/<code>AnalyticsWorker</code> are already idempotent.
+        </li>
+      </ul>
+
+      <p class="scenario-note">
+        <code>outbox_events</code> is created automatically via <code>ddl-auto: update</code>.
+        <code>OutboxPublisher</code> needs <code>@EnableScheduling</code> on the main application
+        class to actually fire — without it, <code>@Scheduled</code> is silently ignored.
+      </p>
+    </div>
+  </app-scenario-card>
+
   <section
     class="explanation-panel"
     [class.paused]="isPaused()"
@@ -589,7 +707,7 @@ Kafka: reservation-created
               class="retry-step reveal"
               [class.active]="stage() === 'retry-2'"
               [class.complete]="hasReached('retry-3')"
-            >
+          >
               <span>Attempt 2</span>
               <strong>{{ hasReached('retry-3') ? 'Failed' : 'Processing' }}</strong>
             </div>
@@ -602,7 +720,7 @@ Kafka: reservation-created
               class="retry-step reveal"
               [class.active]="stage() === 'retry-3'"
               [class.complete]="hasReached('dlq')"
-            >
+          >
               <span>Attempt 3</span>
               <strong>{{ hasReached('dlq') ? 'Failed' : 'Processing' }}</strong>
             </div>

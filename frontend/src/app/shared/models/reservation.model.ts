@@ -7,8 +7,8 @@ export interface CreateReservationRequest {
 }
 
 export interface ReservationResponse {
-  id: string;
-  eventId: string;
+  id: number;
+  eventId: number;
   quantity: number;
   status: ReservationStatus;
   reservedAt: string;

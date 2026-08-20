@@ -1,7 +1,7 @@
 // src/app/shared/models/event.model.ts
 
 export interface Event {
-  id: string;
+  id: number;
   name: string;
   venue: string;
   eventDate: string;
