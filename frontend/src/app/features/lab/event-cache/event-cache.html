@@ -1,0 +1,55 @@
+<h1>Redis Cache Lab</h1>
+
+<div>
+  <label for="token">JWT Token</label>
+  <textarea
+    id="token"
+    [(ngModel)]="token"
+    rows="5"
+    placeholder="Paste JWT token"
+  ></textarea>
+</div>
+
+<div>
+  <label for="eventId">Event ID</label>
+  <input
+    id="eventId"
+    [(ngModel)]="eventId"
+    type="text"
+    placeholder="Event UUID"
+  />
+</div>
+
+<button
+  type="button"
+  (click)="loadEvent()"
+>
+  Load Event
+</button>
+
+<hr />
+
+<p>Request count: {{ requestCount() }}</p>
+<p>Response time: {{ responseTime() }} ms</p>
+
+@if (error()) {
+  <p>{{ error() }}</p>
+}
+
+@if (event()) {
+  <h2>Event</h2>
+
+  <p>Name: {{ event().name }}</p>
+  <p>Venue: {{ event().venue }}</p>
+  <p>Available tickets: {{ event().availableTickets }}</p>
+}
+
+<hr />
+
+<h2>Expected behavior</h2>
+
+<pre>
+Request #1 → PostgreSQL
+Request #2 → Redis
+Request #3 → Redis
+</pre>
