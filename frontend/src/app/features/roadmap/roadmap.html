@@ -1,0 +1,71 @@
+<div class="roadmap">
+  <header class="stub">
+    <div class="stub-main">
+      <div class="eyebrow">Solutions Architecture · Learning Curriculum</div>
+      <h1>TicketForge Roadmap</h1>
+      <p class="subtitle">
+        A ticketing platform built one bottleneck at a time — every technology on this list exists
+        because a real version of it, sold out and oversold, actually broke first.
+      </p>
+    </div>
+
+    <div class="perforation"></div>
+
+    <div class="stub-strip">
+      <div class="stat">
+        <div class="n">{{ doneSprints() }} / {{ totalSprints() }}</div>
+        <div class="lbl">Sprints shipped</div>
+      </div>
+      <div class="stat">
+        <div class="n">{{ levelsTouched() }} / {{ levels().length }}</div>
+        <div class="lbl">Levels touched</div>
+      </div>
+      <div class="stat">
+        <div class="n text">{{ nextSprint()?.name ?? 'None flagged' }}</div>
+        <div class="lbl">Next sprint</div>
+      </div>
+      <div class="stat">
+        <div class="n">{{ gapCount() }}</div>
+        <div class="lbl">Backfill gaps</div>
+      </div>
+    </div>
+  </header>
+
+  @for (level of levels(); track level.name) {
+    <section class="level">
+      <div class="level-head">
+        <span class="name">{{ level.name }}</span>
+        <span class="frac">{{ levelFraction(level) }}</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Sprint</th>
+              <th>Note</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sprint of level.sprints; track sprint.num) {
+              <tr>
+                <td class="sprint-num">{{ sprint.num }}</td>
+                <td class="sprint-name">{{ sprint.name }}</td>
+                <td class="sprint-note">{{ sprint.note }}</td>
+                <td class="sprint-status">
+                  <span class="pill" [class]="sprint.status">{{ statusLabel[sprint.status] }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  <footer>
+    Edit <code>features/roadmap/roadmap.ts</code> to update a sprint's status as you finish it.
+  </footer>
+</div>

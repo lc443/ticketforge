@@ -1,0 +1,58 @@
+@use '../../../shared/styles/lab-kit';
+
+:host {
+  display: block;
+}
+
+.lab-container {
+  width: min(880px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  margin-bottom: 28px;
+
+  .badge {
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  h1 {
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 4vw, 40px);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.adr-template {
+  margin: 0;
+  padding: 16px 18px;
+
+  border-radius: var(--radius-sm);
+  background: var(--stamp-soft);
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink);
+
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.quiz-card .quiz:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}

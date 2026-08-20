@@ -1,0 +1,36 @@
+<nav
+  class="lab-breadcrumb"
+  aria-label="Lab navigation"
+>
+  <div class="crumb-trail">
+    <a
+      routerLink="/labs"
+      class="crumb-root"
+    >
+      Labs
+    </a>
+    <span class="crumb-sep">/</span>
+    @if (current(); as c) {
+      <span class="crumb-current">{{ c.sprint }} · {{ c.title }}</span>
+    }
+  </div>
+
+  <div class="crumb-nav">
+    @if (prev(); as p) {
+      <a
+        class="crumb-link"
+        [routerLink]="p.path"
+      >
+        ← {{ p.sprint }}
+      </a>
+    }
+    @if (next(); as n) {
+      <a
+        class="crumb-link"
+        [routerLink]="n.path"
+      >
+        {{ n.sprint }} →
+      </a>
+    }
+  </div>
+</nav>

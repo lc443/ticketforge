@@ -1,0 +1,137 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/monolith" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 1</span>
+      <h1>Modular Monolith Lab</h1>
+      <p>Same "Reserve Ticket" flow, two ways to wire it. Watch what changes.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 1 · already built"
+    title="Why a monolith, not microservices"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Microservices from day one, for 5 users.</h3>
+        <p>
+          Every module call becomes a network call. Every network call can fail on its own,
+          independent of the others. A feature that used to be one transaction is now four
+          services that have to agree.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>One deployable, clean module boundaries.</h3>
+        <p>
+          <code>auth</code>, <code>event</code>, <code>inventory</code>, <code>reservation</code>,
+          <code>order</code> — separate packages, one JVM. Calls are method calls, not network
+          calls. Split a module out later, once it's actually earned it.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>No partial failure.</strong> One process, one transaction, one outcome.</li>
+        <li><strong>No network latency</strong> between modules that talk constantly.</li>
+        <li><strong>Simple to deploy and debug</strong> — one artifact, one log stream.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>Reserve Ticket — traced both ways</h2>
+      <p>Same 4 steps. Run it as a monolith, then as microservices.</p>
+    </div>
+
+    <div class="mode-toggle">
+      <button
+        type="button"
+        [class.active]="mode() === 'monolith'"
+        [disabled]="running()"
+        (click)="setMode('monolith')"
+      >
+        Monolith
+      </button>
+      <button
+        type="button"
+        [class.active]="mode() === 'microservices'"
+        [disabled]="running()"
+        (click)="setMode('microservices')"
+      >
+        Microservices
+      </button>
+    </div>
+
+    <button
+      class="primary-btn run-btn"
+      type="button"
+      [disabled]="running()"
+      (click)="run()"
+    >
+      {{ running() ? 'Running...' : 'Send Reserve Ticket Request' }}
+    </button>
+
+    @if (results()) {
+      <div class="trace">
+        @for (step of results(); track step.label) {
+          <div
+            class="trace-row"
+            [class.fail]="!step.ok"
+          >
+            <span class="trace-label">{{ step.label }}</span>
+            <span class="trace-ms">{{ step.ms }}ms</span>
+            <span class="trace-status">{{ step.ok ? 'OK' : 'FAILED' }}</span>
+          </div>
+        }
+      </div>
+
+      <div
+        class="trace-total"
+        [class.fail]="failed()"
+      >
+        @if (failed()) {
+          Request failed partway — {{ totalLatency() }}ms wasted, and now something needs to be
+          rolled back across services that don't share a transaction.
+        } @else {
+          Total: {{ totalLatency() }}ms
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

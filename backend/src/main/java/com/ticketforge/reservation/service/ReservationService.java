@@ -6,6 +6,8 @@ import com.ticketforge.reservation.dto.CreateReservationRequest;
 import com.ticketforge.reservation.dto.ReservationResponse;
 import com.ticketforge.reservation.entity.Reservation;
 import com.ticketforge.reservation.entity.ReservationStatus;
+import com.ticketforge.reservation.event.ReservationCreatedEvent;
+import com.ticketforge.reservation.kafka.ReservationProducer;
 import com.ticketforge.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final EventRepository eventRepository;
+    private final ReservationProducer reservationProducer;
 
     @Transactional
     public ReservationResponse createReservation(
@@ -45,6 +48,12 @@ public class ReservationService {
                 .build();
 
         Reservation savedReservation = reservationRepository.save(reservation);
+        reservationProducer.publish(
+                new ReservationCreatedEvent(
+                        savedReservation.getId(), event.getId(),
+                        savedReservation.getQuantity(), LocalDateTime.now()
+        )
+);
 
         return new ReservationResponse(
                 savedReservation.getId(),

@@ -195,6 +195,8 @@ You propose something. It gets challenged. Only then do you build it — and by 
 
 ## Progress Tracker
 
+> **Live status:** [TicketForge Roadmap](https://claude.ai/code/artifact/e9ff4b8c-ad8b-4d66-b0af-d075df780e6b) — reconciled against the actual repo, with recommended next sprints and documentation debt.
+
 - [ ] **Sprint 0** — Requirements & Initial Architecture *(up next)*
 - [ ] **Sprint 1** — Modular Monolith
 - [ ] **Sprint 2** — Authentication & Security

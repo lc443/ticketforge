@@ -1,0 +1,160 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/distributed-lock" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 8</span>
+      <span class="badge bad">Gap — not built yet</span>
+      <h1>Distributed Locking Lab</h1>
+      <p>Two API instances. Each one thinks it's the only one holding the lock.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 8 · still a gap"
+    title="A lock that only works on one machine"
+  >
+    <div class="scenario-recap">
+      <p>
+        TicketForge still runs Sprint 7's pessimistic lock straight against PostgreSQL — that
+        part is safe regardless of how many API instances call it, because the lock lives in the
+        database, not in any one JVM. This lab is about the case that <em>isn't</em> covered: a
+        critical section that <strong>isn't</strong> a single database transaction.
+      </p>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>A local lock only knows about its own process.</h3>
+        <pre class="scenario-chain">
+API #1                     API #2
+   │                          │
+synchronized(ticket)   synchronized(ticket)
+   │                          │
+   └─────────────┬────────────┘
+                 ▼
+            PostgreSQL
+
+Each JVM has its own lock — a local `synchronized`
+block only coordinates threads inside ONE process.</pre>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>A lock every instance actually shares.</h3>
+        <p>
+          A distributed lock (Redis <code>SET NX</code> + TTL, or similar) lives outside any
+          single JVM. Every instance checks the same lock before entering the critical section —
+          not just the threads inside its own process.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Open question — README leaves this to you</span>
+      <p class="scenario-pattern-name">
+        <strong>When should you NOT use a distributed lock?</strong> In Feb 2016, Martin Kleppmann
+        publicly argued Redis's own Redlock algorithm is unsafe under clock drift and process
+        pauses, lacking fencing tokens. Redis's creator, antirez, wrote a public rebuttal
+        defending it. Two serious engineers, same algorithm, different conclusions — read both
+        before deciding.
+      </p>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>1 ticket. 2 instances. Same instant.</h2>
+    </div>
+
+    <div class="lock-toggle">
+      <button
+        type="button"
+        [class.active]="lockType() === 'jvm'"
+        [disabled]="running()"
+        (click)="setLockType('jvm')"
+      >
+        Local synchronized
+      </button>
+      <button
+        type="button"
+        [class.active]="lockType() === 'distributed'"
+        [disabled]="running()"
+        (click)="setLockType('distributed')"
+      >
+        Distributed lock
+      </button>
+    </div>
+
+    <button
+      class="primary-btn"
+      type="button"
+      [disabled]="running()"
+      (click)="simulate()"
+    >
+      {{ running() ? 'Simulating...' : 'Both instances handle a reserve request' }}
+    </button>
+
+    @if (outcome(); as o) {
+      <div class="outcome reveal">
+        <div class="instances-row">
+          <div
+            class="instance-outcome"
+            [class.won]="o.a === 'won'"
+            [class.lost]="o.a === 'lost'"
+          >
+            <strong>API #1</strong>
+            <span>{{ o.a === 'won' ? 'Reserved ✓' : 'Rejected' }}</span>
+          </div>
+          <div
+            class="instance-outcome"
+            [class.won]="o.b === 'won'"
+            [class.lost]="o.b === 'lost'"
+          >
+            <strong>API #2</strong>
+            <span>{{ o.b === 'won' ? 'Reserved ✓' : 'Sold out' }}</span>
+          </div>
+        </div>
+
+        <div
+          class="tally"
+          [class.bad]="o.oversold"
+        >
+          Tickets sold: {{ o.sold }} / 1 available
+          @if (o.oversold) {
+            — oversold, across two different processes
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

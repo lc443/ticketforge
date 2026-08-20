@@ -1,0 +1,157 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/auth" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 2</span>
+      <h1>Authentication & Authorization Lab</h1>
+      <p>Log in, inspect the token, then try to break it.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 2 · already built"
+    title="Why JWT instead of server sessions"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Sessions don't scale horizontally for free.</h3>
+        <p>
+          A server-side session lives in one instance's memory. Sprint 4 puts N API instances
+          behind a load balancer — the instance that handles request #2 might not be the one that
+          handled the login.
+        </p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>A signed token the client carries.</h3>
+        <p>
+          Login returns a JWT. Every later request sends it in the <code>Authorization</code>
+          header. Any instance can verify the signature and read the role — no shared session
+          store required.
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>Stateless.</strong> No server-side session to keep in sync across instances.</li>
+        <li><strong>Self-contained.</strong> Role and identity travel with the token.</li>
+        <li><strong>Signature-verified.</strong> The client can read a token but can't forge one.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>Login and inspect the token</h2>
+    </div>
+
+    @if (!loggedIn()) {
+      <div class="login-buttons">
+        <button
+          class="primary-btn"
+          type="button"
+          (click)="login('CUSTOMER')"
+        >
+          Log in as CUSTOMER
+        </button>
+        <button
+          class="primary-btn admin"
+          type="button"
+          (click)="login('ADMIN')"
+        >
+          Log in as ADMIN
+        </button>
+      </div>
+    } @else {
+      <div class="token-view">
+        <div class="token-part header">
+          <span class="token-label">Header</span>
+          <pre>{{ header | json }}</pre>
+        </div>
+        <div
+          class="token-part payload"
+          [class.tampered]="tampered()"
+        >
+          <span class="token-label">Payload</span>
+          <pre>{{ payload() | json }}</pre>
+        </div>
+        <div
+          class="token-part signature"
+          [class.invalid]="!signatureValid()"
+        >
+          <span class="token-label">Signature</span>
+          <pre>{{ signatureValid() ? 'VALID — matches header + payload' : 'INVALID — payload was edited after signing' }}</pre>
+        </div>
+      </div>
+
+      <div class="lab-actions">
+        <button
+          class="secondary-btn"
+          type="button"
+          [disabled]="role() === 'ADMIN' || tampered()"
+          (click)="tamperToken()"
+        >
+          Tamper token (set role → ADMIN by hand)
+        </button>
+
+        <button
+          class="primary-btn"
+          type="button"
+          (click)="tryAdminAction()"
+        >
+          Try: Create Event (admin-only)
+        </button>
+
+        <button
+          class="secondary-btn"
+          type="button"
+          (click)="logout()"
+        >
+          Log out
+        </button>
+      </div>
+
+      @if (actionResult()) {
+        <div
+          class="result"
+          [class.ok]="actionResult()!.ok"
+        >
+          {{ actionResult()!.message }}
+        </div>
+      }
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

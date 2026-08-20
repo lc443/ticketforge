@@ -1,0 +1,116 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/scaling" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 4</span>
+      <h1>Horizontal Scaling Lab</h1>
+      <p>Kill an instance mid-traffic. Watch the load balancer route around it.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 4 · already built"
+    title="Why stateless instances behind a load balancer"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>One API instance is a single point of failure.</h3>
+        <p>It also caps throughput at whatever that one box can handle.</p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>N identical, disposable instances behind NGINX.</h3>
+        <p>Round-robin traffic across them. Health checks pull dead ones out of rotation.</p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>No single point of failure.</strong> One instance dying doesn't take the app down.</li>
+        <li><strong>Elastic capacity.</strong> Add instances under load, remove them when it's quiet.</li>
+        <li><strong>Requires statelessness</strong> — any instance must be able to handle any request.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>NGINX round-robin</h2>
+    </div>
+
+    <div class="instances">
+      @for (inst of instances(); track inst.id) {
+        <div
+          class="instance"
+          [class.dead]="!inst.alive"
+          [class.active]="activeInstance() === inst.id && inst.alive"
+        >
+          <div class="instance-head">
+            <strong>API #{{ inst.id }}</strong>
+            <span class="status-dot"></span>
+          </div>
+          <span class="instance-count">{{ inst.requests }} requests</span>
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="toggle(inst.id)"
+          >
+            {{ inst.alive ? 'Kill' : 'Revive' }}
+          </button>
+        </div>
+      }
+    </div>
+
+    <button
+      class="primary-btn send-btn"
+      type="button"
+      (click)="sendRequest()"
+    >
+      Send Request
+    </button>
+
+    @if (aliveCount() === 0) {
+      <div class="all-down">All instances down — total outage.</div>
+    }
+
+    @if (log().length) {
+      <div class="request-log">
+        @for (line of log(); track $index) {
+          <div class="log-line">{{ line }}</div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

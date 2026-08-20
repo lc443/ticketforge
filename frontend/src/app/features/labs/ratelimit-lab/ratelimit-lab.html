@@ -1,0 +1,113 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/ratelimit" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 6</span>
+      <h1>Rate Limiting Lab</h1>
+      <p>A 5-token bucket, refilling 1 token every 1.5s. Try to drain it.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 6 · already built"
+    title="Why rate limit at all"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>A burst — bot or bug — can hammer one endpoint.</h3>
+        <p>Without a limit, one client can starve every other client of capacity.</p>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>A token bucket in Redis, shared across instances.</h3>
+        <p>Each request costs a token. Tokens refill on a schedule. Empty bucket → 429.</p>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>Bursts allowed, sustained abuse blocked</strong> — unlike a hard per-second cap.</li>
+        <li><strong>Shared in Redis</strong> — the limit holds even across N load-balanced instances.</li>
+        <li><strong>Atomic increments</strong> prevent two simultaneous requests from both slipping through.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>Drain the bucket</h2>
+    </div>
+
+    <div class="bucket">
+      @for (i of [0, 1, 2, 3, 4]; track i) {
+        <span
+          class="token"
+          [class.filled]="i < tokens()"
+        ></span>
+      }
+    </div>
+    <p class="bucket-readout">{{ tokens() }} / {{ capacity }} tokens</p>
+
+    <div class="lab-actions">
+      <button
+        class="primary-btn"
+        type="button"
+        (click)="sendRequest()"
+      >
+        Send Request
+      </button>
+      <button
+        class="secondary-btn"
+        type="button"
+        (click)="burst()"
+      >
+        Burst 10 Requests
+      </button>
+    </div>
+
+    @if (log().length) {
+      <div class="request-log">
+        @for (entry of log(); track $index) {
+          <div
+            class="log-line"
+            [class.bad]="entry.status === 429"
+          >
+            {{ entry.label }}
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

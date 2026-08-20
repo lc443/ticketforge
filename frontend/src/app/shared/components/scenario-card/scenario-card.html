@@ -1,0 +1,30 @@
+<section class="scenario">
+  <button
+    type="button"
+    class="scenario-toggle"
+    [attr.aria-expanded]="expanded()"
+    (click)="toggle()"
+  >
+    <div class="scenario-heading">
+      <span class="eyebrow">{{ eyebrow() }}</span>
+      <h2>{{ title() }}</h2>
+    </div>
+
+    <span
+      class="chevron"
+      [class.open]="expanded()"
+      aria-hidden="true"
+    >
+      ⌄
+    </span>
+  </button>
+
+  <div
+    class="scenario-body"
+    [class.collapsed]="!expanded()"
+  >
+    <div class="scenario-body-inner">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</section>

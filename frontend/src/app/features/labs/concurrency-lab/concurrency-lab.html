@@ -1,0 +1,140 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/concurrency" />
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Sprint 7</span>
+      <h1>Concurrency & Overselling Lab</h1>
+      <p>One ticket left. Two buyers click at the same instant. Toggle the lock and see.</p>
+    </div>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Sprint 7 · already built · the core problem"
+    title="Who gets the last ticket"
+  >
+    <div class="scenario-grid">
+      <div class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Read, then write — with a gap in between.</h3>
+        <pre class="scenario-chain">
+Customer A: read tickets = 1
+Customer B: read tickets = 1
+Customer A: write tickets = 0   ✓ sold
+Customer B: write tickets = 0   ✓ sold
+
+Tickets sold: 2      ← oversold</pre>
+      </div>
+
+      <div class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Pessimistic locking — SELECT ... FOR UPDATE.</h3>
+        <pre class="scenario-chain">
+Customer A: locks the row, reads 1, writes 0, commits
+Customer B: blocked until A commits
+Customer B: reads 0   ← sold out, rejected
+
+Tickets sold: 1</pre>
+      </div>
+    </div>
+
+    <div class="scenario-why">
+      <span class="scenario-label">Why it works</span>
+      <ul>
+        <li><strong>Atomicity.</strong> The read and the write happen as one uninterruptible unit.</li>
+        <li><strong>Serialized access.</strong> The second transaction can't act on stale data.</li>
+        <li><strong>Tradeoff.</strong> Contention forces waiting — fine for one row, not free at scale.</li>
+      </ul>
+    </div>
+  </app-scenario-card>
+
+  <div class="card">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>1 ticket. 2 buyers. Same instant.</h2>
+    </div>
+
+    <div class="lock-toggle">
+      <span>Locking</span>
+      <button
+        type="button"
+        class="switch"
+        [class.on]="locking()"
+        [disabled]="running()"
+        (click)="toggleLocking()"
+      >
+        <span class="knob"></span>
+      </button>
+      <span class="lock-state">{{ locking() ? 'ON — pessimistic lock' : 'OFF — plain read/write' }}</span>
+    </div>
+
+    <button
+      class="primary-btn"
+      type="button"
+      [disabled]="running()"
+      (click)="simulate()"
+    >
+      {{ running() ? 'Simulating...' : 'Both buyers click Reserve at once' }}
+    </button>
+
+    @if (outcome(); as o) {
+      <div class="outcome reveal">
+        <div class="buyers">
+          <div
+            class="buyer"
+            [class.won]="o.a === 'won'"
+            [class.lost]="o.a === 'lost'"
+          >
+            <strong>Customer A</strong>
+            <span>{{ o.a === 'won' ? 'Reserved ✓' : 'Rejected' }}</span>
+          </div>
+          <div
+            class="buyer"
+            [class.won]="o.b === 'won'"
+            [class.lost]="o.b === 'lost'"
+          >
+            <strong>Customer B</strong>
+            <span>{{ o.b === 'won' ? 'Reserved ✓' : 'Sold out' }}</span>
+          </div>
+        </div>
+
+        <div
+          class="tally"
+          [class.bad]="o.oversold"
+        >
+          Tickets sold: {{ o.sold }} / 1 available
+          @if (o.oversold) {
+            — oversold
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card quiz-card">
+    <div class="section-title">
+      <span class="eyebrow">Check yourself</span>
+      <h2>Quick check</h2>
+    </div>
+
+    @for (q of quiz; track q.question; let qi = $index) {
+      <div class="quiz">
+        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+        <div class="quiz-options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              type="button"
+              class="quiz-option"
+              [class.correct]="wasAnswered(qi) && i === q.correct"
+              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
+              [disabled]="wasAnswered(qi)"
+              (click)="answerQuiz(qi, i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

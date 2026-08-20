@@ -1,0 +1,91 @@
+@use '../../styles/lab-kit';
+
+:host {
+  display: block;
+  margin-bottom: 32px;
+}
+
+.scenario {
+  padding: 24px 30px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  background: var(--paper-raised);
+  box-shadow: var(--shadow);
+}
+
+.scenario-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.scenario-heading {
+  h2 {
+    margin: 6px 0 0;
+    font-size: 24px;
+    color: var(--ink);
+  }
+}
+
+.chevron {
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  width: 30px;
+  height: 30px;
+
+  border: 1px solid var(--line);
+  border-radius: 50%;
+
+  color: var(--ink-soft);
+  font-size: 16px;
+
+  transition: transform 0.2s ease;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.scenario-body {
+  display: grid;
+  grid-template-rows: 1fr;
+
+  transition:
+    grid-template-rows 0.3s ease,
+    opacity 0.25s ease,
+    margin-top 0.3s ease;
+
+  margin-top: 20px;
+  opacity: 1;
+
+  &.collapsed {
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    opacity: 0;
+  }
+}
+
+.scenario-body-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (max-width: 700px) {
+  .scenario {
+    padding: 20px 18px;
+  }
+}

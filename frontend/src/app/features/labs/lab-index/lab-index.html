@@ -1,0 +1,31 @@
+<div class="index-container">
+  <header class="hero">
+    <span class="eyebrow">TicketForge Learning Lab</span>
+    <h1>All labs</h1>
+    <p>Sprint 0 through Kafka. Each one poses the real problem, then lets you break it.</p>
+  </header>
+
+  <div class="lab-grid">
+    @for (lab of labs; track lab.path) {
+      <a
+        class="lab-card"
+        [routerLink]="lab.path"
+      >
+        <div class="lab-card-head">
+          <span class="lab-sprint">{{ lab.sprint }}</span>
+          <span
+            class="badge"
+            [class.ok]="lab.status === 'done'"
+            [class.warn]="lab.status === 'partial'"
+            [class.bad]="lab.status === 'gap'"
+          >
+            {{ statusLabel[lab.status] }}
+          </span>
+        </div>
+        <h2>{{ lab.title }}</h2>
+        <p>{{ lab.blurb }}</p>
+        <span class="lab-open">Open lab →</span>
+      </a>
+    }
+  </div>
+</div>
