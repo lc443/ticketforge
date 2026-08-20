@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/events")
@@ -22,5 +23,10 @@ public class EventController {
     @GetMapping
     public List<Event> findAll() {
         return eventService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Event findById(@PathVariable UUID id) {
+        return eventService.findById(id);
     }
 }

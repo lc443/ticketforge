@@ -8,6 +8,14 @@ spring:
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
+  cache:
+    type: redis
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -38,7 +46,7 @@ management:
       show-details: always
 
 server:
-  port: 8080
+  port: 8085
 
 logging:
   level:

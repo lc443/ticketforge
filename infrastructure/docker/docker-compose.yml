@@ -10,6 +10,7 @@ services:
     ports:
       - "5432:5432"
 
+
   api1:
     build:
       context: ../..
@@ -20,8 +21,13 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/ticketforge
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8081:8080"
+    depends_on:
+      - postgres
+      - redis
 
   api2:
     build:
@@ -33,8 +39,13 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/ticketforge
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8082:8080"
+    depends_on:
+      - postgres
+      - redis
 
   api3:
     build:
@@ -46,8 +57,13 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/ticketforge
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8083:8080"
+    depends_on:
+      - postgres
+      - redis
 
   nginx:
     image: nginx:latest
@@ -60,3 +76,10 @@ services:
       - api1
       - api2
       - api3
+
+
+  redis:
+    image: redis:7
+    container_name: ticketforge-redis
+    ports:
+      - "6379:6379"
