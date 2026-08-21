@@ -150,7 +150,7 @@ export class Roadmap {
       ],
     },
     {
-      name: 'Level 4 · Containers & CI/CD',
+      name: 'Level 4 · Product Lifecycle, Containers & Delivery',
       sprints: [
         {
           num: '15',
@@ -160,6 +160,12 @@ export class Roadmap {
         },
         {
           num: '16',
+          name: 'Event Lifecycle & API Evolution',
+          note: 'Edit/delete implementation in progress; define cancellation vs hard delete, organizer ownership, audit history, referential integrity, and API semantics',
+          status: 'next',
+        },
+        {
+          num: '17',
           name: 'CI/CD',
           note: '.github/workflows/ is empty',
           status: 'todo',
@@ -170,31 +176,31 @@ export class Roadmap {
       name: 'Level 5 · Kubernetes',
       sprints: [
         {
-          num: '17',
+          num: '18',
           name: 'Kubernetes Fundamentals',
           note: 'infrastructure/kubernetes/ has no manifests yet',
           status: 'todo',
         },
         {
-          num: '18',
+          num: '19',
           name: 'Production Kubernetes',
           note: 'Probes, ConfigMap, Secret, rollout/rollback',
           status: 'todo',
         },
         {
-          num: '19',
+          num: '20',
           name: 'Kubernetes Networking',
           note: 'ClusterIP, DNS, Ingress',
           status: 'todo',
         },
         {
-          num: '20',
+          num: '21',
           name: 'Autoscaling',
           note: 'HPA, metrics server',
           status: 'todo',
         },
         {
-          num: '21',
+          num: '22',
           name: 'Helm',
           note: 'infrastructure/helm/ is empty',
           status: 'todo',
@@ -205,19 +211,19 @@ export class Roadmap {
       name: 'Level 6 · Infrastructure as Code',
       sprints: [
         {
-          num: '22',
+          num: '23',
           name: 'Terraform Fundamentals',
           note: 'infrastructure/terraform/ is empty',
           status: 'todo',
         },
         {
-          num: '23',
+          num: '24',
           name: 'Terraform State',
           note: 'Remote state, locking, drift',
           status: 'todo',
         },
         {
-          num: '24',
+          num: '25',
           name: 'Terraform Modules',
           note: 'network, eks, database, redis, monitoring',
           status: 'todo',
@@ -228,25 +234,25 @@ export class Roadmap {
       name: 'Level 7 · AWS Solutions Architecture',
       sprints: [
         {
-          num: '25',
+          num: '26',
           name: 'AWS Networking',
           note: 'VPC, subnets, NAT, security groups',
           status: 'todo',
         },
         {
-          num: '26',
+          num: '27',
           name: 'AWS Compute',
           note: 'EC2 / ECS / Fargate / EKS / Lambda — open question on EKS still unanswered',
           status: 'todo',
         },
         {
-          num: '27',
+          num: '28',
           name: 'Managed Data',
           note: 'RDS, ElastiCache, MSK',
           status: 'todo',
         },
         {
-          num: '28',
+          num: '29',
           name: 'AWS Security',
           note: 'IAM, KMS, Secrets Manager, WAF',
           status: 'todo',
@@ -257,19 +263,19 @@ export class Roadmap {
       name: 'Level 8 · Reliability',
       sprints: [
         {
-          num: '29',
+          num: '30',
           name: 'Observability',
           note: 'platform/prometheus, grafana, otel dirs are all empty',
           status: 'todo',
         },
         {
-          num: '30',
+          num: '31',
           name: 'Reliability Engineering',
           note: 'SLI/SLO/SLA, error budgets',
           status: 'todo',
         },
         {
-          num: '31',
+          num: '32',
           name: 'Disaster Recovery',
           note: 'disaster-recovery-plan.md exists but is empty',
           status: 'todo',
@@ -277,12 +283,59 @@ export class Roadmap {
       ],
     },
     {
-      name: 'Level 9 · Solutions Architect Mode',
+      name: 'Level 9 · Architecture Leadership',
       sprints: [
         {
-          num: '32+',
+          num: '33',
+          name: 'AWS Well-Architected Review',
+          note: 'Assess operational excellence, security, reliability, performance, cost, and sustainability; produce risks and remediation priorities',
+          status: 'todo',
+        },
+        {
+          num: '34',
+          name: 'Threat Modeling & Compliance',
+          note: 'Trust boundaries, STRIDE, data classification, OWASP, PCI concepts, evidence, and compensating controls',
+          status: 'todo',
+        },
+        {
+          num: '35',
+          name: 'Cost Architecture & FinOps',
+          note: 'Cost model, unit economics, tagging, budgets, right-sizing, commitments, and cost/performance tradeoffs',
+          status: 'todo',
+        },
+        {
+          num: '36',
+          name: 'Data & Integration Architecture',
+          note: 'System of record, API contracts/versioning, schema evolution, CDC, retention, governance, and build-vs-buy decisions',
+          status: 'todo',
+        },
+        {
+          num: '37',
+          name: 'Multi-Region & Global Architecture',
+          note: 'Latency, DNS routing, active-active vs active-passive, data consistency, failover, and blast-radius containment',
+          status: 'todo',
+        },
+        {
+          num: '38',
+          name: 'Migration & Modernization Strategy',
+          note: 'Current-state assessment, 7 Rs, strangler pattern, dependency waves, cutover, rollback, and organizational risk',
+          status: 'todo',
+        },
+        {
+          num: '39',
+          name: 'Architecture Governance & Communication',
+          note: 'C4 views, ADR portfolio, standards, exception process, architecture review board, executive narrative, and delivery roadmap',
+          status: 'todo',
+        },
+      ],
+    },
+    {
+      name: 'Level 10 · Solutions Architect Mode',
+      sprints: [
+        {
+          num: '40+',
           name: 'Architecture Reviews & Design Exercises',
-          note: 'The 2M-customer / $15k-budget brief from the README, and further ones like it',
+          note: 'Customer discovery, constraints, proposals, tradeoff defense, implementation roadmaps, and review-board challenges',
           status: 'todo',
         },
       ],

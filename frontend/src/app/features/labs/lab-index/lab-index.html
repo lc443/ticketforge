@@ -1,12 +1,19 @@
 <div class="index-container">
   <header class="hero">
     <span class="eyebrow">TicketForge Learning Lab</span>
-    <h1>All labs</h1>
-    <p>Sprint 0 through Kafka. Each one poses the real problem, then lets you break it.</p>
+    <h1>Learn the decisions behind the system</h1>
+    <p>Past labs preserve evidence. Future labs define the decisions and tradeoffs you will learn to defend.</p>
   </header>
 
-  <div class="lab-grid">
-    @for (lab of labs; track lab.path) {
+  <section class="lab-section" aria-labelledby="built-labs-title">
+    <div class="section-heading">
+      <span class="eyebrow">Past sprints</span>
+      <h2 id="built-labs-title">Built and measured</h2>
+      <p>Open these labs to reproduce the commands, evidence, and architecture lessons.</p>
+    </div>
+
+    <div class="lab-grid">
+    @for (lab of builtLabs; track lab.path) {
       <a
         class="lab-card"
         [routerLink]="lab.path"
@@ -27,5 +34,30 @@
         <span class="lab-open">Open lab →</span>
       </a>
     }
-  </div>
+    </div>
+  </section>
+
+  <section class="lab-section" aria-labelledby="future-labs-title">
+    <div class="section-heading">
+      <span class="eyebrow">Current and future sprints</span>
+      <h2 id="future-labs-title">Decisions you will learn to own</h2>
+      <p>These become runnable labs after their sprint is implemented and verified.</p>
+    </div>
+
+    <div class="lab-grid">
+      @for (lab of futureLabs; track lab.sprint) {
+        <article class="lab-card planned-card">
+          <div class="lab-card-head">
+            <span class="lab-sprint">{{ lab.sprint }}</span>
+            <span class="badge" [class.warn]="lab.status === 'next'">
+              {{ statusLabel[lab.status] }}
+            </span>
+          </div>
+          <h2>{{ lab.title }}</h2>
+          <p>{{ lab.blurb }}</p>
+          <span class="lab-plan">Architecture outcome</span>
+        </article>
+      }
+    </div>
+  </section>
 </div>

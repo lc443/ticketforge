@@ -1,7 +1,7 @@
 # TicketForge
 ### A Hands-On Solutions Architecture Curriculum
 
-> **How this document works:** You gave me two drafts of this — a narrative pitch and a formal README — covering the same project with two slightly different level numberings. This merges them into one document, using the README's more granular 9-level structure (it splits "Containers/CI-CD" from "Kubernetes," and merges the old Level 3/4 into one "Distributed Systems" level). Every sprint keeps its original topic list, then adds two things: a short **Why it matters**, and a **Real-world example** — a verified, real incident or practice that shows the concept isn't academic. Neither section answers the open questions the roadmap poses on purpose (Sprint 1's monolith question, Sprint 8's locking question, Sprint 26's EKS question). Those are still yours to work through when you get there.
+> **How this document works:** This is a 10-level curriculum that grows from application fundamentals into delivery, cloud infrastructure, reliability, architecture leadership, and customer-facing design reviews. Every sprint connects implementation to requirements, tradeoffs, evidence, and architecture artifacts. Open questions remain yours to defend rather than being answered for you in advance.
 
 ---
 
@@ -18,12 +18,13 @@
 - [Level 1: Build a Real Application](#level-1-build-a-real-application)
 - [Level 2: Performance & Scaling](#level-2-performance--scaling)
 - [Level 3: Distributed Systems](#level-3-distributed-systems)
-- [Level 4: Containers & CI/CD](#level-4-containers--cicd)
+- [Level 4: Product Lifecycle, Containers & Delivery](#level-4-product-lifecycle-containers--delivery)
 - [Level 5: Kubernetes](#level-5-kubernetes)
 - [Level 6: Infrastructure as Code](#level-6-infrastructure-as-code)
 - [Level 7: AWS Solutions Architecture](#level-7-aws-solutions-architecture)
 - [Level 8: Reliability](#level-8-reliability)
-- [Level 9: Solutions Architect Mode](#level-9-solutions-architect-mode)
+- [Level 9: Architecture Leadership](#level-9-architecture-leadership)
+- [Level 10: Solutions Architect Mode](#level-10-solutions-architect-mode)
 - [Architecture Documentation Practice](#architecture-documentation-practice)
 - [Success Criteria](#success-criteria)
 
@@ -189,7 +190,7 @@ Instead, you'll get something like:
 
 > *Ticket purchases take six seconds because email, ticket generation, analytics, and notifications all happen inside the HTTP request. How would you improve this architecture?*
 
-You propose something. It gets challenged. Only then do you build it — and by Level 9, the roles flip: TicketForge presents requirements like a customer or an architecture review board, and you design, defend, and get challenged on the whole system. That's deliberate. It's the difference between knowing a technology exists and being able to justify choosing it in front of people who disagree with you.
+You propose something. It gets challenged. Only then do you build it — and by Level 10, the roles flip: TicketForge presents requirements like a customer or an architecture review board, and you design, defend, and get challenged on the whole system. That's deliberate. It's the difference between knowing a technology exists and being able to justify choosing it in front of people who disagree with you.
 
 ---
 
@@ -197,7 +198,7 @@ You propose something. It gets challenged. Only then do you build it — and by 
 
 > **Live status:** [TicketForge Roadmap](https://claude.ai/code/artifact/e9ff4b8c-ad8b-4d66-b0af-d075df780e6b) — reconciled against the actual repo, with recommended next sprints and documentation debt.
 
-- [ ] **Sprint 0** — Requirements & Initial Architecture *(up next)*
+- [ ] **Sprint 0** — Requirements & Initial Architecture
 - [ ] **Sprint 1** — Modular Monolith
 - [ ] **Sprint 2** — Authentication & Security
 - [ ] **Sprint 3** — Load Testing
@@ -207,12 +208,15 @@ You propose something. It gets challenged. Only then do you build it — and by 
 - [ ] **Sprint 7** — Concurrency & Overselling
 - [ ] **Sprint 8** — Distributed Locking
 - [ ] **Sprints 9–14** — Kafka & Event-Driven Architecture
-- [ ] **Sprints 15–16** — Docker & CI/CD
-- [ ] **Sprints 17–21** — Kubernetes & Helm
-- [ ] **Sprints 22–24** — Terraform
-- [ ] **Sprints 25–28** — AWS Architecture
-- [ ] **Sprints 29–31** — Observability & Reliability
-- [ ] **Sprint 32+** — Solutions Architect Challenges
+- [ ] **Sprint 15** — Docker
+- [ ] **Sprint 16** — Event Lifecycle & API Evolution *(current)*
+- [ ] **Sprint 17** — CI/CD & GHCR
+- [ ] **Sprints 18–22** — Kubernetes & Helm
+- [ ] **Sprints 23–25** — Terraform
+- [ ] **Sprints 26–29** — AWS Architecture
+- [ ] **Sprints 30–32** — Observability & Reliability
+- [ ] **Sprints 33–39** — Architecture Leadership
+- [ ] **Sprint 40+** — Solutions Architect Challenges
 
 This restarts tracking from zero — it doesn't inherit ScaleLab's completion status.
 
@@ -472,7 +476,7 @@ Worker:  outbox table  →  Kafka
 
 ---
 
-## Level 4: Containers & CI/CD
+## Level 4: Product Lifecycle, Containers & Delivery
 
 ### Sprint 15: Docker
 
@@ -480,7 +484,26 @@ Worker:  outbox table  →  Kafka
 
 **Why it matters:** containers are the deployment unit for everything else in this roadmap from here on — Kubernetes, CI/CD, and every cloud service downstream all assume the app already ships as a container.
 
-### Sprint 16: CI/CD
+### Sprint 16: Event Lifecycle & API Evolution
+
+**Problem:** Create/read is not a complete domain lifecycle. Editing inventory can corrupt sold-ticket accounting, deletion can violate reservation history, and “any authenticated user can manage every event” is not a defensible production authorization model.
+
+**Topics:** PUT vs PATCH, idempotency, validation, referential integrity, hard delete vs soft delete vs cancellation, organizer ownership, RBAC/ABAC, audit history, cache invalidation, optimistic/pessimistic concurrency, API compatibility, and domain invariants
+
+**Deliverables:**
+
+- Update events without changing tickets already sold
+- Reject capacity below committed inventory
+- Define and implement the lifecycle policy for events with reservations
+- Decide who owns an event and who may modify it
+- Record management actions for audit and support
+- Document the API contract and architecture decision
+
+**Architecture question:** Should an event with reservations ever be deleted, or should it transition to `CANCELLED` and preserve customer, financial, and audit history?
+
+**Why it matters:** Solutions Architects must translate a simple product request—“add edit and delete”—into lifecycle, security, data-retention, integration, and operational decisions. The button is the smallest part of the problem.
+
+### Sprint 17: CI/CD
 
 ```
 git push
@@ -506,13 +529,13 @@ GHCR
 
 ## Level 5: Kubernetes
 
-### Sprint 17: Kubernetes Fundamentals
+### Sprint 18: Kubernetes Fundamentals
 
 **Topics:** Pod, Deployment, ReplicaSet, Service, Namespace
 
 **Real-world example:** Kubernetes is Google's public rewrite of Borg, the internal system they'd used for over a decade to schedule containers across their own datacenters. It was open-sourced in 2014 and is now close to the default answer, industry-wide, to "how do you run containers in production."
 
-### Sprint 18: Kubernetes Production Concepts
+### Sprint 19: Kubernetes Production Concepts
 
 **Topics:** liveness probe, readiness probe, ConfigMap, Secret, CPU/memory requests, CPU/memory limits, rolling update, rollback
 
@@ -522,13 +545,13 @@ Kill pods. Exhaust memory. Deploy a broken release. Recover.
 
 **Real-world example:** The 2012 Knight Capital incident is the extreme version of the bug this sprint teaches you to prevent. During a deployment, one of eight production servers didn't receive the new code, leaving dormant trading logic from 2003 active on just that one machine. The mismatched deployment went live, the dormant code started firing on real orders, and it cost the firm roughly $440 million in about 45 minutes before anyone could shut it down. A deployment mechanism that guarantees every replica ends up in the same state — exactly what Kubernetes rolling updates are for — is precisely the guardrail that incident was missing.
 
-### Sprint 19: Kubernetes Networking
+### Sprint 20: Kubernetes Networking
 
 **Topics:** ClusterIP, service discovery, DNS, Gateway API, Ingress concepts, TLS
 
 **Why it matters:** pod IPs change constantly as things get rescheduled; DNS-based service discovery is the only reason anything can reliably find anything else inside the cluster.
 
-### Sprint 20: Kubernetes Autoscaling
+### Sprint 21: Kubernetes Autoscaling
 
 ```
 Traffic ↑             Traffic ↓
@@ -539,7 +562,7 @@ Traffic ↑             Traffic ↓
 
 **Why it matters:** this is the exact mechanism large retailers lean on to absorb Black-Friday-scale traffic spikes without paying for that peak capacity 365 days a year. You're about to watch the same curve happen to your own pods.
 
-### Sprint 21: Helm
+### Sprint 22: Helm
 
 **Topics:** templates, values files, environment configuration
 
@@ -549,13 +572,13 @@ Traffic ↑             Traffic ↓
 
 ## Level 6: Infrastructure as Code
 
-### Sprint 22: Terraform Fundamentals
+### Sprint 23: Terraform Fundamentals
 
 **Topics:** providers, resources, variables, outputs, locals, data sources. Master `terraform init`, `plan`, `apply`, `destroy`.
 
 **Why it matters:** declarative infrastructure is what turns "environments" from hand-configured snowflakes into something reproducible and diffable — you can look at a pull request and know exactly what will change in AWS before it happens.
 
-### Sprint 23: Terraform State
+### Sprint 24: Terraform State
 
 **Topics:** tfstate, remote state, locking, drift, import, state management
 
@@ -563,7 +586,7 @@ You'll intentionally modify infrastructure by hand and make Terraform discover t
 
 **Real-world example:** this is the single most common real-world Terraform footgun — someone changes something in the AWS console "just this once," and Terraform's next plan no longer matches reality. Remote state with locking (commonly an S3 bucket plus a DynamoDB lock table on AWS) exists specifically so two people can't `apply` at the same moment and corrupt the shared state file.
 
-### Sprint 24: Terraform Modules
+### Sprint 25: Terraform Modules
 
 **Topics:** reusable infrastructure, environment separation
 
@@ -585,7 +608,7 @@ terraform/
 
 ## Level 7: AWS Solutions Architecture
 
-### Sprint 25: AWS Networking
+### Sprint 26: AWS Networking
 
 ```
 VPC
@@ -598,7 +621,7 @@ VPC
 
 **Why it matters:** this sprint shows up almost verbatim in AWS's own Well-Architected Framework. Networking fundamentals are the part of "Solutions Architect" that's genuinely hard to fake in an interview — you either know why the database subnet has no route to the internet gateway, or you don't.
 
-### Sprint 26: AWS Compute
+### Sprint 27: AWS Compute
 
 **Topics:** EC2, ECS, Fargate, EKS, Lambda
 
@@ -606,7 +629,7 @@ VPC
 
 **Why it matters:** "which compute service and why" is one of the most commonly asked real system-design-interview questions for anyone targeting a Solutions Architect title. Knowing how to deploy EKS matters far less than being able to defend choosing it over ECS, Fargate, or Lambda for this specific workload.
 
-### Sprint 27: Managed Data
+### Sprint 28: Managed Data
 
 Move PostgreSQL → RDS, Redis → ElastiCache, Kafka → MSK.
 
@@ -614,7 +637,7 @@ Compare self-managed vs. AWS-managed across cost, maintenance, availability, con
 
 **Real-world example:** past a certain team size, most engineering organizations deliberately pay the cost premium of RDS, ElastiCache, and MSK specifically to *not* run their own on-call rotation for database failover and patching. It's a genuinely common, deliberate tradeoff — not laziness — and it's worth being able to say exactly where that tradeoff stops making sense.
 
-### Sprint 28: AWS Security
+### Sprint 29: AWS Security
 
 **Topics:** IAM, roles, policies, least privilege, KMS, Secrets Manager, security groups, CloudTrail, WAF
 
@@ -624,7 +647,7 @@ Compare self-managed vs. AWS-managed across cost, maintenance, availability, con
 
 ## Level 8: Reliability
 
-### Sprint 29: Observability
+### Sprint 30: Observability
 
 ```
 Browser → API → Kafka → Worker → PostgreSQL
@@ -635,7 +658,7 @@ Browser → API → Kafka → Worker → PostgreSQL
 
 **Real-world example:** distributed tracing as a concept traces back to Google's 2010 "Dapper" paper, which described attaching a single trace ID to a request and following it across every internal service it touched. It's the direct ancestor of Zipkin, Jaeger, and the OpenTelemetry tooling you're about to wire up here.
 
-### Sprint 30: Reliability Engineering
+### Sprint 31: Reliability Engineering
 
 **Topics:** SLI, SLO, SLA, error budgets, availability, MTTR, MTBF
 
@@ -643,7 +666,7 @@ Example targets: 99.9% availability, purchase p95 < 500ms, error rate < 0.1%.
 
 **Real-world example:** this entire vocabulary — SLI, SLO, error budget — comes directly from Google's Site Reliability Engineering practice, written up in their freely available SRE book (2016). The error-budget chapter specifically is worth reading once you hit this sprint: it's the idea that turns "reliability" from a vague goal into a number you can actually trade off against feature velocity.
 
-### Sprint 31: Disaster Recovery
+### Sprint 32: Disaster Recovery
 
 Simulate: API failure, worker failure, Redis failure, Kafka failure, database failure, a bad deployment, an AZ failure, data loss. Diagnose and recover.
 
@@ -653,7 +676,39 @@ Simulate: API failure, worker failure, Redis failure, Kafka failure, database fa
 
 ---
 
-## Level 9: Solutions Architect Mode
+## Level 9: Architecture Leadership
+
+### Sprint 33: AWS Well-Architected Review
+
+Review TicketForge against operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability. Produce a risk register with severity, evidence, remediation, owner, effort, and target date.
+
+### Sprint 34: Threat Modeling & Compliance
+
+Map assets, actors, entry points, data flows, and trust boundaries. Apply STRIDE, classify customer and payment data, connect threats to controls, and distinguish regulatory requirements from optional security improvements.
+
+### Sprint 35: Cost Architecture & FinOps
+
+Build a monthly cost model and unit economics such as cost per reservation. Compare managed and self-managed services, model normal and peak demand, define budgets and anomaly alerts, and defend availability/cost tradeoffs.
+
+### Sprint 36: Data & Integration Architecture
+
+Define systems of record, API ownership, contract versioning, schema evolution, retention, deletion, CDC, analytics boundaries, and integration styles. Practice deciding between synchronous APIs, events, files, and managed integration services.
+
+### Sprint 37: Multi-Region & Global Architecture
+
+Design for users, failures, and regulations across regions. Compare active-active and active-passive, model DNS and failover, choose consistency boundaries, prevent double selling across regions, and contain blast radius.
+
+### Sprint 38: Migration & Modernization Strategy
+
+Assess a current state and apply the 7 Rs. Design strangler migrations, dependency waves, dual-running periods, data migration, cutover criteria, rollback, and organizational change—not only the target diagram.
+
+### Sprint 39: Architecture Governance & Communication
+
+Create a coherent C4 and ADR portfolio, technical standards, exception process, review cadence, and implementation roadmap. Present the same decision differently to engineers, security, finance, executives, and customers.
+
+---
+
+## Level 10: Solutions Architect Mode
 
 TicketForge stops being a coding assistant relationship and starts being a customer, or an architecture review board.
 
