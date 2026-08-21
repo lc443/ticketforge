@@ -87,6 +87,21 @@
     }
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Prove horizontal scaling on the real topology</h2>
+      <p>Scaling is not “three processes exist.” Prove one artifact, shared external state, traffic distribution, and failure survival.</p></div>
+    <div class="practice-flow"><div><strong>Client</strong><span>:8080</span></div><div><strong>NGINX</strong><span>round robin</span></div><div><strong>Replicas</strong><span>api1 · api2 · api3</span></div><div><strong>State</strong><span>Postgres · Redis</span></div></div>
+    <pre><code>docker compose -f infrastructure/docker/docker-compose.yml ps
+docker image inspect ticketforge-api:local
+
+for request in 1 2 3 4 5 6; do curl -s http://localhost:8080/health; done
+docker compose -f infrastructure/docker/docker-compose.yml stop api2
+for request in 1 2 3 4 5 6; do curl -s -o /dev/null -w '%&#123;http_code&#125;\n' http://localhost:8080/api/events; done
+docker compose -f infrastructure/docker/docker-compose.yml start api2</code></pre>
+    <div class="practice-notes"><div><strong>Invariant</strong><p>Any healthy replica must handle any request. Authentication, inventory, cache policy, and rate-limit state cannot depend on one JVM’s memory.</p></div><div><strong>Failure clue</strong><p>The first request that encounters a dead peer can be slower because passive NGINX failure detection needs an attempted connection before retrying another upstream.</p></div></div>
+    <ol class="rebuild-list"><li>Start with one API and record availability and throughput.</li><li>Add a second identical replica behind NGINX.</li><li>Prove both use the same image digest.</li><li>Stop one during traffic and explain every observed status and latency change.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>

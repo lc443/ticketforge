@@ -976,6 +976,21 @@ Kafka: reservation-created
     </div>
   </section>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Operate and reconstruct</span><h2>Prove the asynchronous delivery chain</h2>
+      <p>The architecture is complete only when you can inspect durable intent, broker state, consumer progress, retries, and recovery.</p></div>
+    <div class="practice-flow"><div><strong>Transaction</strong><span>reservation + outbox</span></div><div><strong>Publisher</strong><span>poll + send</span></div><div><strong>Kafka</strong><span>topic · key · partition</span></div><div><strong>Consumers</strong><span>process · retry · DLQ</span></div></div>
+    <pre><code>docker compose -f infrastructure/docker/docker-compose.yml exec kafka \
+  /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+docker compose -f infrastructure/docker/docker-compose.yml exec kafka \
+  /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --describe
+
+docker compose -f infrastructure/docker/docker-compose.yml logs -f --tail=200 api1 api2 api3</code></pre>
+    <div class="practice-notes"><div><strong>Delivery claim</strong><p>TicketForge designs for at-least-once delivery. Consumer idempotency turns duplicates into harmless reprocessing rather than duplicate side effects.</p></div><div><strong>Failure drill</strong><p>Stop Kafka, create a reservation, prove the outbox row remains unpublished, restart Kafka, and prove the publisher eventually delivers it.</p></div></div>
+    <ol class="rebuild-list"><li>Define event ownership and schema.</li><li>Write business state and outbox intent atomically.</li><li>Publish with a stable message key.</li><li>Make consumers idempotent, then test retry exhaustion and DLQ recovery.</li></ol>
+  </section>
+
   <section class="final-quiz-section">
     <div class="sandbox-heading">
       <span class="eyebrow">Final check</span>

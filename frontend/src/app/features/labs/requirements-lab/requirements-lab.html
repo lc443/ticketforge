@@ -62,6 +62,17 @@ Consequences:  What does this make easier or harder?
 Tradeoffs:     What are we giving up?</pre>
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Architect workflow</span><h2>Turn an idea into testable architecture</h2>
+      <p>Requirements are inputs to decisions. If a quality attribute has no measurable scenario, it cannot guide or validate a design.</p></div>
+    <div class="practice-flow"><div><strong>Stakeholders</strong><span>goals · users</span></div><div><strong>Constraints</strong><span>budget · skills · time</span></div><div><strong>Quality attributes</strong><span>scenario + measure</span></div><div><strong>Decision</strong><span>ADR + evidence plan</span></div></div>
+    <pre><code>sed -n '1,240p' architecture/requirements/product-requirements.md
+sed -n '1,220p' architecture/diagrams/system-context.md
+sed -n '1,220p' architecture/decisions/ADR-001-modular-monolith.md</code></pre>
+    <div class="practice-notes"><div><strong>Quality scenario</strong><p>Replace “the system is fast” with source, stimulus, environment, response, and measure—for example, authenticated event reads remain below a defined p95 under a defined request rate.</p></div><div><strong>Traceability</strong><p>Connect each material decision to a requirement and each requirement to a test, drill, metric, or review that can prove it.</p></div></div>
+    <ol class="rebuild-list"><li>Interview for goals, actors, constraints, and failure impact.</li><li>Separate functional behavior from measurable quality attributes.</li><li>Draw the system boundary and external dependencies.</li><li>Record one consequential decision with alternatives and consequences.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>

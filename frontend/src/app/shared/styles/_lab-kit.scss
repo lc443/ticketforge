@@ -238,6 +238,106 @@
   text-align: center;
 }
 
+/* ---------- architecture practice contract ---------- */
+
+.architect-practice {
+  .practice-flow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+
+    div {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+    }
+
+    strong,
+    span {
+      display: block;
+    }
+
+    strong {
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    span {
+      margin-top: 4px;
+      color: var(--ink-soft);
+      font: 10.5px/1.45 var(--font-mono);
+    }
+  }
+
+  pre {
+    margin: 0;
+    padding: 15px 16px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+    color: var(--ink);
+    font: 12px/1.7 var(--font-mono);
+  }
+
+  .practice-notes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+
+    div {
+      padding: 13px 14px;
+      border-left: 2px solid var(--stamp);
+      background: var(--stamp-soft);
+    }
+
+    strong {
+      color: var(--stamp);
+      font: 700 10.5px var(--font-mono);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: 5px 0 0;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  }
+
+  .rebuild-list {
+    margin: 16px 0 0;
+    padding: 16px 0 0 22px;
+    border-top: 1px dashed var(--line);
+
+    li {
+      padding: 4px 0 4px 5px;
+      color: var(--ink-soft);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    li::marker {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .architect-practice {
+    .practice-flow,
+    .practice-notes {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
 /* ---------- scenario card body content ---------- */
 
 .scenario-recap {
