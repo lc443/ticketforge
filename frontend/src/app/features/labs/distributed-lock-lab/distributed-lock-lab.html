@@ -52,6 +52,22 @@
     <p>The invariant held through NGINX with all three APIs running. The database—not process memory—serialized access to the event row.</p>
   </div>
 
+  <section class="card architect-practice"><div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Place coordination beside the invariant</h2>
+    <p>The protected value and the lock live in PostgreSQL, so one database transaction owns both serialization and commit.</p></div>
+    <div class="practice-flow"><div><strong>API transaction A</strong><span>findWithLockById</span></div><div><strong>PostgreSQL row</strong><span>FOR UPDATE</span></div><div><strong>API transaction B</strong><span>waits, then rereads</span></div><div><strong>Invariant</strong><span>tickets ≥ 0</span></div></div>
+    <pre><code># Create a disposable event with exactly one ticket, then:
+export TF_EMAIL='loadtest@example.com'
+export TF_PASSWORD='replace-me'
+export EVENT_ID='1'
+
+docker run --rm \
+  -e TF_EMAIL -e TF_PASSWORD -e EVENT_ID \
+  -v "$PWD/load-tests:/scripts" \
+  grafana/k6 run /scripts/reservation-race.js</code></pre>
+    <div class="practice-notes"><div><strong>Implementation</strong><p><code>@Lock(PESSIMISTIC_WRITE)</code> makes Spring Data request a database write lock; <code>@Transactional</code> keeps it held through inventory validation, mutation, reservation, and outbox writes.</p></div><div><strong>Expected evidence</strong><p>Two simultaneous buyers produce one 201, one 409, one reservation row, and zero remaining tickets—never negative inventory.</p></div></div>
+    <ol class="rebuild-list"><li>State the invariant before choosing a lock.</li><li>Identify every process that can modify the row.</li><li>Place lock acquisition and mutation in one transaction.</li><li>Prove behavior under contention, rollback, and timeout.</li></ol>
+  </section>
+
   <div class="card quiz-card"><div class="section-title"><span class="eyebrow">Check yourself</span><h2>Quick check</h2></div>
     @for (q of quiz; track q.question; let qi = $index) { <div class="quiz"><p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
       <div class="quiz-options">@for (option of q.options; track option; let i = $index) {

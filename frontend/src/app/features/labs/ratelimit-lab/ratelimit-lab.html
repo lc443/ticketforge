@@ -84,6 +84,24 @@
     }
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Trace the real distributed counter</h2>
+      <p>TicketForge currently implements a fixed-window counter: Redis increments one shared key and gives its first increment a one-minute TTL.</p></div>
+    <div class="practice-flow"><div><strong>Request</strong><span>/api/events</span></div><div><strong>Filter</strong><span>client IP key</span></div><div><strong>Redis</strong><span>INCR + EXPIRE</span></div><div><strong>Decision</strong><span>allow or 429</span></div></div>
+    <pre><code>docker compose -f infrastructure/docker/docker-compose.yml exec redis \
+  redis-cli --scan --pattern 'rate-limit:*'
+
+docker run --rm \
+  -e TF_EMAIL -e TF_PASSWORD \
+  -v "$PWD/load-tests:/scripts" \
+  grafana/k6 run /scripts/rate-limit.js
+
+docker compose -f infrastructure/docker/docker-compose.yml exec redis \
+  redis-cli TTL rate-limit:&lt;client-ip&gt;</code></pre>
+    <div class="practice-notes"><div><strong>Syntax</strong><p><code>exec redis</code> runs a command inside the existing Redis service. <code>--scan</code> iterates keys safely; the pattern narrows results to this policy.</p></div><div><strong>Tradeoff</strong><p>The implementation is a fixed window, not the five-token simulation above. Fixed windows are simple but permit boundary bursts and need an atomic increment/expiry design.</p></div></div>
+    <ol class="rebuild-list"><li>Define the protected resource and client identity.</li><li>Choose a limit, window, and rejection contract.</li><li>Make state shared across replicas.</li><li>Test allowed traffic, exhausted capacity, expiry, and Redis failure behavior.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>

@@ -115,4 +115,19 @@
       </li>
     </ol>
   </div>
+
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Trace cache-aside and invalidation</h2>
+      <p>Reads may be served from Redis, but PostgreSQL remains the system of record and every mutation must preserve cache correctness.</p></div>
+    <div class="practice-flow"><div><strong>GET event</strong><span>@Cacheable</span></div><div><strong>Redis miss</strong><span>query Postgres</span></div><div><strong>Redis hit</strong><span>skip database</span></div><div><strong>Mutation</strong><span>@CachePut / @CacheEvict</span></div></div>
+    <pre><code>docker compose -f infrastructure/docker/docker-compose.yml exec redis redis-cli MONITOR
+
+curl -i http://localhost:8080/api/events/1
+curl -i http://localhost:8080/api/events/1
+
+docker compose -f infrastructure/docker/docker-compose.yml exec redis \
+  redis-cli --scan --pattern 'events*'</code></pre>
+    <div class="practice-notes"><div><strong>Ownership</strong><p>The cache is derived data, so its loss must affect performance—not correctness or recoverability.</p></div><div><strong>Invalidation</strong><p>Event updates refresh the entry, deletion and reservations evict it, and the following read repopulates from committed database state.</p></div></div>
+    <ol class="rebuild-list"><li>Measure the uncached read before adding Redis.</li><li>Choose keys, TTL, serialization, and invalidation owners.</li><li>Test miss, hit, update, delete, eviction, and Redis outage.</li><li>Compare latency improvement against staleness and operational cost.</li></ol>
+  </section>
 </div>

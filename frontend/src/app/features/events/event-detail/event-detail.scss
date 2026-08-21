@@ -42,6 +42,28 @@
   }
 }
 
+.tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--done);
+  border: 1px solid var(--done);
+  border-radius: 999px;
+  padding: 3px 9px;
+
+  &.cancelled {
+    color: var(--gap);
+    border-color: var(--gap);
+    background: var(--gap-bg);
+  }
+}
+
 .detail-card {
   background: var(--paper-raised);
   border: 1px solid var(--line);
@@ -59,6 +81,13 @@ h1 {
 .date {
   margin: 0 0 4px;
   color: var(--ink-soft);
+}
+
+.owner {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
 }
 
 .availability {
@@ -83,12 +112,20 @@ h1 {
 }
 
 .edit-button,
+.cancel-button,
 .delete-button {
   padding: 8px 14px;
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
+}
+
+.cancel-button {
+  margin: 0;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: var(--paper-raised);
 }
 
 .edit-button {
@@ -195,4 +232,50 @@ button {
     border-radius: var(--radius-sm);
     padding: 10px 12px;
   }
+}
+
+.lifecycle-note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  color: var(--gap);
+  background: var(--gap-bg);
+  border: 1px solid var(--gap);
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+
+  strong {
+    display: block;
+    margin-bottom: 3px;
+  }
+}
+
+.audit-panel {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--line);
+}
+
+.audit-entry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+
+  div {
+    font-family: var(--font-mono);
+  }
+
+  p {
+    margin: 5px 0;
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+}
+
+.audit-empty {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
 }

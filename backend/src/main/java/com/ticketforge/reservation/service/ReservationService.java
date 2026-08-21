@@ -5,6 +5,7 @@ import com.ticketforge.auth.repository.UserRepository;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import com.ticketforge.event.entity.Event;
+import com.ticketforge.event.entity.EventStatus;
 import com.ticketforge.event.repository.EventRepository;
 import com.ticketforge.reservation.dto.CreateReservationRequest;
 import com.ticketforge.reservation.dto.ReservationResponse;
@@ -38,7 +39,7 @@ public class ReservationService {
     private final UserRepository userRepository;
 
     @Transactional
-    @CacheEvict(value = "events", key = "#eventId")
+    @CacheEvict(value = "events-v2", key = "#eventId")
     public ReservationResponse createReservation(
             Long eventId,
             CreateReservationRequest request,
@@ -47,8 +48,12 @@ public class ReservationService {
        User user = userRepository.findByEmail(userEmail)
                .orElseThrow(() -> new NotFoundException("Authenticated user was not found."));
 
-       Event event = eventRepository.findWithLockById(eventId)
+        Event event = eventRepository.findWithLockById(eventId)
         .orElseThrow(() -> new NotFoundException("Event " + eventId + " was not found."));
+
+        if (event.getStatus() == EventStatus.CANCELLED) {
+            throw new ConflictException("Cancelled events cannot accept reservations.");
+        }
 
         if (event.getAvailableTickets() < request.quantity()) {
             throw new ConflictException(

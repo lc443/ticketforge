@@ -161,14 +161,14 @@ export class Roadmap {
         {
           num: '16',
           name: 'Event Lifecycle & API Evolution',
-          note: 'Edit/delete implementation in progress; define cancellation vs hard delete, organizer ownership, audit history, referential integrity, and API semantics',
-          status: 'next',
+          note: 'Organizer ownership, guarded edit/delete, cancellation, audit history, inventory invariants, stale-write detection, DTO contract, and replica-safe cache evolution verified',
+          status: 'done',
         },
         {
           num: '17',
           name: 'CI/CD',
-          note: '.github/workflows/ is empty',
-          status: 'todo',
+          note: '.github/workflows/ is empty; automate tests, image builds, security gates, provenance, promotion, and rollback',
+          status: 'next',
         },
       ],
     },

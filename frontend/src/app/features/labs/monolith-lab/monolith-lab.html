@@ -108,6 +108,19 @@
     }
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and inspect</span><h2>Prove boundaries without adding networks</h2>
+      <p>A modular monolith earns future options by separating ownership in code while retaining one deployment and transaction boundary.</p></div>
+    <div class="practice-flow"><div><strong>Controller</strong><span>HTTP contract</span></div><div><strong>Service</strong><span>business transaction</span></div><div><strong>Repository</strong><span>persistence boundary</span></div><div><strong>Modules</strong><span>auth · event · reservation</span></div></div>
+    <pre><code>find backend/src/main/java/com/ticketforge -maxdepth 2 -type d | sort
+cd backend
+./mvnw test
+./mvnw package -DskipTests
+jar tf target/ticketforge-*.jar | grep 'com/ticketforge/'</code></pre>
+    <div class="practice-notes"><div><strong>One deployable</strong><p>The packaged JAR contains every module. Method calls replace network calls, and one database transaction can preserve reservation invariants.</p></div><div><strong>Extraction signal</strong><p>Consider a service boundary only when independent scaling, ownership, release cadence, data isolation, or fault isolation outweigh distributed-system cost.</p></div></div>
+    <ol class="rebuild-list"><li>Name capabilities rather than technical layers.</li><li>Give each capability controllers, services, repositories, and models.</li><li>Make cross-module dependencies explicit.</li><li>Document what evidence would justify extracting one module later.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>

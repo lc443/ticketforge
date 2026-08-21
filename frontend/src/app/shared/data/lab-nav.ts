@@ -21,4 +21,6 @@ export const LAB_NAV: LabNavEntry[] = [
   { sprint: 'Sprint 7', title: 'Concurrency & Overselling', path: '/labs/concurrency' },
   { sprint: 'Sprint 8', title: 'Distributed Locking', path: '/labs/distributed-lock' },
   { sprint: 'Sprint 9–14', title: 'Kafka', path: '/lab/kafka' },
+  { sprint: 'Sprint 15', title: 'Docker', path: '/labs/docker' },
+  { sprint: 'Sprint 16', title: 'Event Lifecycle & API Evolution', path: '/labs/event-lifecycle' },
 ];

@@ -2,9 +2,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE } from './api-base';
-import { Event } from '../../shared/models/event.model';
+import { Event, EventAudit, EventStatus } from '../../shared/models/event.model';
 
-export type EventWriteRequest = Pick<Event, 'name' | 'venue' | 'eventDate' | 'totalTickets'>;
+export type EventWriteRequest = Pick<Event, 'name' | 'venue' | 'eventDate' | 'totalTickets'> & {
+  version?: number;
+};
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
@@ -18,10 +20,6 @@ export class EventService {
     return this.http.get<Event>(`${API_BASE}/events/${id}`);
   }
 
-  // No role check on the backend today — SecurityConfig only requires
-  // .anyRequest().authenticated(), so any signed-in user can create an
-  // event. Not gating this in the UI either; it should reflect what the
-  // API actually enforces, not an admin-only behavior that doesn't exist.
   create(payload: EventWriteRequest) {
     return this.http.post<Event>(`${API_BASE}/events`, payload);
   }
@@ -32,5 +30,13 @@ export class EventService {
 
   delete(id: number) {
     return this.http.delete<void>(`${API_BASE}/events/${id}`);
+  }
+
+  updateStatus(id: number, status: EventStatus) {
+    return this.http.patch<Event>(`${API_BASE}/events/${id}/status`, { status });
+  }
+
+  audit(id: number) {
+    return this.http.get<EventAudit[]>(`${API_BASE}/events/${id}/audit`);
   }
 }

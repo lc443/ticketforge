@@ -1,10 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../core/services/event.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ReservationService } from '../../../core/services/reservation.service';
-import { Event } from '../../../shared/models/event.model';
+import { Event, EventAudit } from '../../../shared/models/event.model';
 import { ReservationResponse } from '../../../shared/models/reservation.model';
 import { apiErrorMessage } from '../../../core/http/api-error';
 
@@ -26,6 +27,11 @@ export class EventDetail implements OnInit {
   confirmation = signal<ReservationResponse | null>(null);
   deleting = signal(false);
   deleteError = signal<string | null>(null);
+  cancelling = signal(false);
+  lifecycleError = signal<string | null>(null);
+  audits = signal<EventAudit[]>([]);
+  auditError = signal<string | null>(null);
+  canManage = computed(() => this.event()?.organizerEmail === this.auth.email());
 
   // The route param is always a string — Angular's router doesn't know or
   // care what type an ID is, it's just a URL segment. We convert once here
@@ -36,6 +42,7 @@ export class EventDetail implements OnInit {
     private route: ActivatedRoute,
     private eventService: EventService,
     private reservationService: ReservationService,
+    readonly auth: AuthService,
     private router: Router,
   ) {}
 
@@ -45,11 +52,42 @@ export class EventDetail implements OnInit {
       next: (event) => {
         this.event.set(event);
         this.loading.set(false);
+        if (event.organizerEmail === this.auth.email()) {
+          this.loadAudit();
+        }
       },
       error: (error) => {
         this.loading.set(false);
         this.error.set(apiErrorMessage(error, 'Could not load the event.'));
       },
+    });
+  }
+
+  cancelEvent() {
+    const event = this.event();
+    if (!event || !window.confirm(`Cancel "${event.name}"? Existing reservations will be preserved.`)) {
+      return;
+    }
+
+    this.lifecycleError.set(null);
+    this.cancelling.set(true);
+    this.eventService.updateStatus(this.eventId, 'CANCELLED').subscribe({
+      next: (updated) => {
+        this.event.set(updated);
+        this.cancelling.set(false);
+        this.loadAudit();
+      },
+      error: (error) => {
+        this.cancelling.set(false);
+        this.lifecycleError.set(apiErrorMessage(error, 'Could not cancel the event.'));
+      },
+    });
+  }
+
+  private loadAudit() {
+    this.eventService.audit(this.eventId).subscribe({
+      next: (audits) => this.audits.set(audits),
+      error: (error) => this.auditError.set(apiErrorMessage(error, 'Could not load event history.')),
     });
   }
 

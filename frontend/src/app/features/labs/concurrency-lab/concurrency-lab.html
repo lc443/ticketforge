@@ -111,6 +111,26 @@ Tickets sold: 1</pre>
     }
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Test the business invariant, not only the status code</h2>
+      <p>Concurrency bugs exist between individually valid operations. The proof must inspect both responses and the final database state.</p></div>
+    <div class="practice-flow"><div><strong>Buyer A</strong><span>read 1 ticket</span></div><div><strong>Buyer B</strong><span>read 1 ticket</span></div><div><strong>Serialized write</strong><span>row lock</span></div><div><strong>Final state</strong><span>1 winner · 0 left</span></div></div>
+    <pre><code>export TF_EMAIL='loadtest@example.com'
+export TF_PASSWORD='replace-me'
+export EVENT_ID='1'
+
+docker run --rm \
+  -e TF_EMAIL -e TF_PASSWORD -e EVENT_ID \
+  -v "$PWD/load-tests:/scripts" \
+  grafana/k6 run --summary-export=/scripts/results/reservation-race.json \
+  /scripts/reservation-race.js
+
+docker compose -f infrastructure/docker/docker-compose.yml exec postgres \
+  psql -U postgres -d ticketforge -c 'select id, available_tickets from events where id = 1;'</code></pre>
+    <div class="practice-notes"><div><strong>Race window</strong><p>The vulnerable sequence is check-then-act: both transactions can observe the same old value unless access is serialized or the write is made conditional.</p></div><div><strong>Alternative</strong><p>An atomic conditional update can avoid blocking locks, but it changes how conflicts and returned state are modeled. Choose with measured contention in mind.</p></div></div>
+    <ol class="rebuild-list"><li>Write the invariant mathematically.</li><li>Create deterministic contention around the same record.</li><li>Assert winner count, loser contract, and durable final state.</li><li>Repeat through all replicas rather than one JVM.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>

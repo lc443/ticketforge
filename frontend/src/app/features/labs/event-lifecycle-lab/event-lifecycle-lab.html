@@ -1,0 +1,62 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/event-lifecycle" />
+
+  <header class="hero">
+    <span class="eyebrow">Sprint 16</span>
+    <h1>Event lifecycle & API evolution</h1>
+    <p>Turn “add edit and delete” into an ownership, data-retention, concurrency, and support design.</p>
+  </header>
+
+  <app-scenario-card eyebrow="Architecture scenario" title="A sold event must be cancelled">
+    <div class="scenario-grid">
+      <section class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Deleting the row erases business context.</h3>
+        <p>Customers still have reservations, support needs history, and downstream messages may still refer to the event ID.</p>
+      </section>
+      <section class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Model cancellation as a state transition.</h3>
+        <p>Stop new reservations, preserve committed records, authorize the organizer, and write the audit entry in the same transaction.</p>
+      </section>
+    </div>
+  </app-scenario-card>
+
+  <section class="card">
+    <div class="section-title"><span class="eyebrow">Policy</span><h2>Define the rules before the endpoints</h2></div>
+    <div class="policy-grid">
+      <div><strong>Ownership</strong><span>The creating user becomes organizer. Organizer or ADMIN may manage; everyone may read.</span></div>
+      <div><strong>Inventory</strong><span>An edit preserves tickets already sold and cannot reduce capacity below that number.</span></div>
+      <div><strong>Cancellation</strong><span><code>SCHEDULED → CANCELLED</code> is valid and repeat requests are idempotent.</span></div>
+      <div><strong>Deletion</strong><span>Hard delete is allowed only when no reservations exist; otherwise return a structured 409.</span></div>
+      <div><strong>Concurrency</strong><span>The client returns the loaded version. A stale write receives 409 instead of overwriting newer data.</span></div>
+      <div><strong>Audit</strong><span>Create, update, cancel, and delete record actor, time, action, and explanation.</span></div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title"><span class="eyebrow">HTTP contract</span><h2>Use verbs that express intent</h2></div>
+    <div class="flow"><code>PUT /api/events/42</code><i>→</i><span>replace editable event details</span></div>
+    <div class="flow"><code>PATCH /api/events/42/status</code><i>→</i><span>change one lifecycle field</span></div>
+    <div class="flow"><code>GET /api/events/42/audit</code><i>→</i><span>organizer support evidence</span></div>
+    <div class="flow"><code>DELETE /api/events/42</code><i>→</i><span>only an unreserved event</span></div>
+    <div class="callout"><span class="callout-label">Why PATCH for cancellation?</span><p>The client is changing one part of the resource. A full PUT would require it to resend fields unrelated to the lifecycle decision and increases accidental overwrite risk.</p></div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title"><span class="eyebrow">Run the evidence</span><h2>Build, deploy, and inspect all three replicas</h2></div>
+    <div class="command-step"><span>Run focused Java 21 tests</span><pre><code>docker run --rm \
+  -v "$PWD/backend:/workspace" \
+  -w /workspace eclipse-temurin:21-jdk \
+  ./mvnw -Dtest=EventServiceTest test</code></pre><p><code>--rm</code> removes the disposable test container. <code>-v</code> mounts backend source and <code>-w</code> selects it as the working directory.</p></div>
+    <div class="command-step"><span>Rebuild and replace the API and frontend containers</span><pre><code>docker compose -f infrastructure/docker/docker-compose.yml \
+  up -d --build api1 api2 api3 api-gateway frontend</code></pre><p><code>up</code> reconciles desired state, <code>-d</code> runs detached, and <code>--build</code> creates the new shared API image before replacing replicas.</p></div>
+    <div class="command-step"><span>Verify replica health and startup</span><pre><code>docker compose -f infrastructure/docker/docker-compose.yml ps
+docker compose -f infrastructure/docker/docker-compose.yml logs --tail=100 api1 api2 api3</code></pre><p>Healthy containers prove process readiness; logs reveal schema migration or startup failures across every replica.</p></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title"><span class="eyebrow">Architect takeaway</span><h2>The buttons are the smallest part</h2></div>
+    <p>A Solutions Architect expands a feature into lifecycle, security, data integrity, compatibility, operations, and evidence questions—then makes those decisions observable and defensible.</p>
+  </section>
+</div>

@@ -41,6 +41,29 @@
     <p class="command-note"><code>load-tests/</code> contains runnable smoke, browse, rate-limit, and last-ticket scenarios with JSON result exports.</p>
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Run an evidence-producing test from scratch</h2>
+      <p>A load test is code: workload, assertions, thresholds, environment, and exported evidence must all be reproducible.</p></div>
+    <div class="practice-flow">
+      <div><strong>Scenario</strong><span>VUs · rate · duration</span></div><div><strong>Gateway</strong><span>localhost:8080</span></div>
+      <div><strong>System</strong><span>NGINX → 3 APIs</span></div><div><strong>Evidence</strong><span>checks · p95 · JSON</span></div>
+    </div>
+    <pre><code>export TF_EMAIL='loadtest@example.com'
+export TF_PASSWORD='replace-me'
+
+docker run --rm \
+  -e TF_EMAIL -e TF_PASSWORD -e RPS=5 -e DURATION=30s \
+  -v "$PWD/load-tests:/scripts" \
+  grafana/k6 run \
+  --summary-export=/scripts/results/browse.json \
+  /scripts/browse-events.js</code></pre>
+    <div class="practice-notes">
+      <div><strong>Syntax</strong><p><code>--rm</code> removes the k6 container, <code>-e</code> passes selected environment variables, and <code>-v host:container</code> mounts the test suite and captures its JSON result.</p></div>
+      <div><strong>Diagnose</strong><p>Compare <code>http_req_duration</code> with <code>business_success_rate</code>. A fast 429 has good transport latency but failed the user objective.</p></div>
+    </div>
+    <ol class="rebuild-list"><li>Write a smoke scenario with one virtual user and explicit checks.</li><li>Add a business-success metric and threshold.</li><li>Increase traffic until one measured constraint fails.</li><li>Change one architecture variable, rerun, and compare evidence.</li></ol>
+  </section>
+
   <div class="card quiz-card"><div class="section-title"><span class="eyebrow">Check yourself</span><h2>Quick check</h2></div>
     @for (q of quiz; track q.question; let qi = $index) {
       <div class="quiz"><p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p><div class="quiz-options">

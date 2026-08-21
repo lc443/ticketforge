@@ -18,6 +18,7 @@ export class EventEdit implements OnInit {
   eventDate = '';
   totalTickets = 1;
   soldTickets = 0;
+  version = 0;
 
   loading = signal(true);
   saving = signal(false);
@@ -38,6 +39,7 @@ export class EventEdit implements OnInit {
         this.eventDate = event.eventDate.slice(0, 16);
         this.totalTickets = event.totalTickets;
         this.soldTickets = event.totalTickets - event.availableTickets;
+        this.version = event.version;
         this.loading.set(false);
       },
       error: (error) => {
@@ -56,6 +58,7 @@ export class EventEdit implements OnInit {
         venue: this.venue,
         eventDate: this.eventDate,
         totalTickets: this.totalTickets,
+        version: this.version,
       })
       .subscribe({
         next: (event) => {

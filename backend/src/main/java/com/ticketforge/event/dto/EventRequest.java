@@ -18,6 +18,8 @@ public record EventRequest(
 
         @NotNull(message = "is required")
         @Min(value = 1, message = "must be at least 1")
-        Integer totalTickets
+        Integer totalTickets,
+
+        Long version
 ) {
 }

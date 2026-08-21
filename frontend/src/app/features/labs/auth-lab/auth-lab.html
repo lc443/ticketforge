@@ -194,6 +194,23 @@
     </div>
   </div>
 
+  <section class="card architect-practice">
+    <div class="section-title"><span class="eyebrow">Build and diagnose</span><h2>Trace authentication into authorization</h2>
+      <p>A signed token proves integrity only after the server validates it and establishes an authenticated security context.</p></div>
+    <div class="practice-flow"><div><strong>Credentials</strong><span>POST /login</span></div><div><strong>JWT</strong><span>sub · iat · exp</span></div><div><strong>Filter</strong><span>signature + expiry</span></div><div><strong>Policy</strong><span>route authorization</span></div></div>
+    <pre><code>curl -i -X POST http://localhost:8080/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '&#123;"email":"learner@example.com","password":"replace-me"&#125;'
+
+curl -i http://localhost:8080/api/reservations/me
+curl -i http://localhost:8080/api/reservations/me \
+  -H 'Authorization: Bearer &lt;token&gt;'
+
+docker compose -f infrastructure/docker/docker-compose.yml logs --tail=200 api1</code></pre>
+    <div class="practice-notes"><div><strong>401 versus 403</strong><p>401 means authentication is absent or invalid. 403 means identity is established but policy denies the requested action.</p></div><div><strong>Trust boundary</strong><p>JWT payloads are encoded, not secret. Never trust claims until signature, algorithm, expiry, and expected issuer/audience rules have been validated.</p></div></div>
+    <ol class="rebuild-list"><li>Hash stored passwords with an adaptive password encoder.</li><li>Issue the smallest useful set of claims.</li><li>Validate the token before populating the security context.</li><li>Test missing, malformed, expired, tampered, and insufficient-permission cases.</li></ol>
+  </section>
+
   <div class="card quiz-card">
     <div class="section-title">
       <span class="eyebrow">Check yourself</span>
