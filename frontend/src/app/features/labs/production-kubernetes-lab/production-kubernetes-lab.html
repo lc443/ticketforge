@@ -1,0 +1,108 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/production-kubernetes" />
+  <header class="hero">
+    <span class="eyebrow">Sprint 19</span>
+    <h1>Production Kubernetes</h1>
+    <p>Protect data, distinguish traffic readiness from process life, drain safely, and make releases reversible.</p>
+  </header>
+
+  <app-scenario-card eyebrow="Architecture scenario" title="A release and a node drain happen during ticket sales">
+    <div class="scenario-grid">
+      <section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Running Pods are not enough.</h3><p>A process can run while its database is unavailable; a replacement can receive traffic too early; an ephemeral database loses sales records.</p></section>
+      <section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Encode lifecycle and availability policy.</h3><p>Persistent claims protect Pod replacement, probe groups control traffic, graceful shutdown drains requests, and rollout history provides recovery.</p></section>
+    </div>
+  </app-scenario-card>
+
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run the commands, inspect the evidence, and mark each exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · persistent state</span><h2>Prove data survives Pod replacement</h2><p>A StatefulSet gives PostgreSQL stable identity; its claim lifecycle is separate from the disposable Pod.</p></div>
+    <pre data-language="bash"><code>kubectl get statefulset,persistentvolumeclaim --namespace ticketforge
+
+kubectl exec --namespace ticketforge postgres-0 -- \
+  psql -U postgres -d ticketforge -c \
+  "CREATE TABLE IF NOT EXISTS sprint19_canary(id int primary key, note text);"
+
+kubectl delete pod postgres-0 --namespace ticketforge
+kubectl rollout status statefulset/postgres --namespace ticketforge
+
+kubectl exec --namespace ticketforge postgres-0 -- \
+  psql -U postgres -d ticketforge -c "SELECT * FROM sprint19_canary;"</code></pre>
+    <div class="syntax-list"><div><code>volumeClaimTemplates</code><p>Creates one durable claim per StatefulSet ordinal.</p></div><div><code>ReadWriteOnce</code><p>The volume may be mounted read-write by one node; it does not mean one Pod globally in every storage system.</p></div><div><code>delete pod</code><p>Tests Pod replacement only—not node loss, backups, restore, or regional disaster recovery.</p></div></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · data survived' : 'Mark persistence exercise complete' }}</button>
+  </section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · health semantics</span><h2>Ask two different questions</h2></div>
+    <pre data-language="bash"><code>kubectl get --raw \
+  /api/v1/namespaces/ticketforge/services/ticketforge-api:8080/proxy/actuator/health/liveness
+
+kubectl get --raw \
+  /api/v1/namespaces/ticketforge/services/ticketforge-api:8080/proxy/actuator/health/readiness</code></pre>
+    <div class="syntax-list"><div><code>liveness</code><p>Can this process make progress? Failure restarts the container.</p></div><div><code>readiness</code><p>Can this instance serve requests now? Database or Redis failure removes it from Service endpoints without causing a restart loop.</p></div><div><code>startup</code><p>Suppresses liveness/readiness decisions until slow application initialization completes.</p></div></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · probe roles separated' : 'Mark probe exercise complete' }}</button>
+  </section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · graceful termination</span><h2>Drain before stopping</h2></div>
+    <pre data-language="yaml"><code>server:
+  shutdown: graceful
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
+
+terminationGracePeriodSeconds: 35
+lifecycle:
+  preStop:
+    exec:
+      command: ["sh", "-c", "sleep 5"]</code></pre>
+    <div class="syntax-list"><div><code>preStop</code><p>Creates a short endpoint-removal window before SIGTERM reaches the app.</p></div><div><code>25s + 5s &lt; 35s</code><p>The container receives enough grace for the hook and Spring request draining before SIGKILL.</p></div></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · shutdown budget understood' : 'Mark shutdown exercise complete' }}</button>
+  </section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · voluntary disruption</span><h2>Preserve quorum-like API capacity</h2></div>
+    <pre data-language="bash"><code>kubectl get poddisruptionbudget ticketforge-api \
+  --namespace ticketforge
+
+kubectl describe poddisruptionbudget ticketforge-api \
+  --namespace ticketforge</code></pre>
+    <div class="syntax-list"><div><code>minAvailable: 2</code><p>With three healthy replicas, one voluntary eviction is allowed.</p></div><div><code>ALLOWED DISRUPTIONS</code><p>The live budget computed by Kubernetes—not a static promise.</p></div><div><code>PDB</code><p>Protects voluntary eviction such as drains, not crashes, direct Pod deletion, or application correctness.</p></div></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · disruption budget read' : 'Mark disruption exercise complete' }}</button>
+  </section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · environment overlays</span><h2>Promote policy without copying the base</h2></div>
+    <pre data-language="bash"><code>kubectl kustomize infrastructure/kubernetes/overlays/development
+kubectl kustomize infrastructure/kubernetes/overlays/production
+
+kubectl apply --dry-run=server \
+  --kustomize infrastructure/kubernetes/overlays/development
+
+kubectl apply --dry-run=server \
+  --kustomize infrastructure/kubernetes/overlays/production</code></pre>
+    <div class="syntax-list"><div><code>base</code><p>Reusable workload identity and common runtime controls.</p></div><div><code>overlay</code><p>Environment-specific image, replicas, labels, and availability policy.</p></div><div><code>immutable release</code><p>Replace the production placeholder with a digest or unique release tag during promotion.</p></div></div>
+    <div class="callout"><span class="callout-label">Storage lesson</span><p>A StatefulSet claim template is immutable after creation. Expand the bound PVC only when its StorageClass supports expansion, or plan a data migration; do not hide the change in an overlay.</p></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · overlays rendered' : 'Mark overlay exercise complete' }}</button>
+  </section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · release recovery</span><h2>Observe a rollout and reverse it</h2></div>
+    <pre data-language="bash"><code>kubectl set image deployment/ticketforge-api \
+  api=ticketforge-api:&lt;new-release&gt; \
+  --namespace ticketforge
+
+kubectl rollout status deployment/ticketforge-api \
+  --namespace ticketforge --timeout=240s
+
+kubectl rollout history deployment/ticketforge-api \
+  --namespace ticketforge
+
+kubectl rollout undo deployment/ticketforge-api \
+  --namespace ticketforge
+
+kubectl rollout status deployment/ticketforge-api \
+  --namespace ticketforge --timeout=240s</code></pre>
+    <div class="syntax-list"><div><code>maxUnavailable</code><p>Limits old capacity removed during an update.</p></div><div><code>maxSurge</code><p>Limits temporary extra capacity while new Pods prove readiness.</p></div><div><code>rollout undo</code><p>Restores the previous Pod template; it does not reverse database migrations or external side effects.</p></div></div>
+    <button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · recovery rehearsed' : 'Mark rollout exercise complete' }}</button>
+  </section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>Redis becomes unavailable. Which probe should fail?</h2></div><div class="quiz-options"><button class="quiz-option" [class.incorrect]="answer() === 'liveness'" (click)="selectAnswer('liveness')">Liveness only</button><button class="quiz-option" [class.correct]="answer() === 'readiness'" (click)="selectAnswer('readiness')">Readiness only</button><button class="quiz-option" [class.incorrect]="answer() === 'both'" (click)="selectAnswer('both')">Both probes</button></div>
+    @if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'readiness'">@if (answer() === 'readiness') { Correct. Stop new traffic while keeping the healthy process alive so the dependency can recover. } @else { Restarting healthy processes during a shared dependency outage creates a restart storm without repairing Redis. }</p> }
+  </section>
+</div>
+
