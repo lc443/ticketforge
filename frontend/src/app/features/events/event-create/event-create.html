@@ -1,0 +1,39 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <span class="stub-tag">Events</span>
+    <h1>Create an event</h1>
+    <p class="sub">Any signed-in account can do this today — there's no admin role check on the backend yet.</p>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Name
+        <input type="text" name="name" [(ngModel)]="name" required autocomplete="off" />
+      </label>
+
+      <label>
+        Venue
+        <input type="text" name="venue" [(ngModel)]="venue" required autocomplete="off" />
+      </label>
+
+      <label>
+        Date &amp; time
+        <input type="datetime-local" name="eventDate" [(ngModel)]="eventDate" required />
+      </label>
+
+      <label>
+        Total tickets
+        <input type="number" name="totalTickets" [(ngModel)]="totalTickets" min="1" required />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? 'Creating…' : 'Create Event' }}
+      </button>
+    </form>
+
+    <p class="switch"><a routerLink="/events">← Back to events</a></p>
+  </div>
+</section>

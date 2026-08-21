@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/events/{eventId}/reservations")
 @RequiredArgsConstructor
@@ -19,8 +21,9 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse createReservation(
             @PathVariable Long eventId,
-            @Valid @RequestBody CreateReservationRequest request
+            @Valid @RequestBody CreateReservationRequest request,
+            Principal principal
     ) {
-        return reservationService.createReservation(eventId, request);
+        return reservationService.createReservation(eventId, request, principal.getName());
     }
 }

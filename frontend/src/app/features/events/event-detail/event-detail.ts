@@ -6,6 +6,7 @@ import { EventService } from '../../../core/services/event.service';
 import { ReservationService } from '../../../core/services/reservation.service';
 import { Event } from '../../../shared/models/event.model';
 import { ReservationResponse } from '../../../shared/models/reservation.model';
+import { apiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-event-detail',
@@ -42,9 +43,9 @@ export class EventDetail implements OnInit {
         this.event.set(event);
         this.loading.set(false);
       },
-      error: () => {
+      error: (error) => {
         this.loading.set(false);
-        this.error.set('Event not found.');
+        this.error.set(apiErrorMessage(error, 'Could not load the event.'));
       },
     });
   }
@@ -70,11 +71,7 @@ export class EventDetail implements OnInit {
       },
       error: (err) => {
         this.reserving.set(false);
-        this.reserveError.set(
-          err.status === 409
-            ? 'Not enough tickets left for that quantity.'
-            : 'Reservation failed. Try again.'
-        );
+        this.reserveError.set(apiErrorMessage(err, 'Reservation failed. Try again.'));
       },
     });
   }

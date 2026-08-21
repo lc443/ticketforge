@@ -73,6 +73,10 @@
   margin-bottom: 20px;
 }
 
+.run-context { margin: 0 0 16px; color: var(--ink-soft); font-size: 13px; }
+.command-note { margin: 12px 0 0; color: var(--ink-soft); font-size: 12px; }
+.command-note code { color: var(--stamp); }
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

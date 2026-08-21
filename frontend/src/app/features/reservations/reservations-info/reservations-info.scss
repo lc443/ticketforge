@@ -1,65 +1,40 @@
-.info-page {
-  max-width: 620px;
-  margin: 0 auto;
-  padding: 32px 20px 60px;
-}
-
-.info-card {
-  background: var(--paper-raised);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  padding: 28px;
-}
-
-.stub-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 3px 10px;
-  margin-bottom: 12px;
-
-  &.gap {
-    color: var(--gap);
-    background: var(--gap-bg);
-  }
-}
-
-h1 {
-  font-size: 1.4rem;
-  margin-bottom: 14px;
-}
-
-p {
-  margin: 0 0 14px;
-  line-height: 1.6;
-}
-
-a {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-code {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.85em;
-}
-
-ul {
-  margin: 0 0 14px;
-  padding-left: 20px;
-  line-height: 1.7;
-}
-
-.right-now {
-  padding-top: 12px;
-  border-top: 1px dashed var(--line);
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-}
+.reservations-page { max-width: 980px; margin: 0 auto; padding: 32px 20px 64px; }
+.page-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:26px;
+  h1 { margin:0; font-size:1.8rem; } p { margin:6px 0 0; color:var(--ink-soft); } }
+.stub-tag { display:inline-block; margin-bottom:8px; padding:3px 10px; border-radius:999px; color:var(--stamp);
+  background:var(--stamp-soft); font:0.72rem var(--font-mono); letter-spacing:.06em; text-transform:uppercase; }
+.summary { display:flex; align-items:center; gap:6px; color:var(--ink-soft); font:0.78rem var(--font-mono);
+  strong { color:var(--ink); font-size:1rem; } i { width:1px; height:18px; margin:0 7px; background:var(--line); } }
+.reservation-list { display:grid; gap:16px; }
+.reservation-card { position:relative; display:grid; grid-template-columns:1fr 170px; overflow:hidden; background:var(--paper-raised);
+  border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm);
+  &::before,&::after { position:absolute; right:161px; z-index:1; width:18px; height:18px; content:'';
+    background:var(--paper); border:1px solid var(--line); border-radius:50%; }
+  &::before { top:-10px; } &::after { bottom:-10px; } }
+.ticket-main { padding:22px 26px; h2 { margin:13px 0 3px; font-size:1.2rem; } }
+.ticket-topline { display:flex; align-items:center; justify-content:space-between; }
+.status { padding:4px 9px; border-radius:999px; font:700 .68rem var(--font-mono); letter-spacing:.05em; text-transform:uppercase;
+  &.pending { color:#8a4b0f; background:#fff1d6; } &.confirmed { color:var(--stamp); background:var(--stamp-soft); }
+  &.expired,&.cancelled { color:var(--gap); background:var(--gap-bg); } }
+.reservation-id { color:var(--ink-soft); font:.75rem var(--font-mono); }
+.venue { margin:0; color:var(--ink-soft); }
+.details { display:flex; gap:48px; margin-top:20px; div { display:grid; gap:3px; }
+  span { color:var(--ink-soft); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; }
+  strong { font-size:.86rem; font-weight:600; } }
+.ticket-quantity { display:flex; flex-direction:column; align-items:center; justify-content:center; border-left:1px dashed var(--line);
+  span { color:var(--ink-soft); font:.7rem var(--font-mono); text-transform:uppercase; }
+  strong { margin:2px 0 12px; color:var(--accent); font-size:2rem; }
+  a { color:var(--stamp); font-size:.78rem; font-weight:600; text-decoration:none; } }
+.state-card { display:grid; justify-items:center; max-width:520px; margin:50px auto; padding:42px 28px; text-align:center;
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm);
+  h2 { margin:14px 0 5px; } p { margin:0; color:var(--ink-soft); }
+  a,button { margin-top:20px; padding:9px 17px; color:#fff; background:var(--accent); border:0; border-radius:var(--radius-sm);
+    font:600 1rem inherit; text-decoration:none; cursor:pointer; } }
+.ticket-icon,.state-icon { display:grid; width:52px; height:52px; place-items:center; border-radius:14px; color:#fff;
+  background:var(--ink); font:700 1rem var(--font-mono); }
+.error-state .state-icon { background:var(--gap); }
+.loader { width:24px; height:24px; border:3px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media(max-width:680px) { .page-head { align-items:flex-start; flex-direction:column; } .reservation-card { grid-template-columns:1fr; }
+  .reservation-card::before,.reservation-card::after { display:none; } .ticket-quantity { padding:16px; border-top:1px dashed var(--line); border-left:0; }
+  .details { flex-direction:column; gap:12px; } }

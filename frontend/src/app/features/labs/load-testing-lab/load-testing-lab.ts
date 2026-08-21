@@ -1,105 +1,42 @@
-// src/app/features/labs/load-testing-lab/load-testing-lab.ts
-
 import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
 
-type Load = 10 | 100 | 1000 | 5000;
-
-interface Metrics {
-  rps: number;
-  p50: number;
-  p95: number;
-  p99: number;
-  errorRate: number;
-}
-
-// Rough, made-up curve: fine up to ~500 concurrent users, then the
-// (single, unscaled) instance starts queuing and erroring.
-function metricsFor(load: Load): Metrics {
-  const capacity = 500;
-  const strain = Math.max(0, load - capacity) / capacity;
-
-  return {
-    rps: Math.round(Math.min(load, capacity) * 0.9 - strain * 30),
-    p50: Math.round(40 + strain * 300),
-    p95: Math.round(90 + strain * 1400),
-    p99: Math.round(160 + strain * 3200),
-    errorRate: Math.round(Math.min(60, strain * 45) * 10) / 10,
-  };
+type RunId = 'smoke' | 'browse';
+interface MeasuredRun {
+  id: RunId; label: string; traffic: string; requests: number; successRate: number;
+  p95: number; p99: number; rateLimited: number; result: 'passed' | 'threshold-failed'; note: string;
 }
 
 @Component({
-  selector: 'app-load-testing-lab',
-  standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
-  templateUrl: './load-testing-lab.html',
+  selector: 'app-load-testing-lab', standalone: true,
+  imports: [ScenarioCard, LabBreadcrumb], templateUrl: './load-testing-lab.html',
   styleUrl: './load-testing-lab.scss',
 })
 export class LoadTestingLab {
-  loads: Load[] = [10, 100, 1000, 5000];
-  load = signal<Load>(10);
-  running = signal(false);
-  ran = signal(false);
-
-  metrics = computed<Metrics>(() => metricsFor(this.load()));
-
+  runs: MeasuredRun[] = [
+    { id: 'smoke', label: 'Smoke', traffic: '1 iteration', requests: 2, successRate: 100,
+      p95: 413.21, p99: 426.83, rateLimited: 0, result: 'passed',
+      note: 'Login and event listing both succeeded. This proves the path works, not that it scales.' },
+    { id: 'browse', label: 'Browse baseline', traffic: '5 req/s · 10 seconds', requests: 51,
+      successRate: 20, p95: 16.51, p99: 275.45, rateLimited: 40, result: 'threshold-failed',
+      note: 'The API stayed fast, but Redis rate limiting rejected 80% of browse operations after the first 10.' },
+  ];
+  selectedId = signal<RunId>('browse');
+  selectedRun = computed(() => this.runs.find((run) => run.id === this.selectedId())!);
   quiz = [
-    {
-      question: 'What is the rule this sprint is built around?',
-      options: [
-        'Optimize first, measure later',
-        'Measure before optimizing',
-        'Never measure — trust your instincts',
-      ],
-      correct: 1,
-    },
-    {
-      question: "HealthCare.gov's 2013 launch is the cautionary tale here because:",
-      options: [
-        'The code had a typo',
-        'It was never load-tested at real-world scale before it mattered',
-        'It used the wrong programming language',
-      ],
-      correct: 1,
-    },
-    {
-      question: 'Why look at p95/p99 latency instead of just the average?',
-      options: [
-        'Averages hide the slow requests that real users actually experience',
-        'p95/p99 are easier to calculate',
-        "They're the same number, just renamed",
-      ],
-      correct: 0,
-    },
+    { question: 'The browse run had a 16.51ms p95 but only 20% business success. Was it healthy?',
+      options: ['Yes — latency was low', 'No — fast 429 responses are still failed user operations', 'Yes — all HTTP responses count as success'], correct: 1 },
+    { question: 'What is the rule this sprint is built around?',
+      options: ['Optimize first, measure later', 'Measure before optimizing', 'Trust architectural assumptions'], correct: 1 },
+    { question: 'Why inspect p95/p99 instead of only the average?',
+      options: ['Averages hide slow requests that real users experience', 'They are easier to calculate', 'They are the same number'], correct: 0 },
   ];
   quizAnswers = signal<Record<number, number | null>>({});
-
-  async run() {
-    if (this.running()) return;
-    this.running.set(true);
-    this.ran.set(false);
-    await new Promise((r) => setTimeout(r, 700));
-    this.ran.set(true);
-    this.running.set(false);
+  select(id: RunId) { this.selectedId.set(id); }
+  answerQuiz(i: number, answer: number) {
+    if (this.quizAnswers()[i] == null) this.quizAnswers.update((a) => ({ ...a, [i]: answer }));
   }
-
-  setLoad(load: Load) {
-    if (this.running()) return;
-    this.load.set(load);
-    this.ran.set(false);
-  }
-
-  answerQuiz(i: number, index: number) {
-    if (this.quizAnswers()[i] != null) return;
-    this.quizAnswers.update((a) => ({ ...a, [i]: index }));
-  }
-
-  wasAnswered(i: number) {
-    return this.quizAnswers()[i] != null;
-  }
-
-  selected(i: number) {
-    return this.quizAnswers()[i] ?? null;
-  }
+  wasAnswered(i: number) { return this.quizAnswers()[i] != null; }
+  selectedAnswer(i: number) { return this.quizAnswers()[i] ?? null; }
 }

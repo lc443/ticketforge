@@ -30,6 +30,16 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
 
+      // Registered before 'events/:id' — route matching is order-sensitive,
+      // and a param route would otherwise swallow '/events/new' with
+      // id='new'.
+      {
+        path: 'events/new',
+        loadComponent: () =>
+          import('./features/events/event-create/event-create').then((m) => m.EventCreate),
+        canActivate: [authGuard],
+      },
+
       {
         path: 'events/:id',
         loadComponent: () =>

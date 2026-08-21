@@ -5,6 +5,10 @@
 }
 
 .page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
@@ -25,11 +29,31 @@ h1 {
   font-size: 1.7rem;
 }
 
+.create-link {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
+
 .status {
   color: var(--ink-soft);
 
   &.error {
     color: var(--gap);
+  }
+
+  a {
+    color: var(--accent);
+    font-weight: 600;
   }
 }
 

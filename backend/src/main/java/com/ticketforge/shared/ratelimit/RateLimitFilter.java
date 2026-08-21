@@ -1,5 +1,6 @@
 package com.ticketforge.shared.ratelimit;
 
+import com.ticketforge.shared.error.ApiErrorWriter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RateLimitService rateLimitService;
+    private final ApiErrorWriter apiErrorWriter;
 
     @Override
     protected void doFilterInternal(
@@ -32,8 +34,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String clientIp = request.getRemoteAddr();
 
         if (!rateLimitService.isAllowed(clientIp)) {
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.getWriter().write("Rate limit exceeded");
+            apiErrorWriter.write(
+                    request, response, HttpStatus.TOO_MANY_REQUESTS,
+                    "Rate limit exceeded. Try again in one minute."
+            );
             return;
         }
 

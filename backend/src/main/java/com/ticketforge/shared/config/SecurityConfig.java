@@ -2,6 +2,7 @@ package com.ticketforge.shared.config;
 
 import com.ticketforge.auth.security.JwtAuthenticationFilter;
 import com.ticketforge.shared.ratelimit.RateLimitFilter;
+import com.ticketforge.shared.error.ApiErrorWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RateLimitFilter rateLimitFilter;
+    private final ApiErrorWriter apiErrorWriter;
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -31,10 +33,28 @@ public class SecurityConfig {
 
                 .csrf(csrf -> csrf.disable())
 
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, exception) ->
+                                apiErrorWriter.write(
+                                        request, response,
+                                        org.springframework.http.HttpStatus.UNAUTHORIZED,
+                                        "Authentication is required to access this resource."
+                                )
+                        )
+                        .accessDeniedHandler((request, response, exception) ->
+                                apiErrorWriter.write(
+                                        request, response,
+                                        org.springframework.http.HttpStatus.FORBIDDEN,
+                                        "You do not have permission to access this resource."
+                                )
+                        )
+                )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/error"
                         )
                         .permitAll()
                         .anyRequest()

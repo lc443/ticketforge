@@ -1,6 +1,6 @@
 package com.ticketforge.reservation.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.ticketforge.reservation.entity.OutboxEvent;
 import com.ticketforge.reservation.event.ReservationCreatedEvent;
 import com.ticketforge.reservation.repository.OutboxEventRepository;

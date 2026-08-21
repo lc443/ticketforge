@@ -13,3 +13,9 @@ export interface ReservationResponse {
   status: ReservationStatus;
   reservedAt: string;
 }
+
+export interface MyReservation extends ReservationResponse {
+  eventName: string;
+  venue: string;
+  eventDate: string;
+}

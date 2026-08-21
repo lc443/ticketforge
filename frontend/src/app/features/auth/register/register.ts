@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { apiErrorMessage } from '../../../core/http/api-error';
 
 @Component({
   selector: 'app-register',
@@ -46,9 +47,9 @@ export class Register {
             },
           });
         },
-        error: () => {
+        error: (error) => {
           this.loading.set(false);
-          this.error.set('Registration failed. Email may already be in use.');
+          this.error.set(apiErrorMessage(error, 'Registration failed.'));
         },
       });
   }

@@ -16,7 +16,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 ### Level 2: Performance & Scaling
 
--   Sprint 3: Load testing
+-   Sprint 3: Load testing ✅ — real k6 suite; smoke passed; browse baseline measured 20% business success under the current distributed rate limit
 -   Sprint 4: Horizontal scaling
 -   Sprint 5: Redis caching
 -   Sprint 6: Distributed rate limiting

@@ -73,8 +73,8 @@ export class Roadmap {
         {
           num: '3',
           name: 'Load Testing',
-          note: 'Skipped — load-tests/ is empty, no review exists',
-          status: 'gap',
+          note: 'Real k6 smoke, browse, rate-limit, and last-ticket scenarios; baseline exposed the 10 req/min limiter as the first bottleneck',
+          status: 'done',
         },
         {
           num: '4',

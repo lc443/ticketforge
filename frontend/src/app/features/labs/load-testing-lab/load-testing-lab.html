@@ -1,144 +1,55 @@
 <div class="lab-container">
   <app-lab-breadcrumb path="/labs/load-testing" />
+  <header class="hero"><div><span class="eyebrow">Sprint 3</span>
+    <span class="badge ok">Built · real k6 results</span><h1>Load Testing Lab</h1>
+    <p>Real traffic, measured thresholds, and the first evidence-backed TicketForge bottleneck.</p></div></header>
 
-  <header class="hero">
-    <div>
-      <span class="eyebrow">Sprint 3</span>
-      <span class="badge bad">Gap — not run yet</span>
-      <h1>Load Testing Lab</h1>
-      <p>TicketForge has never actually been load-tested. Here's what that would show.</p>
-    </div>
-  </header>
-
-  <app-scenario-card
-    eyebrow="Sprint 3 · still a gap"
-    title="Why measure before optimizing"
-  >
+  <app-scenario-card eyebrow="Sprint 3 · measured against TicketForge" title="Why measure before optimizing">
     <div class="scenario-grid">
-      <div class="scenario-card problem">
-        <span class="scenario-label">The problem</span>
+      <div class="scenario-card problem"><span class="scenario-label">The problem</span>
         <h3>You don't know where it breaks until you push it.</h3>
-        <p>
-          Every optimization sprint after this one — caching, rate limiting, scaling — is a
-          guess about the bottleneck unless something actually measured where it is first.
-        </p>
-      </div>
-
-      <div class="scenario-card solution">
-        <span class="scenario-label">The solution</span>
-        <h3>Generate load, watch it degrade, find the wall.</h3>
-        <p>
-          10 → 100 → 1,000 → 5,000 concurrent users. Track requests/sec, p50/p95/p99 latency,
-          and error rate at each level, not just "does it work."
-        </p>
-      </div>
+        <p>Caching, scaling, and rate limiting are assumptions unless traffic measures where the system actually stops serving users.</p></div>
+      <div class="scenario-card solution"><span class="scenario-label">The solution</span>
+        <h3>Generate load, define thresholds, and find the wall.</h3>
+        <p>Run reproducible k6 scenarios against NGINX. Track business success, p95/p99 latency, rate-limit rejections, and correctness.</p></div>
     </div>
-
-    <div class="scenario-why">
-      <span class="scenario-label">Why it works</span>
-      <ul>
-        <li><strong>Finds the real bottleneck</strong> instead of the assumed one.</li>
-        <li><strong>p95/p99, not average</strong> — the number that matches what a real user feels.</li>
-        <li><strong>A baseline</strong> to compare against once Sprint 4–6 fixes land.</li>
-      </ul>
-    </div>
+    <div class="scenario-why"><span class="scenario-label">Why it works</span><ul>
+      <li><strong>Finds the real bottleneck</strong> instead of the assumed one.</li>
+      <li><strong>Separates HTTP speed from business success</strong> — a fast 429 still failed the user.</li>
+      <li><strong>Creates a baseline</strong> for later architecture comparisons.</li>
+    </ul></div>
   </app-scenario-card>
 
   <div class="card">
-    <div class="section-title">
-      <span class="eyebrow">Try it</span>
-      <h2>Simulated load test</h2>
-      <p>One unscaled instance. Pick a concurrency level and run it.</p>
-    </div>
-
+    <div class="section-title"><span class="eyebrow">Evidence</span><h2>Measured runs</h2>
+      <p>Captured locally on August 20, 2026. Select a real k6 run to inspect its outcome.</p></div>
     <div class="load-toggle">
-      @for (l of loads; track l) {
-        <button
-          type="button"
-          [class.active]="load() === l"
-          [disabled]="running()"
-          (click)="setLoad(l)"
-        >
-          {{ l }} users
-        </button>
+      @for (run of runs; track run.id) {
+        <button type="button" [class.active]="selectedId() === run.id" (click)="select(run.id)">{{ run.label }}</button>
       }
     </div>
-
-    <button
-      class="primary-btn run-btn"
-      type="button"
-      [disabled]="running()"
-      (click)="run()"
-    >
-      {{ running() ? 'Running...' : 'Run Load Test' }}
-    </button>
-
-    @if (ran()) {
-      <div class="metrics reveal">
-        <div class="metric">
-          <span class="metric-value">{{ metrics().rps }}</span>
-          <span class="metric-label">req/sec</span>
-        </div>
-        <div class="metric">
-          <span class="metric-value">{{ metrics().p50 }}ms</span>
-          <span class="metric-label">p50</span>
-        </div>
-        <div
-          class="metric"
-          [class.warn]="metrics().p95 > 400"
-        >
-          <span class="metric-value">{{ metrics().p95 }}ms</span>
-          <span class="metric-label">p95</span>
-        </div>
-        <div
-          class="metric"
-          [class.bad]="metrics().p99 > 1000"
-        >
-          <span class="metric-value">{{ metrics().p99 }}ms</span>
-          <span class="metric-label">p99</span>
-        </div>
-        <div
-          class="metric"
-          [class.bad]="metrics().errorRate > 0"
-        >
-          <span class="metric-value">{{ metrics().errorRate }}%</span>
-          <span class="metric-label">error rate</span>
-        </div>
-      </div>
-
-      @if (metrics().errorRate > 0) {
-        <p class="load-note">
-          Past ~500 concurrent users this one instance starts queuing and erroring — exactly the
-          wall Sprint 4 (horizontal scaling) and Sprint 5 (caching) exist to push back.
-        </p>
-      }
-    }
+    <p class="run-context"><strong>{{ selectedRun().traffic }}</strong> ·
+      {{ selectedRun().result === 'passed' ? 'Thresholds passed' : 'Business-success threshold failed as expected' }}</p>
+    <div class="metrics reveal">
+      <div class="metric"><span class="metric-value">{{ selectedRun().requests }}</span><span class="metric-label">HTTP requests</span></div>
+      <div class="metric"><span class="metric-value">{{ selectedRun().successRate }}%</span><span class="metric-label">business success</span></div>
+      <div class="metric"><span class="metric-value">{{ selectedRun().p95 }}ms</span><span class="metric-label">p95</span></div>
+      <div class="metric"><span class="metric-value">{{ selectedRun().p99 }}ms</span><span class="metric-label">p99</span></div>
+      <div class="metric" [class.bad]="selectedRun().rateLimited > 0"><span class="metric-value">{{ selectedRun().rateLimited }}</span><span class="metric-label">rate limited</span></div>
+    </div>
+    <p class="load-note">{{ selectedRun().note }}</p>
+    <p class="command-note"><code>load-tests/</code> contains runnable smoke, browse, rate-limit, and last-ticket scenarios with JSON result exports.</p>
   </div>
 
-  <div class="card quiz-card">
-    <div class="section-title">
-      <span class="eyebrow">Check yourself</span>
-      <h2>Quick check</h2>
-    </div>
-
+  <div class="card quiz-card"><div class="section-title"><span class="eyebrow">Check yourself</span><h2>Quick check</h2></div>
     @for (q of quiz; track q.question; let qi = $index) {
-      <div class="quiz">
-        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
-        <div class="quiz-options">
-          @for (option of q.options; track option; let i = $index) {
-            <button
-              type="button"
-              class="quiz-option"
-              [class.correct]="wasAnswered(qi) && i === q.correct"
-              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
-              [disabled]="wasAnswered(qi)"
-              (click)="answerQuiz(qi, i)"
-            >
-              {{ option }}
-            </button>
-          }
-        </div>
-      </div>
+      <div class="quiz"><p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p><div class="quiz-options">
+        @for (option of q.options; track option; let i = $index) {
+          <button type="button" class="quiz-option" [class.correct]="wasAnswered(qi) && i === q.correct"
+            [class.incorrect]="wasAnswered(qi) && selectedAnswer(qi) === i && i !== q.correct"
+            [disabled]="wasAnswered(qi)" (click)="answerQuiz(qi, i)">{{ option }}</button>
+        }
+      </div></div>
     }
   </div>
 </div>

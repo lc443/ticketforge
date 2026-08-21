@@ -1,7 +1,10 @@
 <section class="events-page">
   <header class="page-head">
-    <span class="stub-tag">Events</span>
-    <h1>Upcoming events</h1>
+    <div>
+      <span class="stub-tag">Events</span>
+      <h1>Upcoming events</h1>
+    </div>
+    <a class="create-link" routerLink="/events/new">+ Create Event</a>
   </header>
 
   @if (loading()) {
@@ -9,7 +12,7 @@
   } @else if (error()) {
     <p class="status error">{{ error() }}</p>
   } @else if (events().length === 0) {
-    <p class="status">No events yet.</p>
+    <p class="status">No events yet. <a routerLink="/events/new">Create one</a>.</p>
   } @else {
     <div class="event-grid">
       @for (event of events(); track event.id) {

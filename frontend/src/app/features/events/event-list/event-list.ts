@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { EventService } from '../../../core/services/event.service';
+import { apiErrorMessage } from '../../../core/http/api-error';
 import { Event } from '../../../shared/models/event.model';
 
 @Component({
@@ -24,9 +25,9 @@ export class EventList implements OnInit {
         this.events.set(events);
         this.loading.set(false);
       },
-      error: () => {
+      error: (error) => {
         this.loading.set(false);
-        this.error.set('Could not load events. Is the backend running?');
+        this.error.set(apiErrorMessage(error, 'Could not load events.'));
       },
     });
   }

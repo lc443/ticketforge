@@ -1,33 +1,42 @@
-<section class="info-page">
-  <div class="info-card">
-    <span class="stub-tag gap">Gap</span>
-    <h1>My Reservations isn't buildable yet</h1>
+<section class="reservations-page">
+  <header class="page-head">
+    <div><span class="stub-tag">Reservations</span><h1>My reservations</h1>
+      <p>Tickets you have reserved across TicketForge events.</p></div>
+    @if (!loading() && reservations().length) {
+      <div class="summary"><strong>{{ reservations().length }}</strong> reservations
+        <i></i><strong>{{ totalTickets() }}</strong> tickets</div>
+    }
+  </header>
 
-    <p>
-      Reserving tickets works — <a routerLink="/events">try it here</a>. But there's no
-      "My Reservations" page, because the backend can't support one yet:
-    </p>
-
-    <ul>
-      <li><code>POST /api/events/{{ '{' }}eventId{{ '}' }}/reservations</code> exists and works.</li>
-      <li>There's no <code>GET</code> endpoint to list reservations — for anyone.</li>
-      <li>
-        The <code>Reservation</code> entity has no link to a <code>User</code> at all, so even
-        with a list endpoint, there'd be no way to filter it to "yours".
-      </li>
-    </ul>
-
-    <p>
-      Fixing this means adding a <code>userId</code> column to <code>Reservation</code>, wiring
-      it from the authenticated principal on create, and adding a
-      <code>GET /api/reservations/mine</code> endpoint — real backend/data-model work, not a UI
-      task. Rather than fake a list with data the API can't actually provide, this page says so
-      plainly instead.
-    </p>
-
-    <p class="right-now">
-      For now: each reservation's confirmation is shown once, right after you make it, on the
-      event page.
-    </p>
-  </div>
+  @if (loading()) {
+    <div class="state-card"><span class="loader"></span><p>Loading your reservations…</p></div>
+  } @else if (error()) {
+    <div class="state-card error-state"><span class="state-icon">!</span>
+      <h2>We couldn't load your reservations</h2><p>{{ error() }}</p>
+      <button type="button" (click)="load()">Try again</button></div>
+  } @else if (!reservations().length) {
+    <div class="state-card"><span class="ticket-icon">TF</span><h2>No reservations yet</h2>
+      <p>Find an event you like and reserve your first tickets.</p>
+      <a routerLink="/events">Browse events</a></div>
+  } @else {
+    <div class="reservation-list">
+      @for (reservation of reservations(); track reservation.id) {
+        <article class="reservation-card">
+          <div class="ticket-main">
+            <div class="ticket-topline">
+              <span [class]="'status ' + reservation.status.toLowerCase()">{{ statusLabel(reservation.status) }}</span>
+              <span class="reservation-id">#{{ reservation.id }}</span>
+            </div>
+            <h2>{{ reservation.eventName }}</h2><p class="venue">{{ reservation.venue }}</p>
+            <div class="details">
+              <div><span>Event date</span><strong>{{ reservation.eventDate | date: 'EEE, MMM d, y · h:mm a' }}</strong></div>
+              <div><span>Reserved on</span><strong>{{ reservation.reservedAt | date: 'MMM d, y · h:mm a' }}</strong></div>
+            </div>
+          </div>
+          <div class="ticket-quantity"><span>Quantity</span><strong>{{ reservation.quantity }}</strong>
+            <a [routerLink]="['/events', reservation.eventId]">View event →</a></div>
+        </article>
+      }
+    </div>
+  }
 </section>

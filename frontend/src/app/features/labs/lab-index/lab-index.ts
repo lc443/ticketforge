@@ -52,9 +52,9 @@ export class LabIndex {
     {
       sprint: 'Sprint 3',
       title: 'Load Testing',
-      blurb: 'Simulated — never actually run against TicketForge yet.',
+      blurb: 'Run real k6 traffic and inspect the first measured bottleneck.',
       path: '/labs/load-testing',
-      status: 'gap',
+      status: 'done',
     },
     {
       sprint: 'Sprint 4',
