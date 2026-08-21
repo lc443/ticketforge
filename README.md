@@ -551,7 +551,7 @@ Kill pods. Exhaust memory. Deploy a broken release. Recover.
 
 **Topics:** ClusterIP, service discovery, DNS, Gateway API, Ingress concepts, TLS
 
-**Implemented evidence:** Cluster DNS and EndpointSlices expose ready backends; NGINX Gateway Fabric routes same-origin `/api` and `/` traffic; production renders HTTPS termination; NetworkPolicy intent is declared with the kindnet enforcement limitation documented. See [ADR-008](architecture/decisions/ADR-008-kubernetes-network-edge.md) and the [networking runbook](architecture/delivery/kubernetes-networking-runbook.md).
+**Implemented evidence:** Cluster DNS and EndpointSlices expose ready backends; NGINX Gateway Fabric routes same-origin `/api` and `/` traffic; production renders HTTPS termination; a later denied/allowed load drill proved the default-deny NetworkPolicy path. See [ADR-008](architecture/decisions/ADR-008-kubernetes-network-edge.md) and the [networking runbook](architecture/delivery/kubernetes-networking-runbook.md).
 
 **Why it matters:** pod IPs change constantly as things get rescheduled; DNS-based service discovery is the only reason anything can reliably find anything else inside the cluster.
 
@@ -563,6 +563,8 @@ Traffic ↑             Traffic ↓
 ```
 
 **Topics:** Horizontal Pod Autoscaler (HPA), metrics server, resource management
+
+**Implemented evidence:** Metrics Server supplies CPU observations; a failed 3→6 experiment exposed node/control-plane saturation and disproved the 100m request; a corrected 500m request and bounded HPA scaled 3→4 under policy-aware load and returned 4→3 after demand. See [ADR-009](architecture/decisions/ADR-009-bounded-api-autoscaling.md) and the [autoscaling runbook](architecture/delivery/kubernetes-autoscaling-runbook.md).
 
 **Why it matters:** this is the exact mechanism large retailers lean on to absorb Black-Friday-scale traffic spikes without paying for that peak capacity 365 days a year. You're about to watch the same curve happen to your own pods.
 

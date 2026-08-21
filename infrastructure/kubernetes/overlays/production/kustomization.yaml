@@ -14,4 +14,5 @@ images:
     newTag: replace-with-immutable-release
 patches:
   - path: api-production.yaml
+  - path: api-hpa-production.yaml
   - path: gateway-production.yaml

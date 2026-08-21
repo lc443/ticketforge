@@ -196,8 +196,8 @@ export class Roadmap {
         {
           num: '21',
           name: 'Autoscaling',
-          note: 'HPA, metrics server',
-          status: 'todo',
+          note: 'Metrics Server, corrected CPU requests, autoscaling/v2 behavior, bounded 3→4 scale-out, stabilized 4→3 scale-in, NetworkPolicy-aware load drill, and node-capacity failure evidence',
+          status: 'done',
         },
         {
           num: '22',

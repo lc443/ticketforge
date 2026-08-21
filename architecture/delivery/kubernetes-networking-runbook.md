@@ -92,5 +92,4 @@ docker exec ticketforge-control-plane \
 kubectl get networkpolicy --namespace ticketforge
 ```
 
-kindnet does not enforce NetworkPolicy. Run allowed/denied connectivity tests on Cilium, Calico, or another documented enforcing CNI before asserting isolation.
-
+Do not infer enforcement only from CNI configuration. Prove it: a denied client must time out under default-deny, then succeed only after applying an explicit source/destination/port allow policy. Sprint 21 captured that evidence with `hpa-load.yaml`.

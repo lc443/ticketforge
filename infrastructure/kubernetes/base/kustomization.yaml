@@ -7,6 +7,7 @@ resources:
   - redis.yaml
   - kafka.yaml
   - api.yaml
+  - api-hpa.yaml
   - frontend.yaml
   - gateway.yaml
   - network-policy.yaml

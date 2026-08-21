@@ -22,7 +22,7 @@ TicketForge now has a declared Kubernetes traffic path from one Gateway to same-
 
 ## Accepted limitations
 
-- kindnet accepts but does not enforce NetworkPolicy; isolation is declared, not proven.
+- Sprint 20 did not run an allow/deny drill. Sprint 21 later proved enforcement when default-deny blocked a load Pod and a narrow allow policy restored only its API path.
 - TLS references an external Secret and example hostname; certificate issuance/renewal is not installed.
 - Local NodePort access uses port-forward because the original kind cluster lacks a host port mapping.
 - Internal gateway-to-service traffic is plaintext.
@@ -31,4 +31,3 @@ TicketForge now has a declared Kubernetes traffic path from one Gateway to same-
 ## Next decision
 
 Sprint 21 addresses autoscaling: metrics availability, CPU versus demand signals, HPA behavior, resource requests, load generation, stabilization, and cost/capacity evidence.
-

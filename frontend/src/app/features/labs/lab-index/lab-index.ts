@@ -140,11 +140,16 @@ export class LabIndex {
       blurb: 'Trace Service DNS, publish path-based Gateway routes, design TLS termination, and declare least-privilege traffic.',
       path: '/labs/kubernetes-networking', status: 'done',
     },
+    {
+      sprint: 'Sprint 21', title: 'Kubernetes Autoscaling',
+      blurb: 'Connect resource requests to HPA math, prove bounded scale-out and scale-in, and diagnose node-capacity collapse.',
+      path: '/labs/kubernetes-autoscaling', status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 21–22',
+      sprint: 'Sprint 22',
       title: 'Kubernetes Platform Architecture',
       blurb: 'Choose workload boundaries, health checks, networking, scaling, packaging, and operational policies.',
       status: 'planned',

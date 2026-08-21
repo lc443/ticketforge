@@ -163,6 +163,10 @@ export const routes: Routes = [
         path: 'labs/kubernetes-networking',
         loadComponent: () => import('./features/labs/kubernetes-networking-lab/kubernetes-networking-lab').then((m) => m.KubernetesNetworkingLab),
       },
+      {
+        path: 'labs/kubernetes-autoscaling',
+        loadComponent: () => import('./features/labs/kubernetes-autoscaling-lab/kubernetes-autoscaling-lab').then((m) => m.KubernetesAutoscalingLab),
+      },
 
       {
         path: 'lab/cache',

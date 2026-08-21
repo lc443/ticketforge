@@ -36,7 +36,7 @@ Rejected for Kubernetes. It duplicated edge ownership and the Compose-only `api-
 - Browser API calls remain same-origin, avoiding a new CORS boundary.
 - Gateway controller installation is a platform prerequisite and must be version-managed separately.
 - TLS termination protects north-south traffic; internal plaintext remains an explicit future decision.
-- NetworkPolicy manifests are portable intent, but proof requires an enforcing CNI. kindnet does not provide that evidence.
+- NetworkPolicy manifests require behavioral proof. Sprint 21 later showed a direct load Pod timing out under default-deny and succeeding only after a label-scoped allow policy was applied.
 
 ## Evidence
 
@@ -46,4 +46,3 @@ Rejected for Kubernetes. It duplicated edge ownership and the Compose-only `api-
 - `/api/events` through the same gateway returned Spring's structured HTTP 401 response.
 - EndpointSlices contained three API endpoints and two frontend endpoints.
 - Development and production overlays passed server-side validation.
-
