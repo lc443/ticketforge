@@ -1,0 +1,808 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/cicd" />
+
+  <header class="hero">
+    <span class="eyebrow">Sprint 17 · in progress</span>
+    <h1>CI/CD & software supply chain</h1>
+    <p>
+      Build an automated path from untrusted source change to tested, traceable, promotable
+      container artifact.
+    </p>
+  </header>
+
+  <app-scenario-card
+    eyebrow="Delivery scenario"
+    title="A green laptop build is not release evidence"
+  >
+    <div class="scenario-grid">
+      <section class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>A change can compile locally and still be unsafe to release.</h3>
+        <p>
+          It may use the wrong Java or Node version, break an integration, fail a clean Docker
+          build, contain a vulnerable dependency, or produce an artifact nobody can trace back to
+          reviewed source.
+        </p>
+      </section>
+      <section class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Make evidence an automated promotion requirement.</h3>
+        <p>
+          Pull requests receive read-only correctness gates. Trusted main builds publish immutable
+          images, scan them, attest their provenance, and promote the same digest between
+          environments.
+        </p>
+      </section>
+    </div>
+  </app-scenario-card>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Mental model</span>
+      <h2>CI validates change; CD moves verified artifacts</h2>
+    </div>
+    <div class="pipeline-flow" aria-label="TicketForge delivery flow">
+      <div><strong>Commit</strong><span>candidate source</span></div>
+      <i>→</i>
+      <div><strong>CI gates</strong><span>test · compile</span></div>
+      <i>→</i>
+      <div><strong>Build once</strong><span>OCI images</span></div>
+      <i>→</i>
+      <div><strong>Secure</strong><span>scan · attest</span></div>
+      <i>→</i>
+      <div><strong>Registry</strong><span>GHCR digest</span></div>
+      <i>→</i>
+      <div><strong>Promote</strong><span>environment approval</span></div>
+      <i>→</i>
+      <div><strong>Rollback</strong><span>previous digest</span></div>
+    </div>
+    <div class="callout">
+      <span class="callout-label">Build once, promote many</span>
+      <p>
+        If staging and production rebuild the same Git commit independently, dependency or
+        base-image changes can produce different bytes. TicketForge promotes one verified digest so
+        the artifact tested in staging is exactly the artifact deployed later.
+      </p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Current status</span>
+      <h2>Implemented, verified, and externally pending</h2>
+    </div>
+    <div class="status-grid">
+      <div class="status-item done">
+        <span>Verified</span><strong>Conflict-free baseline</strong>
+        <p>
+          Sprint 17 starts from remote main plus the complete Sprint 16 lifecycle. Angular
+          compilation and 10 lifecycle tests passed after reconciliation.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Verified</span><strong>Pipeline requirements</strong>
+        <p>
+          Trust boundaries, quality attributes, artifact identity, promotion, rollback, timing, and
+          permission requirements are documented.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Verified</span><strong>Correctness gates</strong>
+        <p>
+          Backend, frontend, and container builds are independent jobs. The full backend suite
+          passed 11/11 on Java 21.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Verified</span><strong>Integration network</strong>
+        <p>
+          The Java test container joins the Compose network and resolves PostgreSQL, Redis, and
+          Kafka through service DNS.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Verified</span><strong>Security gates</strong>
+        <p>
+          Trivy scans API, gateway, and frontend artifacts. Fixable HIGH or CRITICAL findings fail
+          the build; all three remediated images passed with zero blocking findings.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Implemented</span><strong>Publication and provenance</strong>
+        <p>
+          A trusted main-only job receives the exact scanned image archive, publishes three GHCR
+          SHA tags, captures their digests, and requests signed attestations.
+        </p>
+      </div>
+      <div class="status-item done">
+        <span>Verified</span><strong>Promotion and rollback</strong>
+        <p>
+          The release Compose override removes local builds and requires API, gateway, and frontend
+          digests. The runbook uses pull, no-build rollout, health checks, and known-good rollback.
+        </p>
+      </div>
+      <div class="status-item next">
+        <span>External proof</span><strong>Trusted GitHub run</strong>
+        <p>
+          The branch must run on GitHub and merge to main before GHCR and OIDC can provide real
+          publication and provenance evidence.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Workflow anatomy</span>
+      <h2>Read GitHub Actions YAML from the outside in</h2>
+    </div>
+    <pre><code>name: Pull request quality gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'sprint-*']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-$&#123;<span></span>&#123; github.workflow &#125;&#125;-$&#123;<span></span>&#123; github.ref &#125;&#125;
+  cancel-in-progress: true
+
+permissions:
+  contents: read</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>name</code>
+        <p>
+          The human-readable workflow name displayed in the Actions UI and branch-protection check
+          list.
+        </p>
+      </div>
+      <div>
+        <code>on</code>
+        <p>
+          Declares events that create a workflow run. YAML treats it as a mapping here, not a shell
+          command.
+        </p>
+      </div>
+      <div>
+        <code>pull_request</code>
+        <p>
+          Validates the proposed merge result targeting <code>main</code>. Pull-request code is an
+          untrusted input.
+        </p>
+      </div>
+      <div>
+        <code>push</code>
+        <p>
+          Runs after commits reach main or a sprint branch, catching changes made without a pull
+          request.
+        </p>
+      </div>
+      <div>
+        <code>'sprint-*'</code>
+        <p>
+          A quoted branch glob. Quoting prevents YAML from interpreting special characters
+          unexpectedly.
+        </p>
+      </div>
+      <div>
+        <code>workflow_dispatch</code>
+        <p>Adds a manual Run workflow button for diagnostics. It does not bypass job gates.</p>
+      </div>
+      <div>
+        <code>concurrency.group</code>
+        <p>
+          Builds a key from workflow and Git ref. Runs for different branches remain independent.
+        </p>
+      </div>
+      <div>
+        <code>$&#123;<span></span>&#123; ... &#125;&#125;</code>
+        <p>
+          GitHub expression syntax evaluated by Actions before the shell runs. It is different from
+          shell <code>$VARIABLE</code> expansion.
+        </p>
+      </div>
+      <div>
+        <code>cancel-in-progress</code>
+        <p>
+          Cancels an older run when a newer commit arrives on the same ref, reducing cost and
+          obsolete feedback.
+        </p>
+      </div>
+      <div>
+        <code>permissions</code>
+        <p>
+          Applies least privilege to the generated <code>GITHUB_TOKEN</code>. CI can read source but
+          cannot publish packages.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Job syntax</span>
+      <h2>A job is an isolated runner responsibility</h2>
+    </div>
+    <pre><code>jobs:
+  backend:
+    name: Backend · Java 21 tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the candidate commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Run a command
+        run: docker version</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>jobs</code>
+        <p>
+          Contains independently scheduled units. Jobs run in parallel unless
+          <code>needs</code> creates a dependency.
+        </p>
+      </div>
+      <div>
+        <code>backend</code>
+        <p>
+          A stable internal job identifier used by branch protection, expressions, and downstream
+          <code>needs</code>.
+        </p>
+      </div>
+      <div>
+        <code>runs-on</code>
+        <p>
+          Selects the runner operating system. TicketForge needs Linux because Docker networking and
+          service containers are part of the evidence.
+        </p>
+      </div>
+      <div>
+        <code>timeout-minutes</code>
+        <p>
+          Bounds cost and prevents a hung dependency or test from consuming a runner indefinitely.
+        </p>
+      </div>
+      <div>
+        <code>steps</code>
+        <p>An ordered list sharing the job workspace. A failing step stops later normal steps.</p>
+      </div>
+      <div>
+        <code>uses</code>
+        <p>
+          Executes a reusable action. TicketForge pins checkout to a full immutable commit SHA
+          rather than a mutable tag.
+        </p>
+      </div>
+      <div>
+        <code>run</code>
+        <p>
+          Executes shell commands on the runner. Multi-line folded YAML with
+          <code>&gt;-</code> becomes one command line.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Backend gate · implemented</span>
+      <h2>Test inside the real dependency network</h2>
+    </div>
+    <pre><code>docker compose -p ticketforge-ci \
+  -f infrastructure/docker/docker-compose.yml \
+  -f infrastructure/docker/docker-compose.ci.yml \
+  up -d --wait postgres redis kafka
+
+docker run --rm \
+  --network ticketforge-ci_default \
+  -e DB_URL=jdbc:postgresql://postgres:5432/ticketforge \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=postgres \
+  -e REDIS_HOST=redis \
+  -e REDIS_PORT=6379 \
+  -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092 \
+  -v "$PWD/backend:/workspace" \
+  -w /workspace \
+  eclipse-temurin:21-jdk \
+  ./mvnw -B test</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>docker compose</code>
+        <p>Creates the dependency containers and a shared network from the checked-in topology.</p>
+      </div>
+      <div>
+        <code>-p ticketforge-ci</code>
+        <p>
+          Sets a deterministic Compose project name. The default network therefore becomes
+          <code>ticketforge-ci_default</code>.
+        </p>
+      </div>
+      <div>
+        <code>-f</code>
+        <p>
+          Applies files from left to right. The base defines the topology; the CI override removes
+          fixed host ports and container names so concurrent runners cannot collide.
+        </p>
+      </div>
+      <div>
+        <code>up -d</code>
+        <p>Reconciles and starts dependencies in detached mode so the next command can run.</p>
+      </div>
+      <div>
+        <code>--wait</code>
+        <p>
+          Waits until selected services are running or healthy instead of relying on startup order.
+        </p>
+      </div>
+      <div>
+        <code>docker run --rm</code>
+        <p>
+          Creates a disposable Java test container and removes it after the Maven process exits.
+        </p>
+      </div>
+      <div>
+        <code>--network</code>
+        <p>
+          Joins the same DNS domain as the dependencies. This makes Kafka's advertised
+          <code>kafka:9092</code> address resolvable.
+        </p>
+      </div>
+      <div>
+        <code>-e</code>
+        <p>
+          Sets environment variables for Spring configuration. Service names are Compose DNS
+          records, not hostnames on the public internet.
+        </p>
+      </div>
+      <div>
+        <code>-v</code>
+        <p>
+          Bind-mounts the checked-out backend into the test container. The left side is runner
+          storage; the right side is container storage.
+        </p>
+      </div>
+      <div>
+        <code>-w</code>
+        <p>Sets the container working directory so <code>./mvnw</code> resolves correctly.</p>
+      </div>
+      <div>
+        <code>-B</code>
+        <p>Runs Maven in batch mode: stable, non-interactive output designed for automation.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="callout-label">Failure discovered while building the gate</span>
+      <p>
+        The first version used host networking. Tests passed, but Kafka advertised
+        <code>kafka:9092</code> and consumers logged <code>UnknownHostException</code>. Joining the
+        Compose network aligned bootstrap and advertised addresses. A green test alone was weaker
+        evidence than a green test with healthy integration logs.
+      </p>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Failure evidence and cleanup</span>
+      <h2>Diagnostics must run even when the normal path stops</h2>
+    </div>
+    <pre><code>- name: Capture dependency logs after a failure
+  if: failure()
+  run: docker compose -p ticketforge-ci \
+    -f infrastructure/docker/docker-compose.yml \
+    -f infrastructure/docker/docker-compose.ci.yml \
+    logs --tail=200 postgres redis kafka
+
+- name: Remove integration dependencies
+  if: always()
+  run: docker compose -p ticketforge-ci \
+    -f infrastructure/docker/docker-compose.yml \
+    -f infrastructure/docker/docker-compose.ci.yml \
+    down --volumes</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>if: failure()</code>
+        <p>
+          Runs only after an earlier failure, preserving bounded diagnostic logs without flooding
+          successful runs.
+        </p>
+      </div>
+      <div>
+        <code>logs --tail=200</code>
+        <p>
+          Captures the latest 200 lines per dependency. The bound protects log storage and reduces
+          accidental secret exposure.
+        </p>
+      </div>
+      <div>
+        <code>if: always()</code>
+        <p>Runs on success, failure, or cancellation. Cleanup cannot depend on the happy path.</p>
+      </div>
+      <div>
+        <code>down --volumes</code>
+        <p>
+          Removes the ephemeral CI containers, network, and test data. Never run this against a
+          production Compose project.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Frontend gate · implemented</span>
+      <h2>Use the declared Node runtime and lockfile</h2>
+    </div>
+    <pre><code>docker run --rm \
+  -v "$PWD/frontend:/workspace" \
+  -w /workspace \
+  node:22-alpine \
+  sh -c 'npm ci &amp;&amp; npm run build'</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>node:22-alpine</code>
+        <p>
+          Matches the frontend Docker builder instead of inheriting whichever Node version a runner
+          happens to provide.
+        </p>
+      </div>
+      <div>
+        <code>sh -c</code>
+        <p>
+          Starts a shell inside the container so two commands can execute as one controlled script.
+        </p>
+      </div>
+      <div>
+        <code>npm ci</code>
+        <p>
+          Installs exactly the lockfile and fails when package metadata disagrees with it. It is the
+          automation form of npm installation.
+        </p>
+      </div>
+      <div>
+        <code>&amp;&amp;</code>
+        <p>
+          Runs the build only when installation exits successfully. The right side is skipped after
+          a non-zero exit.
+        </p>
+      </div>
+      <div>
+        <code>npm run build</code>
+        <p>
+          Executes Angular's production build, including template checking, TypeScript compilation,
+          bundling, and configured budgets.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Container gates · implemented</span>
+      <h2>Prove deployable artifacts build from a clean checkout</h2>
+    </div>
+    <pre><code>docker build \
+  -f infrastructure/docker/Dockerfile.api \
+  -t ticketforge-api:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  .
+
+docker build \
+  -f infrastructure/docker/Dockerfile.frontend \
+  -t ticketforge-frontend:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  .
+
+docker build \
+  -f infrastructure/docker/Dockerfile.gateway \
+  -t ticketforge-gateway:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  .</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>docker build</code>
+        <p>Executes Dockerfile stages and produces a local OCI image when every layer succeeds.</p>
+      </div>
+      <div>
+        <code>-f</code>
+        <p>Points to a Dockerfile while retaining repository root as the build context.</p>
+      </div>
+      <div>
+        <code>-t name:tag</code>
+        <p>
+          Assigns a local reference. <code>github.sha</code> identifies the exact candidate commit.
+        </p>
+      </div>
+      <div>
+        <code>.</code>
+        <p>
+          The build context. Docker can access only included files beneath this directory after
+          applying <code>.dockerignore</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Security gates · implemented and verified</span>
+      <h2>Separate correctness from known-risk policy</h2>
+    </div>
+    <div class="gate-grid">
+      <div class="gate">
+        <strong>Dependency review</strong>
+        <p>
+          Compare the pull request's dependency graph with its base and reject newly introduced
+          packages above the agreed severity or license policy.
+        </p>
+      </div>
+      <div class="gate">
+        <strong>Container scan</strong>
+        <p>
+          Scan the final API, gateway, and frontend images—not only source manifests—because base
+          operating-system packages also create vulnerabilities.
+        </p>
+      </div>
+      <div class="gate">
+        <strong>Report retention</strong>
+        <p>
+          Upload SARIF or another machine-readable report so findings remain searchable and tied to
+          the candidate commit.
+        </p>
+      </div>
+      <div class="gate">
+        <strong>Exception governance</strong>
+        <p>
+          A finding may require a time-bounded exception with owner, justification, compensating
+          control, and expiration—not an undocumented skip.
+        </p>
+      </div>
+    </div>
+    <pre><code>docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v trivy-cache:/root/.cache/trivy \
+  aquasec/trivy:0.58.2 image \
+  --scanners vuln \
+  --ignore-unfixed \
+  --severity HIGH,CRITICAL \
+  --exit-code 1 \
+  ticketforge-api:$&#123;<span></span>&#123; github.sha &#125;&#125;</code></pre>
+    <div class="callout">
+      <span class="callout-label">The gate found real defects</span>
+      <p>
+        The first scan found 35 frontend findings, a vulnerable PostgreSQL JDBC driver, and an
+        unrelated vulnerable Pebble binary in the API runtime. We upgraded pgJDBC, moved the API to
+        a smaller Alpine JRE, patched NGINX packages, and created a scanned gateway artifact instead
+        of weakening the threshold.
+      </p>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">GHCR publication · implemented, main-run pending</span>
+      <h2>Write authority exists only after trusted gates</h2>
+    </div>
+    <pre><code>permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
+registry: ghcr.io
+username: $&#123;<span></span>&#123; github.actor &#125;&#125;
+password: $&#123;<span></span>&#123; secrets.GITHUB_TOKEN &#125;&#125;</code></pre>
+    <pre><code>docker save --output ticketforge-images.tar \
+  ticketforge-api:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  ticketforge-gateway:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  ticketforge-frontend:$&#123;<span></span>&#123; github.sha &#125;&#125;
+
+docker load --input ticketforge-images.tar
+
+docker tag ticketforge-api:$&#123;<span></span>&#123; github.sha &#125;&#125; \
+  ghcr.io/$&#123;<span></span>&#123; github.repository_owner &#125;&#125;/ticketforge-api:sha-$&#123;<span></span>&#123; github.sha &#125;&#125;
+
+docker push \
+  ghcr.io/$&#123;<span></span>&#123; github.repository_owner &#125;&#125;/ticketforge-api:sha-$&#123;<span></span>&#123; github.sha &#125;&#125;</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>packages: write</code>
+        <p>
+          Allows the trusted job to push GHCR packages. It must not be a workflow-wide pull-request
+          permission.
+        </p>
+      </div>
+      <div>
+        <code>attestations: write</code>
+        <p>Allows GitHub to store provenance statements associated with the artifact.</p>
+      </div>
+      <div>
+        <code>id-token: write</code>
+        <p>
+          Allows short-lived OIDC identity issuance. It does not expose a permanent cloud key by
+          itself.
+        </p>
+      </div>
+      <div>
+        <code>github.actor</code>
+        <p>
+          The identity that triggered the trusted workflow and is used as the GHCR login username.
+        </p>
+      </div>
+      <div>
+        <code>secrets.GITHUB_TOKEN</code>
+        <p>
+          An automatically generated, repository-scoped credential whose permissions are constrained
+          by the job declaration.
+        </p>
+      </div>
+      <div>
+        <code>docker save / docker load</code>
+        <p>
+          Transfers the exact locally scanned image between isolated jobs. The publication job
+          does not rebuild and accidentally create different bytes.
+        </p>
+      </div>
+      <div>
+        <code>docker tag / docker push</code>
+        <p>
+          Adds the registry-qualified immutable commit tag, then uploads that already-verified
+          image to GHCR. The workflow repeats this operation for all three artifacts.
+        </p>
+      </div>
+    </div>
+    <pre><code>- name: Attest the API image provenance
+  uses: actions/attest@c32b4b8b198b65d0bd9d63490e847ff7b53989d4
+  with:
+    subject-name: ghcr.io/$&#123;<span></span>&#123; github.repository_owner &#125;&#125;/ticketforge-api
+    subject-digest: $&#123;<span></span>&#123; steps.push.outputs.api-digest &#125;&#125;
+    push-to-registry: true</code></pre>
+    <p>
+      The attestation names the registry package and binds it to the digest returned after push.
+      Consumers can therefore verify which repository, commit, and trusted workflow produced the
+      deployed bytes.
+    </p>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Artifact identity · implemented, registry proof pending</span>
+      <h2>Tags help humans; digests identify bytes</h2>
+    </div>
+    <pre><code>ghcr.io/lc443/ticketforge-api:sha-e180ac8
+ghcr.io/lc443/ticketforge-api@sha256:&lt;immutable-digest&gt;</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>registry/owner/image</code>
+        <p>
+          The globally qualified package name. TicketForge publishes API, gateway, and frontend as
+          separate deployable artifacts.
+        </p>
+      </div>
+      <div>
+        <code>:sha-…</code>
+        <p>
+          A readable tag linked to source revision. Registry tags can still be moved and are not the
+          final integrity guarantee.
+        </p>
+      </div>
+      <div>
+        <code>@sha256:…</code>
+        <p>
+          A content digest computed from the image manifest. Changing artifact bytes changes the
+          digest.
+        </p>
+      </div>
+      <div>
+        <code>provenance</code>
+        <p>
+          A signed statement connecting digest, source repository, commit, workflow, and build
+          identity so consumers can verify origin.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Promotion and rollback · implemented and verified</span>
+      <h2>Deployment changes a reference, not source code</h2>
+    </div>
+    <pre><code>export API_IMAGE='ghcr.io/lc443/ticketforge-api@sha256:&lt;verified-digest&gt;'
+export GATEWAY_IMAGE='ghcr.io/lc443/ticketforge-gateway@sha256:&lt;verified-digest&gt;'
+export FRONTEND_IMAGE='ghcr.io/lc443/ticketforge-frontend@sha256:&lt;verified-digest&gt;'
+
+docker compose \
+  -f infrastructure/docker/docker-compose.yml \
+  -f infrastructure/docker/docker-compose.release.yml \
+  pull api1 api2 api3 api-gateway frontend
+
+docker compose \
+  -f infrastructure/docker/docker-compose.yml \
+  -f infrastructure/docker/docker-compose.release.yml \
+  up -d --no-build --wait api1 api2 api3 api-gateway frontend</code></pre>
+    <div class="syntax-list">
+      <div>
+        <code>API_IMAGE=…</code>
+        <p>
+          Shell variable assignment for one command environment. The value is an artifact
+          coordinate, not a build instruction.
+        </p>
+      </div>
+      <div>
+        <code>build: !reset null</code>
+        <p>
+          Compose override syntax that removes the base file's build instruction. Release
+          deployment must fail when a digest is absent instead of silently rebuilding locally.
+        </p>
+      </div>
+      <div>
+        <code>--no-build</code>
+        <p>
+          Runtime enforcement of the same invariant: pull and start the approved artifact, but do
+          not produce a replacement during deployment.
+        </p>
+      </div>
+      <div>
+        <code>environment</code>
+        <p>
+          A GitHub deployment boundary such as staging or production with separate approvals,
+          secrets, and history.
+        </p>
+      </div>
+      <div>
+        <code>promotion</code>
+        <p>
+          Authorizes an existing digest for the next environment after evidence and approval; it
+          does not compile again.
+        </p>
+      </div>
+      <div>
+        <code>rollback</code>
+        <p>
+          Restores a previously verified digest. Database compatibility and irreversible migrations
+          must be assessed separately.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Local evidence</span>
+      <h2>What has actually been proved</h2>
+    </div>
+    <div class="metrics">
+      <div><strong>11 / 11</strong><span>backend tests passed</span></div>
+      <div><strong>Java 21</strong><span>declared runtime</span></div>
+      <div><strong>Node 22</strong><span>production builder</span></div>
+      <div><strong>3 / 3</strong><span>images scan clean</span></div>
+    </div>
+    <ul class="proof-list">
+      <li>Workflow YAML parses and Compose configuration expands successfully.</li>
+      <li>Spring application context reaches PostgreSQL, Redis, and Kafka.</li>
+      <li>
+        Kafka consumers resolve the broker after the test container joins the Compose network.
+      </li>
+      <li>Angular and the lifecycle suite still pass after the main/Sprint 16 merge resolution.</li>
+      <li>The CI override removes fixed container names and host ports, so project isolation works.</li>
+      <li>API, gateway, and frontend report zero fixable HIGH or CRITICAL vulnerabilities.</li>
+      <li>All three API replicas became healthy on one identical Alpine runtime image.</li>
+      <li>
+        Local persistent data still exposes the previously documented outbox LOB defect; a clean CI
+        volume will not hide the need to repair that production behavior.
+      </li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Architect takeaway</span>
+      <h2>A pipeline is an executable governance model</h2>
+    </div>
+    <p>
+      CI/CD is not only automation syntax. It defines who may produce artifacts, which evidence is
+      mandatory, where secrets exist, how identity is preserved, how environments approve risk, and
+      how the system returns to a known state after failure.
+    </p>
+  </section>
+</div>

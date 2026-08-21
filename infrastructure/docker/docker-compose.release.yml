@@ -1,0 +1,18 @@
+services:
+  api1:
+    image: ${API_IMAGE:?Set API_IMAGE to a verified GHCR digest}
+    build: !reset null
+
+  api2:
+    image: ${API_IMAGE:?Set API_IMAGE to a verified GHCR digest}
+
+  api3:
+    image: ${API_IMAGE:?Set API_IMAGE to a verified GHCR digest}
+
+  api-gateway:
+    image: ${GATEWAY_IMAGE:?Set GATEWAY_IMAGE to a verified GHCR digest}
+    build: !reset null
+
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE to a verified GHCR digest}
+    build: !reset null

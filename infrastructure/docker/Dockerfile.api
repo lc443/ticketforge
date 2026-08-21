@@ -10,13 +10,11 @@ RUN ./mvnw -B dependency:go-offline
 COPY backend/src src
 RUN ./mvnw -B clean package -DskipTests
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-alpine
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system ticketforge \
-    && useradd --system --gid ticketforge --home-dir /app ticketforge
+RUN apk add --no-cache curl \
+    && addgroup --system ticketforge \
+    && adduser --system --ingroup ticketforge --home /app ticketforge
 
 WORKDIR /app
 COPY --from=build --chown=ticketforge:ticketforge /workspace/target/ticketforge-*.jar app.jar

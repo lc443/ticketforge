@@ -139,6 +139,12 @@ export const routes: Routes = [
       },
 
       {
+        path: 'labs/cicd',
+        loadComponent: () =>
+          import('./features/labs/cicd-lab/cicd-lab').then((m) => m.CicdLab),
+      },
+
+      {
         path: 'lab/cache',
         loadComponent: () =>
           import('./features/lab/event-cache/event-cache').then((m) => m.EventCache),

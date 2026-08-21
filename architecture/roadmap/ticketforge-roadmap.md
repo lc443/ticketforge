@@ -36,7 +36,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 -   Sprint 15: Docker ✅ — multi-stage API/frontend images, one API digest across three replicas, health-gated startup, bounded NGINX failover, and PostgreSQL volume persistence verified
 -   Sprint 16: Event lifecycle and API evolution — update/delete semantics, cancellation policy, ownership, auditability, referential integrity, and cache consistency
--   Sprint 17: CI/CD and GHCR
+-   Sprint 17: CI/CD and GHCR 🟡 — correctness gates, isolated integration topology, three-image vulnerability policy, exact-artifact handoff, main-only publication, provenance, digest promotion, and rollback implemented; GitHub-hosted evidence pending
 
 ### Level 5: Kubernetes
 
@@ -77,7 +77,16 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 ### Level 10: Solutions Architect Mode
 
--   Sprint 40+: Customer discovery, architecture proposals, tradeoff defense, and review-board exercises
+-   Sprint 40: Customer discovery, architecture proposals, tradeoff defense, and review-board exercises
+
+### Level 11: TicketForge Academy and Blueprint OS
+
+-   Sprint 41: Academy foundations — tracks, modules, lessons, prerequisites, learner profiles, progress, and credential policy
+-   Sprint 42: Competency and evidence graph — connect labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable skills
+-   Sprint 43: Assessments and practical exams — scenarios, rubrics, attempts, scoring, feedback, and mastery thresholds
+-   Sprint 44: Verifiable academy credentials — evidence-backed certificates, unique IDs, QR verification, renewal, and revocation
+-   Sprint 45: Blueprint OS integration — identity, transcripts, evidence APIs, credential synchronization, consent, and public profiles
+-   Sprint 46: External certification preparation — official objective mapping, study plans, readiness checks, and renewal tracking; begin with AWS Solutions Architect Associate
 
 ## Architecture Artifacts
 
@@ -91,3 +100,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 -   Threat models and compliance control maps
 -   Migration wave plans and rollback strategies
 -   Architecture review presentations for technical and executive audiences
+-   Competency matrices and evidence manifests
+-   Assessment rubrics and practical-exam records
+-   Verifiable academy certificates and public credential records
+-   External certification objective maps and readiness reports

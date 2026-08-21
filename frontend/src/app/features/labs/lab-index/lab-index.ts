@@ -114,15 +114,16 @@ export class LabIndex {
       path: '/labs/event-lifecycle',
       status: 'done',
     },
-  ];
-
-  futureLabs: LabEntry[] = [
     {
       sprint: 'Sprint 17',
       title: 'Delivery Pipeline & Supply Chain',
-      blurb: 'Design quality gates, artifact provenance, environment promotion, and rollback.',
-      status: 'planned',
+      blurb: 'Automate correctness, security, immutable publication, provenance, promotion, and rollback evidence.',
+      path: '/labs/cicd',
+      status: 'partial',
     },
+  ];
+
+  futureLabs: LabEntry[] = [
     {
       sprint: 'Sprints 18–22',
       title: 'Kubernetes Platform Architecture',
@@ -154,9 +155,15 @@ export class LabIndex {
       status: 'planned',
     },
     {
-      sprint: 'Sprint 40+',
+      sprint: 'Sprint 40',
       title: 'Solutions Architect Mode',
       blurb: 'Run customer-style discovery, produce proposals, defend tradeoffs, and review outcomes.',
+      status: 'planned',
+    },
+    {
+      sprint: 'Sprints 41–46',
+      title: 'TicketForge Academy & Blueprint OS',
+      blurb: 'Turn engineering evidence into learning paths, practical assessments, verifiable credentials, and external certification readiness.',
       status: 'planned',
     },
   ];

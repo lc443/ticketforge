@@ -23,4 +23,5 @@ export const LAB_NAV: LabNavEntry[] = [
   { sprint: 'Sprint 9–14', title: 'Kafka', path: '/lab/kafka' },
   { sprint: 'Sprint 15', title: 'Docker', path: '/labs/docker' },
   { sprint: 'Sprint 16', title: 'Event Lifecycle & API Evolution', path: '/labs/event-lifecycle' },
+  { sprint: 'Sprint 17', title: 'CI/CD & Software Supply Chain', path: '/labs/cicd' },
 ];

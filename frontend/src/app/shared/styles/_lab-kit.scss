@@ -139,7 +139,7 @@
 
   padding: 14px 18px;
 
-  border-left: 3px solid var(--accent);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
 
   background: var(--accent-soft);
@@ -290,7 +290,7 @@
 
     div {
       padding: 13px 14px;
-      border-left: 2px solid var(--stamp);
+      border: 1px solid var(--line);
       background: var(--stamp-soft);
     }
 
@@ -476,7 +476,7 @@
   margin: 18px 0 0;
   padding: 14px 16px;
 
-  border-left: 3px solid var(--stamp);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--stamp-soft);
 

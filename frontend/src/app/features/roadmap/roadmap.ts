@@ -167,8 +167,8 @@ export class Roadmap {
         {
           num: '17',
           name: 'CI/CD',
-          note: '.github/workflows/ is empty; automate tests, image builds, security gates, provenance, promotion, and rollback',
-          status: 'next',
+          note: 'Java/Node gates, isolated dependencies, three scanned images, exact-artifact GHCR publication, provenance, digest promotion, and rollback implemented; trusted GitHub evidence pending',
+          status: 'partial',
         },
       ],
     },
@@ -333,9 +333,50 @@ export class Roadmap {
       name: 'Level 10 · Solutions Architect Mode',
       sprints: [
         {
-          num: '40+',
+          num: '40',
           name: 'Architecture Reviews & Design Exercises',
           note: 'Customer discovery, constraints, proposals, tradeoff defense, implementation roadmaps, and review-board challenges',
+          status: 'todo',
+        },
+      ],
+    },
+    {
+      name: 'Level 11 · TicketForge Academy & Blueprint OS',
+      sprints: [
+        {
+          num: '41',
+          name: 'Academy Foundations',
+          note: 'Tracks, modules, lessons, prerequisites, learner profiles, progress, and an honest credential policy',
+          status: 'todo',
+        },
+        {
+          num: '42',
+          name: 'Competency & Evidence Graph',
+          note: 'Map labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable engineering competencies',
+          status: 'todo',
+        },
+        {
+          num: '43',
+          name: 'Assessments & Practical Exams',
+          note: 'Question banks, scenarios, hands-on rubrics, attempts, scoring, feedback, and mastery thresholds',
+          status: 'todo',
+        },
+        {
+          num: '44',
+          name: 'Verifiable Academy Credentials',
+          note: 'Credential IDs, evidence manifests, certificate generation, QR verification, renewal, revocation, and public validation',
+          status: 'todo',
+        },
+        {
+          num: '45',
+          name: 'Blueprint OS Integration',
+          note: 'Identity, learner transcript, evidence and credential APIs, consent, synchronization, and public profile linking',
+          status: 'todo',
+        },
+        {
+          num: '46',
+          name: 'External Certification Preparation',
+          note: 'Official exam objective mapping, study plans, readiness assessments, renewal tracking, and AWS Solutions Architect Associate first',
           status: 'todo',
         },
       ],
