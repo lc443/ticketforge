@@ -12,16 +12,16 @@
 
   <app-scenario-card eyebrow="Sprint 15 · verified" title="Why TicketForge needs containers">
     <div class="scenario-grid">
-      <section class="scenario problem">
-        <span>The problem</span>
+      <section class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
         <h3>“It runs on my machine” is not a deployment strategy.</h3>
         <p>
           Host-built JARs, duplicated replica images, missing health gates, and container-local
           database files make releases inconsistent and fragile.
         </p>
       </section>
-      <section class="scenario solution">
-        <span>The solution</span>
+      <section class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
         <h3>Build immutable images and externalize state.</h3>
         <p>
           Multi-stage builds compile in Docker, three APIs share one digest, health checks order
@@ -32,29 +32,33 @@
   </app-scenario-card>
 
   <section class="card">
-    <span class="eyebrow">Core model</span>
-    <h2>Image ≠ container</h2>
-    <div class="concept-grid">
-      <div>
-        <strong>Image</strong>
-        <p>Read-only recipe and filesystem. Built once and identified by a digest.</p>
+    <div class="section-title">
+      <span class="eyebrow">Core model</span>
+      <h2>Image ≠ container</h2>
+    </div>
+    <div class="glossary-grid">
+      <div class="glossary-term">
+        <strong>Image</strong
+        ><span>Read-only recipe and filesystem. Built once and identified by a digest.</span>
       </div>
-      <div>
-        <strong>Container</strong>
-        <p>A running instance of that image with a small writable layer.</p>
+      <div class="glossary-term">
+        <strong>Container</strong
+        ><span>A running instance of that image with a small writable layer.</span>
       </div>
-      <div>
-        <strong>Volume</strong>
-        <p>State with a lifecycle independent of a disposable container.</p>
+      <div class="glossary-term">
+        <strong>Volume</strong
+        ><span>State with a lifecycle independent of a disposable container.</span>
       </div>
     </div>
   </section>
 
   <section class="card">
-    <span class="eyebrow">Try it</span>
-    <h2>Which layers rebuild?</h2>
-    <p>Docker reuses every unchanged layer before the first changed instruction.</p>
-    <div class="choices">
+    <div class="section-title">
+      <span class="eyebrow">Try it</span>
+      <h2>Which layers rebuild?</h2>
+      <p>Docker reuses every unchanged layer before the first changed instruction.</p>
+    </div>
+    <div class="layer-toggle">
       <button type="button" [class.active]="change() === 'source'" (click)="select('source')">
         Java / TypeScript source
       </button>
@@ -83,8 +87,10 @@
   </section>
 
   <section class="card">
-    <span class="eyebrow">Measured proof</span>
-    <h2>What Sprint 15 verified</h2>
+    <div class="section-title">
+      <span class="eyebrow">Measured proof</span>
+      <h2>What Sprint 15 verified</h2>
+    </div>
     <div class="metrics">
       <div><strong>83 KB</strong><span>API build context, down from ~94 MB</span></div>
       <div><strong>1 digest</strong><span>shared by api1, api2, and api3</span></div>
@@ -104,14 +110,16 @@
   </section>
 
   <section class="card commands">
-    <span class="eyebrow">Production loop</span>
-    <h2>Build, start, observe</h2>
-    <pre><code>tfdeploylocal
-tfps
-tfapilogs</code></pre>
+    <div class="section-title">
+      <span class="eyebrow">Production loop</span>
+      <h2>Build, start, observe</h2>
+    </div>
+    <pre><code>docker compose -f infrastructure/docker/docker-compose.yml up -d --build
+docker compose -f infrastructure/docker/docker-compose.yml ps
+docker compose -f infrastructure/docker/docker-compose.yml logs -f --tail=200 api1 api2 api3</code></pre>
     <p>
-      <code>tfdeploylocal</code> builds the shared API image once and recreates all three replicas
-      from it.
+      The first command builds the shared API image once and recreates all three replicas from it.
+      The next two commands show container health and follow the API logs.
     </p>
   </section>
 </div>
