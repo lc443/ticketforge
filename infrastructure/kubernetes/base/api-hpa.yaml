@@ -1,0 +1,41 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ticketforge-api
+  namespace: ticketforge
+  labels:
+    app.kubernetes.io/name: ticketforge-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ticketforge
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ticketforge-api
+  minReplicas: 3
+  maxReplicas: 4
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      selectPolicy: Max
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 120
+      selectPolicy: Max
+      policies:
+        - type: Percent
+          value: 25
+          periodSeconds: 60
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

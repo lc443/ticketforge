@@ -27,4 +27,5 @@ export const LAB_NAV: LabNavEntry[] = [
   { sprint: 'Sprint 18', title: 'Kubernetes Foundations', path: '/labs/kubernetes-foundations' },
   { sprint: 'Sprint 19', title: 'Production Kubernetes', path: '/labs/production-kubernetes' },
   { sprint: 'Sprint 20', title: 'Kubernetes Networking', path: '/labs/kubernetes-networking' },
+  { sprint: 'Sprint 21', title: 'Kubernetes Autoscaling', path: '/labs/kubernetes-autoscaling' },
 ];

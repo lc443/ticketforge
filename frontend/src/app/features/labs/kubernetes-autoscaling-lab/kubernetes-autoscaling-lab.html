@@ -1,0 +1,75 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/kubernetes-autoscaling" />
+  <header class="hero"><span class="eyebrow">Sprint 21</span><h1>Kubernetes autoscaling</h1><p>Turn resource telemetry into bounded capacity decisions, then prove scale-out, stabilization, and recovery.</p></header>
+  <app-scenario-card eyebrow="Architecture scenario" title="An event announcement creates a sudden demand spike"><div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Fixed capacity is either late or wasteful.</h3><p>Too few replicas miss latency goals; permanent peak replicas waste compute. Scaling without node headroom can collapse the platform.</p></section><section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Scale from measured demand inside safety bounds.</h3><p>Metrics Server supplies resource observations; HPA compares usage to requests; behavior policies control speed; min/max replicas cap availability and cost.</p></section></div></app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run each command, inspect the result, then mark the exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · telemetry pipeline</span><h2>Install and verify Metrics Server</h2></div><pre data-language="bash"><code>kubectl apply --filename \
+  https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.8.1/components.yaml
+
+kubectl patch deployment metrics-server \
+  --namespace kube-system \
+  --type=json \
+  --patch='[&#123;"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"&#125;]'
+
+kubectl wait apiservice/v1beta1.metrics.k8s.io \
+  --for=condition=Available --timeout=180s
+kubectl top nodes
+kubectl top pods --namespace ticketforge</code></pre><div class="syntax-list"><div><code>Metrics Server</code><p>Feeds CPU/memory resource metrics to Kubernetes autoscaling; it is not long-term monitoring.</p></div><div><code>--kubelet-insecure-tls</code><p>Local kind exception for self-signed kubelet serving certificates; do not normalize this in production.</p></div><div><code>kubectl top</code><p>Proves the aggregated Metrics API returns observations.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · metrics available' : 'Mark metrics exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · scaling math</span><h2>Understand the denominator</h2></div><pre data-language="text"><code>utilization = current CPU ÷ requested CPU × 100
+
+25m ÷ 500m × 100 = 5%
+400m ÷ 500m × 100 = 80%
+
+desired replicas ≈ current replicas × current utilization ÷ target
+3 × 80 ÷ 70 = 3.43 → 4 replicas</code></pre><div class="syntax-list"><div><code>requests.cpu</code><p>Scheduling reservation and utilization denominator. An inaccurate request produces an inaccurate scaling signal.</p></div><div><code>limits.cpu</code><p>Maximum CPU consumption before throttling; it is not the HPA denominator.</p></div><div><code>round up</code><p>Capacity must meet demand, so fractional desired replicas become the next whole Pod.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · math understood' : 'Mark scaling math complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · bounded policy</span><h2>Declare target, floor, ceiling, and behavior</h2></div><pre data-language="yaml"><code>minReplicas: 3
+maxReplicas: 4
+behavior:
+  scaleUp:
+    stabilizationWindowSeconds: 0
+  scaleDown:
+    stabilizationWindowSeconds: 120
+metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70</code></pre><div class="syntax-list"><div><code>minReplicas</code><p>Availability/cold-start floor even when demand is low.</p></div><div><code>maxReplicas</code><p>Cost and cluster-capacity circuit breaker.</p></div><div><code>stabilizationWindowSeconds</code><p>Uses recent recommendations to avoid rapid scale-down oscillation.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · policy bounded' : 'Mark policy exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · load drill</span><h2>Open one test path and generate load</h2></div><pre data-language="bash"><code>kubectl apply --filename \
+  infrastructure/kubernetes/exercises/hpa-load.yaml
+
+kubectl get horizontalpodautoscaler ticketforge-api \
+  --namespace ticketforge --watch
+
+kubectl get pods --namespace ticketforge \
+  --selector app.kubernetes.io/name=ticketforge-api</code></pre><div class="syntax-list"><div><code>allow-hpa-load-to-api</code><p>Explicitly permits only the labeled generator to API port 8080; default-deny blocked the original attempt.</p></div><div><code>/actuator/health</code><p>Avoids public API rate limiting so this drill measures compute scaling rather than 429 protection.</p></div><div><code>--watch</code><p>Streams metric and replica decisions until Ctrl+C.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · scale-out observed' : 'Mark load drill complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · scale-in</span><h2>Remove demand and observe stabilization</h2></div><pre data-language="bash"><code>kubectl delete --filename \
+  infrastructure/kubernetes/exercises/hpa-load.yaml
+
+kubectl describe horizontalpodautoscaler ticketforge-api \
+  --namespace ticketforge
+
+kubectl get deployment ticketforge-api \
+  --namespace ticketforge --watch</code></pre><div class="syntax-list"><div><code>delete --filename</code><p>Removes both the temporary Pod and its narrow allow policy.</p></div><div><code>ScalingLimited</code><p>Explains when min/max bounds constrain the calculated recommendation.</p></div><div><code>events</code><p>Record successful rescale decisions and failed metric/scale operations.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · scale-in observed' : 'Mark scale-in complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · failure analysis</span><h2>Recognize when scaling reduces capacity</h2></div><pre data-language="text"><code>Observed failed experiment
+
+100m request → 645% reported utilization
+HPA 3 → 6 replicas
+kind node CPU → approximately 12.5 cores
+API, PostgreSQL, scheduler, and control-plane probes failed
+
+Correction
+
+500m measured request · 70% target · max 4 locally
+3 → 4 under load · 4 → 3 after demand</code></pre><div class="syntax-list"><div><code>HPA</code><p>Creates desired Pods; it cannot create node capacity. Cluster Autoscaler is a separate control loop.</p></div><div><code>background work</code><p>Per-replica Kafka consumers, pools, and scheduled work can increase total cost as replicas grow.</p></div><div><code>capacity model</code><p>Connect maximum Pods to node allocatable CPU/memory, dependency connections, and cost before production.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · failure defended' : 'Mark failure analysis complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>Why did a 100m request create a dangerous scaling decision?</h2></div><div class="quiz-options"><button class="quiz-option" [class.correct]="answer() === 'denominator'" (click)="selectAnswer('denominator')">It understated the denominator</button><button class="quiz-option" [class.incorrect]="answer() === 'limit'" (click)="selectAnswer('limit')">The CPU limit was absent</button><button class="quiz-option" [class.incorrect]="answer() === 'dns'" (click)="selectAnswer('dns')">Service DNS changed</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'denominator'">@if (answer() === 'denominator') { Correct. Roughly 500m usage divided by a 100m request appeared as more than 500% utilization, driving maximum scale-out. } @else { HPA utilization uses requests, not DNS or the CPU limit, as its denominator. }</p> }</section>
+</div>
+
