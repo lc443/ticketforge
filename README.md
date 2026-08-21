@@ -209,7 +209,7 @@ You propose something. It gets challenged. Only then do you build it — and by 
 - [ ] **Sprint 8** — Distributed Locking
 - [ ] **Sprints 9–14** — Kafka & Event-Driven Architecture
 - [ ] **Sprint 15** — Docker
-- [ ] **Sprint 16** — Event Lifecycle & API Evolution *(current)*
+- [x] **Sprint 16** — Event Lifecycle & API Evolution
 - [ ] **Sprint 17** — CI/CD & GHCR
 - [ ] **Sprints 18–22** — Kubernetes & Helm
 - [ ] **Sprints 23–25** — Terraform

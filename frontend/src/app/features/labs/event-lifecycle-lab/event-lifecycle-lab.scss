@@ -1,0 +1,41 @@
+@use '../../../shared/styles/lab-kit';
+
+:host { display: block; }
+
+.lab-container {
+  width: min(880px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  margin-bottom: 28px;
+  h1 { margin: 6px 0 8px; color: var(--ink); font-size: clamp(28px, 4vw, 40px); }
+  p { margin: 0; color: var(--ink-soft); font-size: 15px; }
+}
+
+.card { margin-bottom: 20px; }
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+
+  div { padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); }
+  strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 13px; }
+  span { color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
+}
+
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  code { padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); }
+  i { color: var(--accent); font-style: normal; }
+}
+
+@media (max-width: 640px) {
+  .lab-container { width: min(100% - 32px, 880px); padding-top: 28px; }
+  .policy-grid { grid-template-columns: 1fr; }
+}

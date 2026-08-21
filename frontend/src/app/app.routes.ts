@@ -131,6 +131,14 @@ export const routes: Routes = [
       },
 
       {
+        path: 'labs/event-lifecycle',
+        loadComponent: () =>
+          import('./features/labs/event-lifecycle-lab/event-lifecycle-lab').then(
+            (m) => m.EventLifecycleLab,
+          ),
+      },
+
+      {
         path: 'lab/cache',
         loadComponent: () =>
           import('./features/lab/event-cache/event-cache').then((m) => m.EventCache),

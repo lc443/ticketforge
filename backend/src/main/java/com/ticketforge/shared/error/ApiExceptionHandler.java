@@ -45,6 +45,11 @@ public class ApiExceptionHandler {
         return response(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    ResponseEntity<ApiError> forbidden(ForbiddenException exception, HttpServletRequest request) {
+        return response(HttpStatus.FORBIDDEN, exception.getMessage(), request);
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     ResponseEntity<ApiError> emailExists(
             EmailAlreadyExistsException exception,

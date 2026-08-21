@@ -7,25 +7,39 @@
     <p class="status error">{{ error() }}</p>
   } @else if (event(); as ev) {
     <div class="detail-card">
-      <span class="stub-tag">Event</span>
+      <div class="tag-row">
+        <span class="stub-tag">Event</span>
+        <span class="status-tag" [class.cancelled]="ev.status === 'CANCELLED'">{{ ev.status }}</span>
+      </div>
       <h1>{{ ev.name }}</h1>
       <p class="venue">{{ ev.venue }}</p>
       <p class="date">{{ ev.eventDate | date: 'full' }}</p>
+      <p class="owner">Organizer: {{ ev.organizerEmail || 'Legacy event — owner not assigned' }}</p>
 
       <div class="availability">
         <span class="count">{{ ev.availableTickets }}</span> / {{ ev.totalTickets }} tickets
         available
       </div>
 
-      <div class="management-actions">
-        <a class="edit-button" [routerLink]="['/events', ev.id, 'edit']">Edit event</a>
-        <button class="delete-button" type="button" [disabled]="deleting()" (click)="deleteEvent()">
-          {{ deleting() ? 'Deleting…' : 'Delete event' }}
-        </button>
-      </div>
+      @if (canManage()) {
+        <div class="management-actions">
+          @if (ev.status === 'SCHEDULED') {
+            <a class="edit-button" [routerLink]="['/events', ev.id, 'edit']">Edit event</a>
+            <button class="cancel-button" type="button" [disabled]="cancelling()" (click)="cancelEvent()">
+              {{ cancelling() ? 'Cancelling…' : 'Cancel event' }}
+            </button>
+          }
+          <button class="delete-button" type="button" [disabled]="deleting()" (click)="deleteEvent()">
+            {{ deleting() ? 'Deleting…' : 'Delete event' }}
+          </button>
+        </div>
+      }
 
       @if (deleteError()) {
         <p class="error management-error">{{ deleteError() }}</p>
+      }
+      @if (lifecycleError()) {
+        <p class="error management-error">{{ lifecycleError() }}</p>
       }
 
       @if (confirmation(); as c) {
@@ -41,6 +55,11 @@
             Note: this backend has no endpoint to list your past reservations — this confirmation is
             the only record of it once you leave the page.
           </p>
+        </div>
+      } @else if (ev.status === 'CANCELLED') {
+        <div class="lifecycle-note">
+          <strong>Reservations closed.</strong>
+          This event was cancelled; existing reservation history remains available.
         </div>
       } @else {
         <form class="reserve-form" (ngSubmit)="reserve()">
@@ -70,6 +89,25 @@
             }}
           </button>
         </form>
+      }
+
+      @if (canManage()) {
+        <section class="audit-panel">
+          <span class="stub-tag">Audit trail</span>
+          @if (auditError()) {
+            <p class="error">{{ auditError() }}</p>
+          } @else if (audits().length === 0) {
+            <p class="audit-empty">No lifecycle changes recorded yet.</p>
+          } @else {
+            @for (entry of audits(); track entry.id) {
+              <article class="audit-entry">
+                <div><strong>{{ entry.action }}</strong> · {{ entry.occurredAt | date: 'medium' }}</div>
+                <p>{{ entry.details }}</p>
+                <span>{{ entry.actorEmail }}</span>
+              </article>
+            }
+          }
+        </section>
       }
     </div>
   }

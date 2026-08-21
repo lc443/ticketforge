@@ -18,6 +18,7 @@
       @for (event of events(); track event.id) {
         <a class="event-card" [routerLink]="['/events', event.id]">
           <div class="ticket-notch"></div>
+          <span class="event-status" [class.cancelled]="event.status === 'CANCELLED'">{{ event.status }}</span>
           <h2>{{ event.name }}</h2>
           <p class="venue">{{ event.venue }}</p>
           <p class="date">{{ event.eventDate | date: 'medium' }}</p>

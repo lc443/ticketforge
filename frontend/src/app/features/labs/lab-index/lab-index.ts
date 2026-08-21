@@ -107,15 +107,16 @@ export class LabIndex {
       path: '/labs/docker',
       status: 'done',
     },
-  ];
-
-  futureLabs: LabEntry[] = [
     {
       sprint: 'Sprint 16',
       title: 'Event Lifecycle & API Evolution',
-      blurb: 'Decide cancellation versus deletion, ownership, audit history, invariants, and compatible API behavior.',
-      status: 'next',
+      blurb: 'Protect ownership, inventory, cancellation history, stale writes, and compatible API behavior.',
+      path: '/labs/event-lifecycle',
+      status: 'done',
     },
+  ];
+
+  futureLabs: LabEntry[] = [
     {
       sprint: 'Sprint 17',
       title: 'Delivery Pipeline & Supply Chain',
