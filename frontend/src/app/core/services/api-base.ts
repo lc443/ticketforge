@@ -1,8 +1,7 @@
 // src/app/core/services/api-base.ts
 //
-// Backend runs behind NGINX in docker-compose on :8080 (see
-// infrastructure/nginx/nginx.conf). Running a single instance directly
-// (no docker-compose) instead uses :8085 from application.yml — swap this
-// if that's how you're running it locally.
+// Both production NGINX and the Angular development proxy forward /api to
+// TicketForge's API gateway. A relative URL keeps browser configuration out
+// of the compiled application and avoids cross-origin requests.
 
-export const API_BASE = 'http://localhost:8080/api';
+export const API_BASE = '/api';

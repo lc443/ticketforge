@@ -83,9 +83,7 @@ export const routes: Routes = [
       {
         path: 'labs/load-testing',
         loadComponent: () =>
-          import('./features/labs/load-testing-lab/load-testing-lab').then(
-            (m) => m.LoadTestingLab,
-          ),
+          import('./features/labs/load-testing-lab/load-testing-lab').then((m) => m.LoadTestingLab),
       },
 
       {
@@ -117,6 +115,12 @@ export const routes: Routes = [
       {
         path: 'lab/kafka',
         loadComponent: () => import('./features/kafka-lab/kafka-lab').then((m) => m.KafkaLab),
+      },
+
+      {
+        path: 'labs/docker',
+        loadComponent: () =>
+          import('./features/labs/docker-lab/docker-lab').then((m) => m.DockerLab),
       },
 
       {
