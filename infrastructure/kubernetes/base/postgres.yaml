@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres
   namespace: ticketforge
@@ -8,7 +8,10 @@ metadata:
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: ticketforge
 spec:
+  serviceName: postgres
   replicas: 1
+  updateStrategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app.kubernetes.io/name: postgres
@@ -57,11 +60,21 @@ spec:
               cpu: 500m
               memory: 512Mi
           volumeMounts:
-            - name: data
+            - name: postgres-data
               mountPath: /var/lib/postgresql/data
-      volumes:
-        - name: data
-          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+        labels:
+          app.kubernetes.io/name: postgres
+          app.kubernetes.io/component: database
+          app.kubernetes.io/part-of: ticketforge
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 2Gi
 ---
 apiVersion: v1
 kind: Service

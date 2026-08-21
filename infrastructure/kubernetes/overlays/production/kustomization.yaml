@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+labels:
+  - pairs:
+      app.kubernetes.io/environment: production
+images:
+  - name: ticketforge-api
+    newName: ghcr.io/lc443/ticketforge-api
+    newTag: replace-with-immutable-release
+patches:
+  - path: api-production.yaml

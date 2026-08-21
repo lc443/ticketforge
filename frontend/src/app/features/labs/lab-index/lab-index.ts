@@ -128,11 +128,18 @@ export class LabIndex {
       path: '/labs/kubernetes-foundations',
       status: 'done',
     },
+    {
+      sprint: 'Sprint 19',
+      title: 'Production Kubernetes',
+      blurb: 'Protect state, separate probe semantics, drain safely, constrain disruption, promote overlays, and rehearse rollback.',
+      path: '/labs/production-kubernetes',
+      status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 19–22',
+      sprint: 'Sprints 20–22',
       title: 'Kubernetes Platform Architecture',
       blurb: 'Choose workload boundaries, health checks, networking, scaling, packaging, and operational policies.',
       status: 'planned',

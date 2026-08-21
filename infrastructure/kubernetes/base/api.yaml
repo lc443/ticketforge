@@ -25,6 +25,7 @@ spec:
         app.kubernetes.io/component: api
         app.kubernetes.io/part-of: ticketforge
     spec:
+      terminationGracePeriodSeconds: 35
       securityContext:
         runAsNonRoot: true
         runAsUser: 100
@@ -52,7 +53,7 @@ spec:
               memory: 32Mi
       containers:
         - name: api
-          image: ticketforge-api:k8s
+          image: ticketforge-api:sprint-19
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -70,13 +71,13 @@ spec:
             failureThreshold: 18
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/readiness
               port: http
             periodSeconds: 5
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: http
             periodSeconds: 10
             failureThreshold: 3
@@ -92,6 +93,10 @@ spec:
             capabilities:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 5"]
           volumeMounts:
             - name: temporary-files
               mountPath: /tmp
@@ -115,3 +120,19 @@ spec:
     - name: http
       port: 8080
       targetPort: http
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ticketforge-api
+  namespace: ticketforge
+  labels:
+    app.kubernetes.io/name: ticketforge-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ticketforge
+spec:
+  minAvailable: 2
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ticketforge-api

@@ -184,8 +184,8 @@ export class Roadmap {
         {
           num: '19',
           name: 'Production Kubernetes',
-          note: 'Persistent storage, application probe groups, graceful shutdown, disruption policy, environment overlays, configuration rollout, and rollback',
-          status: 'todo',
+          note: 'Stateful PostgreSQL claim and survival drill, application probe groups, graceful shutdown budget, disruption policy, validated environment overlays, rolling update, and rollback evidence',
+          status: 'done',
         },
         {
           num: '20',

@@ -545,6 +545,8 @@ Kill pods. Exhaust memory. Deploy a broken release. Recover.
 
 **Real-world example:** The 2012 Knight Capital incident is the extreme version of the bug this sprint teaches you to prevent. During a deployment, one of eight production servers didn't receive the new code, leaving dormant trading logic from 2003 active on just that one machine. The mismatched deployment went live, the dormant code started firing on real orders, and it cost the firm roughly $440 million in about 45 minutes before anyone could shut it down. A deployment mechanism that guarantees every replica ends up in the same state — exactly what Kubernetes rolling updates are for — is precisely the guardrail that incident was missing.
 
+**Implemented evidence:** Stateful PostgreSQL storage survived Pod replacement; dependency-aware readiness failed without restarting live API processes; graceful shutdown and a PodDisruptionBudget encode safe draining; development and production Kustomize overlays validate server-side; a failed image rollout preserved old capacity and rollback restored three healthy replicas. See the in-app Production Kubernetes lab, [ADR-007](architecture/decisions/ADR-007-production-kubernetes-lifecycle.md), and the [release runbook](architecture/delivery/kubernetes-release-runbook.md).
+
 ### Sprint 20: Kubernetes Networking
 
 **Topics:** ClusterIP, service discovery, DNS, Gateway API, Ingress concepts, TLS
