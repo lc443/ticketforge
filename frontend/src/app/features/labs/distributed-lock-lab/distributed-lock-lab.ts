@@ -1,94 +1,46 @@
-// src/app/features/labs/distributed-lock-lab/distributed-lock-lab.ts
-
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
 
-type LockType = 'jvm' | 'distributed';
-
-interface Outcome {
-  a: 'won' | 'lost';
-  b: 'won' | 'lost';
-  sold: number;
-  oversold: boolean;
+type StrategyId = 'local' | 'postgres' | 'redis';
+interface Strategy {
+  id: StrategyId; name: string; authority: string; outcome: string;
+  correct: boolean; measured: boolean; tradeoff: string;
 }
 
 @Component({
-  selector: 'app-distributed-lock-lab',
-  standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
-  templateUrl: './distributed-lock-lab.html',
+  selector: 'app-distributed-lock-lab', standalone: true,
+  imports: [ScenarioCard, LabBreadcrumb], templateUrl: './distributed-lock-lab.html',
   styleUrl: './distributed-lock-lab.scss',
 })
 export class DistributedLockLab {
-  lockType = signal<LockType>('jvm');
-  running = signal(false);
-  outcome = signal<Outcome | null>(null);
+  strategies: Strategy[] = [
+    { id: 'local', name: 'Local synchronized', authority: 'Each API JVM',
+      outcome: 'Both replicas can enter because they own different locks. Inventory can oversell.',
+      correct: false, measured: false, tradeoff: 'Simple inside one process, but provides no cluster-wide coordination.' },
+    { id: 'postgres', name: 'PostgreSQL row lock', authority: 'Shared event row',
+      outcome: 'One request created a reservation; the other waited, re-read zero inventory, and returned 409.',
+      correct: true, measured: true, tradeoff: 'Correct and transactional, but hot events serialize and waiting increases tail latency.' },
+    { id: 'redis', name: 'Redis lease lock', authority: 'Shared Redis key',
+      outcome: 'Can coordinate replicas, but the lock and protected inventory live in different systems.',
+      correct: true, measured: false, tradeoff: 'Requires ownership tokens, expiry, failure handling, and often fencing against stale holders.' },
+  ];
+  selectedId = signal<StrategyId>('postgres');
+  selectedStrategy = computed(() => this.strategies.find((s) => s.id === this.selectedId())!);
 
   quiz = [
-    {
-      question: "Why doesn't a Java `synchronized` block protect this across two API instances?",
-      options: [
-        'It does — synchronized works cluster-wide by default',
-        'Each JVM has its own lock; synchronized only coordinates threads inside one process',
-        '`synchronized` is deprecated and does nothing',
-      ],
-      correct: 1,
-    },
-    {
-      question: 'What does a distributed lock (e.g. Redis-based) add that a local lock cannot?',
-      options: [
-        'Faster reads',
-        'A single shared lock that every instance, on every machine, checks before proceeding',
-        'Automatic database backups',
-      ],
-      correct: 1,
-    },
-    {
-      question:
-        "Kleppmann and antirez publicly disagreed about Redlock. What was the core of the disagreement?",
-      options: [
-        'Whether Redis is open source',
-        'Whether Redlock is safe under real-world clock drift and process pauses without fencing tokens',
-        'Which programming language Redis should be written in',
-      ],
-      correct: 1,
-    },
+    { question: 'Why does PostgreSQL locking coordinate all three TicketForge replicas?',
+      options: ['Spring copies JVM locks between servers', 'Every replica consults the same database row', 'NGINX allows only one request'], correct: 1 },
+    { question: 'Why did TicketForge not add a Redis inventory lock?',
+      options: ['Redis cannot implement locks', 'The protected data and transaction already live in PostgreSQL', 'Redis is always slower than PostgreSQL'], correct: 1 },
+    { question: 'What did the real two-request experiment prove?',
+      options: ['One 201, one 409, one row, zero tickets remaining', 'Both requests succeeded', 'Only one API replica was running'], correct: 0 },
   ];
   quizAnswers = signal<Record<number, number | null>>({});
-
-  setLockType(type: LockType) {
-    if (this.running()) return;
-    this.lockType.set(type);
-    this.outcome.set(null);
+  select(id: StrategyId) { this.selectedId.set(id); }
+  answerQuiz(i: number, answer: number) {
+    if (this.quizAnswers()[i] == null) this.quizAnswers.update((a) => ({ ...a, [i]: answer }));
   }
-
-  async simulate() {
-    if (this.running()) return;
-    this.running.set(true);
-    this.outcome.set(null);
-
-    await new Promise((r) => setTimeout(r, 600));
-
-    if (this.lockType() === 'distributed') {
-      this.outcome.set({ a: 'won', b: 'lost', sold: 1, oversold: false });
-    } else {
-      this.outcome.set({ a: 'won', b: 'won', sold: 2, oversold: true });
-    }
-
-    this.running.set(false);
-  }
-
-  answerQuiz(i: number, index: number) {
-    if (this.quizAnswers()[i] != null) return;
-    this.quizAnswers.update((a) => ({ ...a, [i]: index }));
-  }
-
-  wasAnswered(i: number) {
-    return this.quizAnswers()[i] != null;
-  }
-
-  selected(i: number) {
-    return this.quizAnswers()[i] ?? null;
-  }
+  wasAnswered(i: number) { return this.quizAnswers()[i] != null; }
+  selectedAnswer(i: number) { return this.quizAnswers()[i] ?? null; }
 }

@@ -87,9 +87,9 @@ export class LabIndex {
     {
       sprint: 'Sprint 8',
       title: 'Distributed Locking',
-      blurb: 'A local lock only knows about its own process. Two instances prove it.',
+      blurb: 'Compare lock authorities and inspect the measured one-ticket race.',
       path: '/labs/distributed-lock',
-      status: 'gap',
+      status: 'done',
     },
     {
       sprint: 'Sprint 9–14',

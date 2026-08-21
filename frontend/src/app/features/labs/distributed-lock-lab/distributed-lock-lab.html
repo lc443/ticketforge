@@ -1,160 +1,62 @@
 <div class="lab-container">
   <app-lab-breadcrumb path="/labs/distributed-lock" />
+  <header class="hero"><div><span class="eyebrow">Sprint 8</span>
+    <span class="badge ok">Built · decision verified</span><h1>Distributed Locking Lab</h1>
+    <p>The best distributed lock is the one that protects the data in the system where it already lives.</p></div></header>
 
-  <header class="hero">
-    <div>
-      <span class="eyebrow">Sprint 8</span>
-      <span class="badge bad">Gap — not built yet</span>
-      <h1>Distributed Locking Lab</h1>
-      <p>Two API instances. Each one thinks it's the only one holding the lock.</p>
-    </div>
-  </header>
-
-  <app-scenario-card
-    eyebrow="Sprint 8 · still a gap"
-    title="A lock that only works on one machine"
-  >
-    <div class="scenario-recap">
-      <p>
-        TicketForge still runs Sprint 7's pessimistic lock straight against PostgreSQL — that
-        part is safe regardless of how many API instances call it, because the lock lives in the
-        database, not in any one JVM. This lab is about the case that <em>isn't</em> covered: a
-        critical section that <strong>isn't</strong> a single database transaction.
-      </p>
-    </div>
-
+  <app-scenario-card eyebrow="Sprint 8 · one ticket across three replicas" title="Where should coordination live?">
+    <div class="scenario-recap"><p>
+      A Java <code>synchronized</code> lock belongs to one JVM. TicketForge has three JVMs, so local locks cannot protect shared inventory.
+      PostgreSQL is shared by every replica and owns the inventory transaction, making its row lock a distributed coordination mechanism.
+    </p></div>
     <div class="scenario-grid">
-      <div class="scenario-card problem">
-        <span class="scenario-label">The problem</span>
-        <h3>A local lock only knows about its own process.</h3>
-        <pre class="scenario-chain">
-API #1                     API #2
-   │                          │
-synchronized(ticket)   synchronized(ticket)
-   │                          │
-   └─────────────┬────────────┘
-                 ▼
-            PostgreSQL
-
-Each JVM has its own lock — a local `synchronized`
-block only coordinates threads inside ONE process.</pre>
-      </div>
-
-      <div class="scenario-card solution">
-        <span class="scenario-label">The solution</span>
-        <h3>A lock every instance actually shares.</h3>
-        <p>
-          A distributed lock (Redis <code>SET NX</code> + TTL, or similar) lives outside any
-          single JVM. Every instance checks the same lock before entering the critical section —
-          not just the threads inside its own process.
-        </p>
-      </div>
+      <div class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Local memory stops at the process boundary.</h3>
+        <pre class="scenario-chain">API #1 lock A       API #2 lock B
+      │                   │
+      └──── both enter ───┘
+                  │
+             shared ticket</pre></div>
+      <div class="scenario-card solution"><span class="scenario-label">TicketForge's solution</span><h3>Lock the PostgreSQL row being changed.</h3>
+        <p><code>SELECT … FOR UPDATE</code> makes competing transactions wait. The loser re-reads committed inventory before deciding.</p></div>
     </div>
-
-    <div class="scenario-why">
-      <span class="scenario-label">Open question — README leaves this to you</span>
-      <p class="scenario-pattern-name">
-        <strong>When should you NOT use a distributed lock?</strong> In Feb 2016, Martin Kleppmann
-        publicly argued Redis's own Redlock algorithm is unsafe under clock drift and process
-        pauses, lacking fencing tokens. Redis's creator, antirez, wrote a public rebuttal
-        defending it. Two serious engineers, same algorithm, different conclusions — read both
-        before deciding.
-      </p>
-    </div>
+    <div class="scenario-why"><span class="scenario-label">Architecture decision</span>
+      <p class="scenario-pattern-name"><strong>Do not add Redis by default.</strong> A Redis lease would coordinate replicas, but it would split the lock and transaction across two failure domains. PostgreSQL already provides the required guarantee atomically.</p></div>
   </app-scenario-card>
 
-  <div class="card">
-    <div class="section-title">
-      <span class="eyebrow">Try it</span>
-      <h2>1 ticket. 2 instances. Same instant.</h2>
-    </div>
-
+  <div class="card"><div class="section-title"><span class="eyebrow">Compare</span><h2>Three locking strategies</h2>
+    <p>Select a strategy to see its authority, outcome, and cost.</p></div>
     <div class="lock-toggle">
-      <button
-        type="button"
-        [class.active]="lockType() === 'jvm'"
-        [disabled]="running()"
-        (click)="setLockType('jvm')"
-      >
-        Local synchronized
-      </button>
-      <button
-        type="button"
-        [class.active]="lockType() === 'distributed'"
-        [disabled]="running()"
-        (click)="setLockType('distributed')"
-      >
-        Distributed lock
-      </button>
+      @for (strategy of strategies; track strategy.id) {
+        <button type="button" [class.active]="selectedId() === strategy.id" (click)="select(strategy.id)">{{ strategy.name }}</button>
+      }
     </div>
-
-    <button
-      class="primary-btn"
-      type="button"
-      [disabled]="running()"
-      (click)="simulate()"
-    >
-      {{ running() ? 'Simulating...' : 'Both instances handle a reserve request' }}
-    </button>
-
-    @if (outcome(); as o) {
-      <div class="outcome reveal">
-        <div class="instances-row">
-          <div
-            class="instance-outcome"
-            [class.won]="o.a === 'won'"
-            [class.lost]="o.a === 'lost'"
-          >
-            <strong>API #1</strong>
-            <span>{{ o.a === 'won' ? 'Reserved ✓' : 'Rejected' }}</span>
-          </div>
-          <div
-            class="instance-outcome"
-            [class.won]="o.b === 'won'"
-            [class.lost]="o.b === 'lost'"
-          >
-            <strong>API #2</strong>
-            <span>{{ o.b === 'won' ? 'Reserved ✓' : 'Sold out' }}</span>
-          </div>
-        </div>
-
-        <div
-          class="tally"
-          [class.bad]="o.oversold"
-        >
-          Tickets sold: {{ o.sold }} / 1 available
-          @if (o.oversold) {
-            — oversold, across two different processes
-          }
-        </div>
+    <div class="outcome reveal">
+      <div class="instances-row">
+        <div class="instance-outcome"><strong>Lock authority</strong><span>{{ selectedStrategy().authority }}</span></div>
+        <div class="instance-outcome" [class.won]="selectedStrategy().correct" [class.lost]="!selectedStrategy().correct">
+          <strong>Correct across replicas?</strong><span>{{ selectedStrategy().correct ? 'Yes' : 'No' }}</span></div>
       </div>
-    }
+      <div class="tally" [class.bad]="!selectedStrategy().correct">{{ selectedStrategy().outcome }}</div>
+      <p class="tradeoff"><strong>Tradeoff:</strong> {{ selectedStrategy().tradeoff }}</p>
+      @if (selectedStrategy().measured) { <p class="measured">Measured against the running three-replica TicketForge stack.</p> }
+      @else { <p class="conceptual">Conceptual comparison — not enabled in the production reservation path.</p> }
+    </div>
   </div>
 
-  <div class="card quiz-card">
-    <div class="section-title">
-      <span class="eyebrow">Check yourself</span>
-      <h2>Quick check</h2>
+  <div class="card evidence-card"><div class="section-title"><span class="eyebrow">Real experiment</span><h2>Two requests. One ticket.</h2></div>
+    <div class="metrics">
+      <div><strong>1</strong><span>201 winner</span></div><div><strong>1</strong><span>409 rejected</span></div>
+      <div><strong>1</strong><span>reservation row</span></div><div><strong>0</strong><span>tickets left</span></div>
+      <div><strong>261.16ms</strong><span>p95</span></div>
     </div>
+    <p>The invariant held through NGINX with all three APIs running. The database—not process memory—serialized access to the event row.</p>
+  </div>
 
-    @for (q of quiz; track q.question; let qi = $index) {
-      <div class="quiz">
-        <p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
-        <div class="quiz-options">
-          @for (option of q.options; track option; let i = $index) {
-            <button
-              type="button"
-              class="quiz-option"
-              [class.correct]="wasAnswered(qi) && i === q.correct"
-              [class.incorrect]="wasAnswered(qi) && selected(qi) === i && i !== q.correct"
-              [disabled]="wasAnswered(qi)"
-              (click)="answerQuiz(qi, i)"
-            >
-              {{ option }}
-            </button>
-          }
-        </div>
-      </div>
-    }
+  <div class="card quiz-card"><div class="section-title"><span class="eyebrow">Check yourself</span><h2>Quick check</h2></div>
+    @for (q of quiz; track q.question; let qi = $index) { <div class="quiz"><p class="quiz-question">{{ qi + 1 }}. {{ q.question }}</p>
+      <div class="quiz-options">@for (option of q.options; track option; let i = $index) {
+        <button type="button" class="quiz-option" [class.correct]="wasAnswered(qi) && i === q.correct"
+          [class.incorrect]="wasAnswered(qi) && selectedAnswer(qi) === i && i !== q.correct"
+          [disabled]="wasAnswered(qi)" (click)="answerQuiz(qi, i)">{{ option }}</button> }</div></div> }
   </div>
 </div>
