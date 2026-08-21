@@ -1,24 +1,4 @@
 :host {
-  --ink: #1c2130;
-  --ink-soft: #6b7280;
-  --paper: #f8fafc;
-  --paper-raised: #ffffff;
-  --line: #e5e7eb;
-  --accent: #d9631e;
-  --stamp: #2f6f68;
-  --stamp-soft: #e3efed;
-  --done: #2f7a4f;
-  --done-bg: #e3f1e7;
-  --next: #b8791a;
-  --next-bg: #faedd6;
-  --partial: #8a6b1f;
-  --partial-bg: #f3ecd6;
-  --todo: #8a8470;
-  --todo-bg: #efece2;
-  --gap: #b5432f;
-  --gap-bg: #fae3dd;
-  --shadow: 0 1px 2px rgba(28, 33, 48, 0.05), 0 8px 20px -12px rgba(28, 33, 48, 0.14);
-
   display: block;
   font-family: 'IBM Plex Sans', system-ui, sans-serif;
   color: var(--ink);

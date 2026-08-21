@@ -37,6 +37,34 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
+:root[data-theme='dark'] {
+  --ink: #edf0f7;
+  --ink-soft: #a8afbf;
+  --paper: #11141c;
+  --paper-raised: #191e29;
+  --line: #303747;
+
+  --accent: #f0803c;
+  --accent-soft: #3a281f;
+  --stamp: #78b8ae;
+  --stamp-soft: #203733;
+
+  --done: #7bc99a;
+  --done-bg: #1c3929;
+  --next: #e8b45f;
+  --next-bg: #3b301e;
+  --partial: #dcc36f;
+  --partial-bg: #39331f;
+  --todo: #b8b2a0;
+  --todo-bg: #302f2d;
+  --gap: #ef8877;
+  --gap-bg: #412721;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 20px -12px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.25), 0 16px 36px -14px rgba(0, 0, 0, 0.8);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -54,6 +82,7 @@ body {
   font-family: var(--font-body);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.18s ease, color 0.18s ease;
 }
 
 h1,
