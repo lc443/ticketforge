@@ -24,7 +24,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 ### Level 3: Distributed Systems
 
 -   Sprint 7: Concurrency and ticket overselling
--   Sprint 8: Distributed locking
+-   Sprint 8: Distributed locking ✅ — PostgreSQL chosen as the shared lock authority; two-request last-ticket invariant verified; ADR-002 accepted
 -   Sprint 9: Event-driven architecture
 -   Sprint 10: Kafka fundamentals
 -   Sprint 11: Consumer groups

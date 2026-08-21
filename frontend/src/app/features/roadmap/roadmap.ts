@@ -108,8 +108,8 @@ export class Roadmap {
         {
           num: '8',
           name: 'Distributed Locking',
-          note: 'Open question never answered; still just single-instance Postgres locking',
-          status: 'gap',
+          note: 'PostgreSQL row lock selected over JVM-local and redundant Redis locks; real two-request race verified one winner and one 409',
+          status: 'done',
         },
         {
           num: '9',
