@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ticketforge-gateway
+  namespace: ticketforge
+spec:
+  listeners:
+    - name: https
+      hostname: ticketforge.example.com
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: ticketforge-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ticketforge
+  namespace: ticketforge
+spec:
+  hostnames:
+    - ticketforge.example.com
+  parentRefs:
+    - name: ticketforge-gateway
+      sectionName: https
+

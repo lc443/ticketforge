@@ -9,5 +9,9 @@ images:
   - name: ticketforge-api
     newName: ghcr.io/lc443/ticketforge-api
     newTag: replace-with-immutable-release
+  - name: ticketforge-frontend
+    newName: ghcr.io/lc443/ticketforge-frontend
+    newTag: replace-with-immutable-release
 patches:
   - path: api-production.yaml
+  - path: gateway-production.yaml

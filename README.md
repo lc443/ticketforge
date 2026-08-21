@@ -551,6 +551,8 @@ Kill pods. Exhaust memory. Deploy a broken release. Recover.
 
 **Topics:** ClusterIP, service discovery, DNS, Gateway API, Ingress concepts, TLS
 
+**Implemented evidence:** Cluster DNS and EndpointSlices expose ready backends; NGINX Gateway Fabric routes same-origin `/api` and `/` traffic; production renders HTTPS termination; NetworkPolicy intent is declared with the kindnet enforcement limitation documented. See [ADR-008](architecture/decisions/ADR-008-kubernetes-network-edge.md) and the [networking runbook](architecture/delivery/kubernetes-networking-runbook.md).
+
 **Why it matters:** pod IPs change constantly as things get rescheduled; DNS-based service discovery is the only reason anything can reliably find anything else inside the cluster.
 
 ### Sprint 21: Kubernetes Autoscaling

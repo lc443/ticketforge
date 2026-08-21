@@ -190,8 +190,8 @@ export class Roadmap {
         {
           num: '20',
           name: 'Kubernetes Networking',
-          note: 'ClusterIP, DNS, Ingress',
-          status: 'todo',
+          note: 'Service DNS and EndpointSlices, NGINX Gateway Fabric, path-based HTTPRoute, two-replica frontend, TLS termination design, and NetworkPolicy enforcement boundary verified',
+          status: 'done',
         },
         {
           num: '21',

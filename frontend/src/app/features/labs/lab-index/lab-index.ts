@@ -135,11 +135,16 @@ export class LabIndex {
       path: '/labs/production-kubernetes',
       status: 'done',
     },
+    {
+      sprint: 'Sprint 20', title: 'Kubernetes Networking',
+      blurb: 'Trace Service DNS, publish path-based Gateway routes, design TLS termination, and declare least-privilege traffic.',
+      path: '/labs/kubernetes-networking', status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 20–22',
+      sprint: 'Sprints 21–22',
       title: 'Kubernetes Platform Architecture',
       blurb: 'Choose workload boundaries, health checks, networking, scaling, packaging, and operational policies.',
       status: 'planned',

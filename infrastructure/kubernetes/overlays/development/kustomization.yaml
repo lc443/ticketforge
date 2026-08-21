@@ -9,4 +9,6 @@ images:
   - name: ticketforge-api
     newName: ticketforge-api
     newTag: sprint-19
-
+  - name: ticketforge-frontend
+    newName: ticketforge-frontend
+    newTag: sprint-20-networking-v2
