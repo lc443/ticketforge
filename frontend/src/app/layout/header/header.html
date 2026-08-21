@@ -38,6 +38,17 @@
       Roadmap
     </a>
 
+    <button
+      class="theme-toggle"
+      type="button"
+      (click)="theme.toggle()"
+      [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      [attr.title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <span aria-hidden="true">{{ theme.isDark() ? '☀' : '☾' }}</span>
+      <span class="theme-label">{{ theme.isDark() ? 'Light' : 'Dark' }}</span>
+    </button>
+
     @if (auth.isLoggedIn()) {
       <span class="auth-email">{{ auth.email() }}</span>
       <button class="auth-action" type="button" (click)="logout()">Sign Out</button>
