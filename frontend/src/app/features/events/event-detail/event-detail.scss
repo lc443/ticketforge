@@ -73,6 +73,47 @@ h1 {
   }
 }
 
+.management-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.edit-button {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--paper-raised);
+
+  &:hover {
+    border-color: var(--stamp);
+    color: var(--stamp);
+  }
+}
+
+.delete-button {
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--gap);
+  color: var(--gap);
+  background: var(--gap-bg);
+}
+
+.management-error {
+  margin-bottom: 16px;
+}
+
 .reserve-form {
   display: flex;
   flex-direction: column;

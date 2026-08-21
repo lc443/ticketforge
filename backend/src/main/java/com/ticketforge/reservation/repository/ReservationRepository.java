@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    boolean existsByEventId(Long eventId);
+
     @Query("""
             select r from Reservation r
             join fetch r.event

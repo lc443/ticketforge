@@ -13,20 +13,33 @@
       <p class="date">{{ ev.eventDate | date: 'full' }}</p>
 
       <div class="availability">
-        <span class="count">{{ ev.availableTickets }}</span> / {{ ev.totalTickets }} tickets available
+        <span class="count">{{ ev.availableTickets }}</span> / {{ ev.totalTickets }} tickets
+        available
       </div>
+
+      <div class="management-actions">
+        <a class="edit-button" [routerLink]="['/events', ev.id, 'edit']">Edit event</a>
+        <button class="delete-button" type="button" [disabled]="deleting()" (click)="deleteEvent()">
+          {{ deleting() ? 'Deleting…' : 'Delete event' }}
+        </button>
+      </div>
+
+      @if (deleteError()) {
+        <p class="error management-error">{{ deleteError() }}</p>
+      }
 
       @if (confirmation(); as c) {
         <div class="confirmation">
           <span class="stub-tag stamp">Confirmed</span>
           <p>
             Reserved <strong>{{ c.quantity }}</strong> ticket(s) — status
-            <strong>{{ c.status }}</strong>.
+            <strong>{{ c.status }}</strong
+            >.
           </p>
           <p class="meta">Reservation ID: {{ c.id }}</p>
           <p class="gap-note">
-            Note: this backend has no endpoint to list your past reservations —
-            this confirmation is the only record of it once you leave the page.
+            Note: this backend has no endpoint to list your past reservations — this confirmation is
+            the only record of it once you leave the page.
           </p>
         </div>
       } @else {
@@ -48,7 +61,13 @@
           }
 
           <button type="submit" [disabled]="reserving() || ev.availableTickets === 0">
-            {{ reserving() ? 'Reserving…' : ev.availableTickets === 0 ? 'Sold out' : 'Reserve tickets' }}
+            {{
+              reserving()
+                ? 'Reserving…'
+                : ev.availableTickets === 0
+                  ? 'Sold out'
+                  : 'Reserve tickets'
+            }}
           </button>
         </form>
       }

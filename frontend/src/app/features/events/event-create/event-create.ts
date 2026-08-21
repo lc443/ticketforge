@@ -23,7 +23,10 @@ export class EventCreate {
   loading = signal(false);
   error = signal<string | null>(null);
 
-  constructor(private eventService: EventService, private router: Router) {}
+  constructor(
+    private eventService: EventService,
+    private router: Router,
+  ) {}
 
   submit() {
     this.error.set(null);
@@ -35,10 +38,6 @@ export class EventCreate {
         venue: this.venue,
         eventDate: this.eventDate,
         totalTickets: this.totalTickets,
-        // Every ticket starts available — the entity has no default for
-        // this, so the form fills it in rather than asking for two numbers
-        // that always start equal.
-        availableTickets: this.totalTickets,
       })
       .subscribe({
         next: (event) => {
