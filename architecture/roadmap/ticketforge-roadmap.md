@@ -32,41 +32,52 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 -   Sprint 13: Idempotency
 -   Sprint 14: Transactional outbox
 
-### Level 4: Containers & CI/CD
+### Level 4: Product Lifecycle, Containers & Delivery
 
 -   Sprint 15: Docker ✅ — multi-stage API/frontend images, one API digest across three replicas, health-gated startup, bounded NGINX failover, and PostgreSQL volume persistence verified
--   Sprint 16: CI/CD and GHCR
+-   Sprint 16: Event lifecycle and API evolution — update/delete semantics, cancellation policy, ownership, auditability, referential integrity, and cache consistency
+-   Sprint 17: CI/CD and GHCR
 
 ### Level 5: Kubernetes
 
--   Sprint 17: Kubernetes fundamentals
--   Sprint 18: Production Kubernetes
--   Sprint 19: Kubernetes networking
--   Sprint 20: Autoscaling
--   Sprint 21: Helm
+-   Sprint 18: Kubernetes fundamentals
+-   Sprint 19: Production Kubernetes
+-   Sprint 20: Kubernetes networking
+-   Sprint 21: Autoscaling
+-   Sprint 22: Helm
 
 ### Level 6: Infrastructure as Code
 
--   Sprint 22: Terraform fundamentals
--   Sprint 23: Terraform state
--   Sprint 24: Terraform modules
+-   Sprint 23: Terraform fundamentals
+-   Sprint 24: Terraform state
+-   Sprint 25: Terraform modules
 
 ### Level 7: AWS
 
--   Sprint 25: AWS networking
--   Sprint 26: EKS
--   Sprint 27: RDS, ElastiCache, MSK
--   Sprint 28: AWS security
+-   Sprint 26: AWS networking
+-   Sprint 27: Compute selection — EC2, ECS, Fargate, EKS, and Lambda
+-   Sprint 28: RDS, ElastiCache, MSK
+-   Sprint 29: AWS security
 
 ### Level 8: Reliability
 
--   Sprint 29: Observability
--   Sprint 30: SRE principles
--   Sprint 31: Disaster recovery
+-   Sprint 30: Observability
+-   Sprint 31: SRE principles
+-   Sprint 32: Disaster recovery
 
-### Level 9: Architecture Challenges
+### Level 9: Architecture Leadership
 
--   Sprint 32+: Architecture reviews and design exercises
+-   Sprint 33: AWS Well-Architected review and remediation plan
+-   Sprint 34: Threat modeling, data classification, and compliance mapping
+-   Sprint 35: Cost architecture, unit economics, and FinOps
+-   Sprint 36: Data and integration architecture, API evolution, and governance
+-   Sprint 37: Multi-region and global architecture
+-   Sprint 38: Migration and modernization strategy
+-   Sprint 39: Architecture governance, documentation, and executive communication
+
+### Level 10: Solutions Architect Mode
+
+-   Sprint 40+: Customer discovery, architecture proposals, tradeoff defense, and review-board exercises
 
 ## Architecture Artifacts
 
@@ -76,3 +87,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 -   Runbooks
 -   Cost estimates
 -   DR plans
+-   Well-Architected review reports
+-   Threat models and compliance control maps
+-   Migration wave plans and rollback strategies
+-   Architecture review presentations for technical and executive audiences

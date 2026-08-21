@@ -4,8 +4,8 @@
       <div class="eyebrow">Solutions Architecture · Learning Curriculum</div>
       <h1>TicketForge Roadmap</h1>
       <p class="subtitle">
-        A ticketing platform built one bottleneck at a time — every technology on this list exists
-        because a real version of it, sold out and oversold, actually broke first.
+        Every sprint turns a product request into requirements, tradeoffs, implementation evidence,
+        and architecture artifacts you can explain and defend.
       </p>
     </div>
 
@@ -30,6 +30,20 @@
       </div>
     </div>
   </header>
+
+  <section class="learning-loop" aria-labelledby="learning-loop-title">
+    <div class="loop-heading">
+      <div class="eyebrow">Solutions architect practice</div>
+      <h2 id="learning-loop-title">The loop used in every sprint</h2>
+    </div>
+    <div class="loop-grid">
+      <article><span>01</span><h3>Discover</h3><p>Clarify users, constraints, risks, and quality attributes.</p></article>
+      <article><span>02</span><h3>Decide</h3><p>Compare options and document why one fits the context.</p></article>
+      <article><span>03</span><h3>Build</h3><p>Implement the smallest system change that tests the decision.</p></article>
+      <article><span>04</span><h3>Prove</h3><p>Use tests, metrics, failure drills, and operational evidence.</p></article>
+      <article><span>05</span><h3>Defend</h3><p>Explain the design, tradeoffs, cost, security, and next risks.</p></article>
+    </div>
+  </section>
 
   @for (level of levels(); track level.name) {
     <section class="level">
@@ -65,7 +79,5 @@
     </section>
   }
 
-  <footer>
-    Edit <code>features/roadmap/roadmap.ts</code> to update a sprint's status as you finish it.
-  </footer>
+  <footer>Each completed sprint should leave behind working software, evidence, and a defensible architecture decision.</footer>
 </div>

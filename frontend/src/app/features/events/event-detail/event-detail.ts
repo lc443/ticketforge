@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../core/services/event.service';
@@ -24,6 +24,8 @@ export class EventDetail implements OnInit {
   reserving = signal(false);
   reserveError = signal<string | null>(null);
   confirmation = signal<ReservationResponse | null>(null);
+  deleting = signal(false);
+  deleteError = signal<string | null>(null);
 
   // The route param is always a string — Angular's router doesn't know or
   // care what type an ID is, it's just a URL segment. We convert once here
@@ -33,7 +35,8 @@ export class EventDetail implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private eventService: EventService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -72,6 +75,23 @@ export class EventDetail implements OnInit {
       error: (err) => {
         this.reserving.set(false);
         this.reserveError.set(apiErrorMessage(err, 'Reservation failed. Try again.'));
+      },
+    });
+  }
+
+  deleteEvent() {
+    const event = this.event();
+    if (!event || !window.confirm(`Delete "${event.name}"? This cannot be undone.`)) {
+      return;
+    }
+
+    this.deleteError.set(null);
+    this.deleting.set(true);
+    this.eventService.delete(this.eventId).subscribe({
+      next: () => this.router.navigate(['/events']),
+      error: (error) => {
+        this.deleting.set(false);
+        this.deleteError.set(apiErrorMessage(error, 'Could not delete the event.'));
       },
     });
   }

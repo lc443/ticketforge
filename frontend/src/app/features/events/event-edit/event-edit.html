@@ -1,0 +1,55 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <span class="stub-tag">Events</span>
+    <h1>Edit event</h1>
+    <p class="sub">Changes are applied without resetting tickets that have already been sold.</p>
+
+    @if (loading()) {
+      <p class="sub">Loading…</p>
+    } @else {
+      <form (ngSubmit)="submit()">
+        <label>
+          Name
+          <input type="text" name="name" [(ngModel)]="name" required autocomplete="off" />
+        </label>
+
+        <label>
+          Venue
+          <input type="text" name="venue" [(ngModel)]="venue" required autocomplete="off" />
+        </label>
+
+        <label>
+          Date &amp; time
+          <input type="datetime-local" name="eventDate" [(ngModel)]="eventDate" required />
+        </label>
+
+        <label>
+          Total tickets
+          <input
+            type="number"
+            name="totalTickets"
+            [(ngModel)]="totalTickets"
+            [min]="soldTickets || 1"
+            required
+          />
+        </label>
+
+        @if (soldTickets > 0) {
+          <p class="sub">
+            {{ soldTickets }} ticket(s) already sold. Capacity cannot be lower than this.
+          </p>
+        }
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <button type="submit" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </form>
+    }
+
+    <p class="switch"><a [routerLink]="['/events', eventId]">← Back to event</a></p>
+  </div>
+</section>

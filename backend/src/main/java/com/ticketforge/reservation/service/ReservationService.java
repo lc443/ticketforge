@@ -18,6 +18,7 @@ import com.ticketforge.reservation.repository.ReservationRepository;
 import com.ticketforge.shared.error.ConflictException;
 import com.ticketforge.shared.error.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class ReservationService {
     private final UserRepository userRepository;
 
     @Transactional
+    @CacheEvict(value = "events", key = "#eventId")
     public ReservationResponse createReservation(
             Long eventId,
             CreateReservationRequest request,
