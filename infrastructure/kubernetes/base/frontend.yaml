@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketforge-frontend
+  namespace: ticketforge
+  labels:
+    app.kubernetes.io/name: ticketforge-frontend
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: ticketforge
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ticketforge-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ticketforge-frontend
+        app.kubernetes.io/component: web
+        app.kubernetes.io/part-of: ticketforge
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: ticketforge-frontend:sprint-20-networking-v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticketforge-frontend
+  namespace: ticketforge
+  labels:
+    app.kubernetes.io/name: ticketforge-frontend
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: ticketforge
+spec:
+  selector:
+    app.kubernetes.io/name: ticketforge-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

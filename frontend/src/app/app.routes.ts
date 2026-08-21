@@ -159,6 +159,10 @@ export const routes: Routes = [
             (m) => m.ProductionKubernetesLab,
           ),
       },
+      {
+        path: 'labs/kubernetes-networking',
+        loadComponent: () => import('./features/labs/kubernetes-networking-lab/kubernetes-networking-lab').then((m) => m.KubernetesNetworkingLab),
+      },
 
       {
         path: 'lab/cache',

@@ -1,0 +1,77 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/kubernetes-networking" />
+  <header class="hero"><span class="eyebrow">Sprint 20</span><h1>Kubernetes networking</h1><p>Trace DNS and Service routing, publish one controlled edge, terminate TLS, and declare least-privilege traffic.</p></header>
+  <app-scenario-card eyebrow="Architecture scenario" title="Users need one address while Pods keep changing">
+    <div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Pod IPs are disposable and ClusterIP is internal.</h3><p>Port-forward is a debugging tunnel, not a public endpoint. Publishing every workload would expand the attack surface.</p></section><section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Separate discovery, routing, and policy.</h3><p>Services stabilize east-west access; Gateway API owns north-south listeners; HTTPRoute delegates paths; NetworkPolicy constrains allowed flows.</p></section></div>
+  </app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run each command, inspect its evidence, then mark the exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · platform API</span><h2>Install a controller, not only CRDs</h2></div><pre data-language="bash"><code>kubectl apply --server-side --filename \
+  https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/standard-install.yaml
+
+helm upgrade --install ngf \
+  oci://ghcr.io/nginx/charts/nginx-gateway-fabric \
+  --version 2.6.7 \
+  --create-namespace \
+  --namespace nginx-gateway \
+  --set nginx.service.type=NodePort \
+  --wait --timeout 5m</code></pre><div class="syntax-list"><div><code>CRD</code><p>Extends Kubernetes schema; it does not implement traffic handling.</p></div><div><code>controller</code><p>Watches Gateway resources and reconciles an NGINX data plane.</p></div><div><code>--version</code><p>Pins a reproducible chart instead of silently changing behavior.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · platform installed' : 'Mark platform exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · east-west DNS</span><h2>Resolve a stable Service name</h2></div><pre data-language="bash"><code>kubectl run dns-check \
+  --namespace ticketforge \
+  --image=busybox:1.37 \
+  --restart=Never --rm --attach -- \
+  nslookup ticketforge-api.ticketforge.svc.cluster.local
+
+kubectl get endpointslices \
+  --namespace ticketforge \
+  --selector kubernetes.io/service-name=ticketforge-api</code></pre><div class="syntax-list"><div><code>service.namespace.svc.cluster.local</code><p>The fully qualified cluster DNS name.</p></div><div><code>ClusterIP</code><p>A stable virtual address backed by changing ready endpoints.</p></div><div><code>EndpointSlice</code><p>The ready Pod addresses selected by Service labels.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · DNS traced' : 'Mark DNS exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · edge ownership</span><h2>Route API and web traffic by path</h2></div><pre data-language="yaml"><code>listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+
+rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /api
+    backendRefs:
+      - name: ticketforge-api
+        port: 8080
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefs:
+      - name: ticketforge-frontend
+        port: 80</code></pre><div class="syntax-list"><div><code>Gateway</code><p>Infrastructure-owned listener and address.</p></div><div><code>HTTPRoute</code><p>Application-owned hostname/path policy attached to a Gateway.</p></div><div><code>longest prefix</code><p><code>/api</code> wins over <code>/</code>, preventing API requests from falling into Angular.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · routes understood' : 'Mark routing exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · status and traffic</span><h2>Prove reconciliation and raw HTTP behavior</h2></div><pre data-language="bash"><code>kubectl describe httproute ticketforge --namespace ticketforge
+kubectl port-forward --namespace ticketforge \
+  service/ticketforge-gateway-nginx 18080:80
+
+curl --include http://127.0.0.1:18080/
+curl --include http://127.0.0.1:18080/api/events</code></pre><div class="syntax-list"><div><code>Accepted=True</code><p>The parent Gateway permits the route.</p></div><div><code>ResolvedRefs=True</code><p>Every referenced backend exists and is permitted.</p></div><div><code>401 JSON</code><p>Proves `/api/events` reached Spring security; an error can be successful routing evidence.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · traffic proved' : 'Mark traffic exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · TLS boundary</span><h2>Terminate HTTPS at the Gateway</h2></div><pre data-language="yaml"><code>- name: https
+  hostname: ticketforge.example.com
+  protocol: HTTPS
+  port: 443
+  tls:
+    mode: Terminate
+    certificateRefs:
+      - kind: Secret
+        name: ticketforge-tls</code></pre><div class="syntax-list"><div><code>Terminate</code><p>The Gateway presents the public certificate and forwards HTTP inside the cluster.</p></div><div><code>certificateRefs</code><p>References certificate material delivered separately; no private key belongs in Git.</p></div><div><code>hostname</code><p>Limits the listener and route to the intended DNS identity.</p></div></div><div class="callout"><span class="callout-label">Production requirement</span><p>Add certificate automation, renewal alerts, an HTTP-to-HTTPS redirect, and an internal encryption decision before claiming end-to-end transport security.</p></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · TLS boundary identified' : 'Mark TLS exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · network isolation</span><h2>Separate declaration from enforcement evidence</h2></div><pre data-language="bash"><code>kubectl get networkpolicy --namespace ticketforge
+
+docker exec ticketforge-control-plane \
+  cat /etc/cni/net.d/10-kindnet.conflist
+
+# Repeat allow/deny connectivity tests on a cluster whose CNI
+# documents NetworkPolicy enforcement, such as Cilium or Calico.</code></pre><div class="syntax-list"><div><code>default-deny</code><p>Selects every Pod and allows no ingress unless another policy permits it.</p></div><div><code>podSelector</code><p>Matches source/destination identities by labels, not unstable IP addresses.</p></div><div><code>kindnet</code><p>Accepts NetworkPolicy resources but does not enforce them; blocked traffic here would be false evidence.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · evidence boundary understood' : 'Mark policy exercise complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>What does a successful HTTPRoute status prove?</h2></div><div class="quiz-options"><button class="quiz-option" [class.incorrect]="answer() === 'traffic'" (click)="selectAnswer('traffic')">Users can reach it</button><button class="quiz-option" [class.correct]="answer() === 'config'" (click)="selectAnswer('config')">Controller accepted and resolved it</button><button class="quiz-option" [class.incorrect]="answer() === 'tls'" (click)="selectAnswer('tls')">TLS is secure end to end</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'config'">@if (answer() === 'config') { Correct. Status proves reconciliation; DNS, load-balancer reachability, HTTP responses, and policy enforcement need separate tests. } @else { Route status alone cannot prove client reachability or end-to-end security. }</p> }</section>
+</div>
