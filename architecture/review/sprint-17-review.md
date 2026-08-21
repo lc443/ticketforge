@@ -24,6 +24,8 @@ A contributor modifies event authorization. Their laptop build passes, but the c
 
 ## Evidence
 
+GitHub Actions run `32526738146` verified the trusted `main` path: all quality gates passed, all three images were pushed to GHCR, and API, frontend, and gateway provenance attestations succeeded.
+
 | Invariant | Evidence |
 |---|---|
 | Backend runs on the declared runtime | 11/11 tests passed inside Temurin Java 21 |
@@ -48,7 +50,7 @@ A contributor modifies event authorization. Their laptop build passes, but the c
 
 ## Tradeoffs and follow-up
 
-- GitHub-hosted publication still needs a real trusted `main` run to prove GHCR permissions, digest outputs, and OIDC attestations.
+- The trusted `main` run proved GHCR permissions, digest outputs, and OIDC attestations.
 - Dependency-diff review, SARIF retention, SBOM generation, protected environment approvals, and automated cloud deployment remain future delivery maturity.
 - Trivy's Java database is large. The current cache is job-local; persistent GitHub caching can reduce later runtime with additional supply-chain considerations.
 - The existing transactional-outbox PostgreSQL LOB defect remains separate operational debt.
@@ -56,4 +58,4 @@ A contributor modifies event authorization. Their laptop build passes, but the c
 
 ## Outcome
 
-Sprint 17 provides a locally verified CI/CD control plane and a main-only publication design. It is complete only after the GitHub branch gates and trusted `main` publication supply external evidence.
+Sprint 17 provides a verified CI/CD control plane and main-only publication path. Branch gates, exact-image transfer, GHCR publication, and three provenance attestations supplied external evidence.

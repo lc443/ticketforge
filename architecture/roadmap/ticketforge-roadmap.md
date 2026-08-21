@@ -36,12 +36,12 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 -   Sprint 15: Docker ✅ — multi-stage API/frontend images, one API digest across three replicas, health-gated startup, bounded NGINX failover, and PostgreSQL volume persistence verified
 -   Sprint 16: Event lifecycle and API evolution — update/delete semantics, cancellation policy, ownership, auditability, referential integrity, and cache consistency
--   Sprint 17: CI/CD and GHCR 🟡 — correctness gates, isolated integration topology, three-image vulnerability policy, exact-artifact handoff, main-only publication, provenance, digest promotion, and rollback implemented; GitHub-hosted evidence pending
+-   Sprint 17: CI/CD and GHCR ✅ — correctness gates, isolated integration topology, three-image vulnerability policy, exact-artifact handoff, main-only GHCR publication, and three provenance attestations verified in GitHub Actions run 32526738146
 
 ### Level 5: Kubernetes
 
--   Sprint 18: Kubernetes fundamentals
--   Sprint 19: Production Kubernetes
+-   Sprint 18: Kubernetes fundamentals ✅ — isolated kind cluster, Kustomize base, configuration boundary, development dependencies, secured three-replica API Deployment, Service discovery, probes, and Pod replacement verified
+-   Sprint 19: Production Kubernetes — persistence, application probe groups, graceful shutdown, disruption policy, environment overlays, configuration rollout, and rollback evidence
 -   Sprint 20: Kubernetes networking
 -   Sprint 21: Autoscaling
 -   Sprint 22: Helm

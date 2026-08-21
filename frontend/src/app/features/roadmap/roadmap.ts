@@ -167,8 +167,8 @@ export class Roadmap {
         {
           num: '17',
           name: 'CI/CD',
-          note: 'Java/Node gates, isolated dependencies, three scanned images, exact-artifact GHCR publication, provenance, digest promotion, and rollback implemented; trusted GitHub evidence pending',
-          status: 'partial',
+          note: 'Java/Node gates, isolated dependencies, three scanned images, exact-artifact GHCR publication, provenance attestations, digest promotion, and rollback verified on main',
+          status: 'done',
         },
       ],
     },
@@ -178,13 +178,13 @@ export class Roadmap {
         {
           num: '18',
           name: 'Kubernetes Fundamentals',
-          note: 'infrastructure/kubernetes/ has no manifests yet',
-          status: 'todo',
+          note: 'kind cluster, namespaces, Kustomize, configuration boundaries, three-replica API Deployment, Service discovery, security context, probes, and self-healing verified',
+          status: 'done',
         },
         {
           num: '19',
           name: 'Production Kubernetes',
-          note: 'Probes, ConfigMap, Secret, rollout/rollback',
+          note: 'Persistent storage, application probe groups, graceful shutdown, disruption policy, environment overlays, configuration rollout, and rollback',
           status: 'todo',
         },
         {

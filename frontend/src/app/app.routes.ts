@@ -145,6 +145,14 @@ export const routes: Routes = [
       },
 
       {
+        path: 'labs/kubernetes-foundations',
+        loadComponent: () =>
+          import('./features/labs/kubernetes-foundations-lab/kubernetes-foundations-lab').then(
+            (m) => m.KubernetesFoundationsLab,
+          ),
+      },
+
+      {
         path: 'lab/cache',
         loadComponent: () =>
           import('./features/lab/event-cache/event-cache').then((m) => m.EventCache),
