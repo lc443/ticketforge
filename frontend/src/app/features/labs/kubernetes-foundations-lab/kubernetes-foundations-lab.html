@@ -54,7 +54,7 @@
       <h2>Create and identify the local cluster</h2>
       <p>A stale kubeconfig context can point at a cluster that no longer exists. Always identify the target before mutation.</p>
     </div>
-    <pre><code>kind create cluster --name ticketforge
+    <pre data-language="bash"><code>kind create cluster --name ticketforge
 kubectl config current-context
 kind get clusters
 kubectl get nodes --output wide
@@ -75,7 +75,7 @@ kubectl cluster-info</code></pre>
       <span class="eyebrow">Exercise 2 · declarative state</span>
       <h2>Validate, apply, and reapply the Namespace</h2>
     </div>
-    <pre><code>kubectl apply --dry-run=server \
+    <pre data-language="bash"><code>kubectl apply --dry-run=server \
   --filename infrastructure/kubernetes/base/namespace.yaml
 
 kubectl apply \
@@ -105,7 +105,7 @@ kubectl get namespace ticketforge --show-labels</code></pre>
       <div><strong>ConfigMap</strong><p>Ports, service DNS names, and other non-sensitive runtime settings.</p></div>
       <div><strong>Secret</strong><p>Database credentials and JWT signing material, protected with RBAC and external secret management in production.</p></div>
     </div>
-    <pre><code>openssl rand -hex 32
+    <pre data-language="bash"><code>openssl rand -hex 32
 
 kubectl create secret generic ticketforge-api-secret \
   --namespace ticketforge \
@@ -130,7 +130,7 @@ kubectl describe secret ticketforge-api-secret \
       <h2>Load the application image into kind</h2>
       <p>The Docker Desktop image store and kind node containerd store are separate runtimes.</p>
     </div>
-    <pre><code>docker build \
+    <pre data-language="bash"><code>docker build \
   --file infrastructure/docker/Dockerfile.api \
   --tag ticketforge-api:k8s \
   .
@@ -157,7 +157,7 @@ kind load docker-image \
       <span class="eyebrow">Exercise 5 · deployment</span>
       <h2>Render, validate, apply, and observe rollouts</h2>
     </div>
-    <pre><code>kubectl kustomize infrastructure/kubernetes/base
+    <pre data-language="bash"><code>kubectl kustomize infrastructure/kubernetes/base
 
 kubectl apply --dry-run=server \
   --kustomize infrastructure/kubernetes/base
@@ -193,7 +193,7 @@ kubectl get deployments,pods,services \
       <span class="eyebrow">Exercise 6 · evidence and failure drill</span>
       <h2>Prove Service routing and self-healing</h2>
     </div>
-    <pre><code>kubectl get endpointslices \
+    <pre data-language="bash"><code>kubectl get endpointslices \
   --namespace ticketforge \
   --selector kubernetes.io/service-name=ticketforge-api
 

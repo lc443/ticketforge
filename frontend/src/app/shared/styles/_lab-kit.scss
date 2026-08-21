@@ -24,6 +24,22 @@
   box-shadow: var(--shadow);
 }
 
+pre[data-language] {
+  position: relative;
+  padding-top: 38px !important;
+
+  &::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 11px;
+    right: 14px;
+    color: var(--ink-soft);
+    font: 700 9.5px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
 .section-title {
   margin-bottom: 22px;
 
@@ -277,8 +293,8 @@
     overflow-x: auto;
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--todo-bg);
+    color: var(--ink-soft);
     font: 12px/1.7 var(--font-mono);
   }
 

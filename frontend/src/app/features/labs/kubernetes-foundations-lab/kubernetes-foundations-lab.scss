@@ -52,10 +52,10 @@
   margin: 0;
   padding: 20px 22px;
   overflow-x: auto;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--ink);
-  color: var(--paper-raised);
+  background: var(--todo-bg);
+  color: var(--ink-soft);
   font: 12px/1.75 var(--font-mono);
   white-space: pre;
   code { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; white-space: inherit; }
