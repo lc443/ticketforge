@@ -1,0 +1,9 @@
+FROM nginx:1.29-alpine
+
+RUN apk upgrade --no-cache
+
+COPY infrastructure/nginx/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
+  CMD wget -qO- http://127.0.0.1/health || exit 1

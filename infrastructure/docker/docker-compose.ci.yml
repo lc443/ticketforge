@@ -1,0 +1,16 @@
+services:
+  postgres:
+    container_name: !reset null
+    ports: !reset []
+
+  redis:
+    container_name: !reset null
+    ports: !reset []
+
+  kafka:
+    container_name: !reset null
+    ports: !reset []
+
+volumes:
+  postgres-data:
+    name: ticketforge-ci-postgres-data

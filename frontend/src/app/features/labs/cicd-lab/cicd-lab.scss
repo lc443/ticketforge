@@ -1,0 +1,90 @@
+@use '../../../shared/styles/lab-kit';
+
+:host { display: block; }
+
+.lab-container {
+  width: min(880px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  margin-bottom: 28px;
+  h1 { margin: 6px 0 8px; color: var(--ink); font-size: clamp(28px, 4vw, 40px); }
+  p { margin: 0; color: var(--ink-soft); font-size: 15px; }
+}
+
+.card { margin-bottom: 20px; }
+
+.pipeline-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+
+  div {
+    min-width: 118px;
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+  }
+  strong, span { display: block; }
+  strong { color: var(--ink); font-size: 12px; }
+  span { margin-top: 4px; color: var(--ink-soft); font: 10.5px var(--font-mono); }
+  i { align-self: center; color: var(--accent); font-style: normal; }
+}
+
+.gate-grid, .status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gate, .status-item {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 13px; }
+  p { margin: 0; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+}
+
+.status-item {
+  span { display: block; margin-bottom: 5px; font: 700 10px var(--font-mono); text-transform: uppercase; }
+  &.done span { color: var(--done); }
+  &.next span { color: var(--next); }
+}
+
+.lesson > pre {
+  position: relative;
+  margin: 0;
+  padding: 20px 22px;
+  overflow-x: auto;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+  color: var(--paper-raised);
+  font: 12px/1.75 var(--font-mono);
+  tab-size: 2;
+  white-space: pre;
+
+  code {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    white-space: inherit;
+  }
+}
+
+.syntax-list div { grid-template-columns: minmax(170px, 0.8fr) 1.8fr; }
+
+@media (max-width: 640px) {
+  .lab-container { width: min(100% - 32px, 880px); padding-top: 28px; }
+  .gate-grid, .status-grid { grid-template-columns: 1fr; }
+  .syntax-list div { grid-template-columns: 1fr; }
+}
