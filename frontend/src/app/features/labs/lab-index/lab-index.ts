@@ -98,5 +98,12 @@ export class LabIndex {
       path: '/lab/kafka',
       status: 'done',
     },
+    {
+      sprint: 'Sprint 15',
+      title: 'Docker',
+      blurb: 'Build once, run three identical replicas, preserve data, and survive failure.',
+      path: '/labs/docker',
+      status: 'done',
+    },
   ];
 }

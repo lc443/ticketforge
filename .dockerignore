@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.vscode
+.DS_Store
+**/.DS_Store
+**/node_modules
+**/target
+**/dist
+**/.angular
+**/*.log
+load-tests/results
+architecture
+_to_delete

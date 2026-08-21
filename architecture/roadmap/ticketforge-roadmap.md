@@ -34,7 +34,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 ### Level 4: Containers & CI/CD
 
--   Sprint 15: Docker
+-   Sprint 15: Docker ✅ — multi-stage API/frontend images, one API digest across three replicas, health-gated startup, bounded NGINX failover, and PostgreSQL volume persistence verified
 -   Sprint 16: CI/CD and GHCR
 
 ### Level 5: Kubernetes

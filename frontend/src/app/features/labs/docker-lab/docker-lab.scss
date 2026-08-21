@@ -1,0 +1,148 @@
+:host {
+  display: block;
+}
+.lab-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+  color: #1c2334;
+}
+.hero {
+  margin: 2rem 0 2.5rem;
+}
+.hero h1 {
+  max-width: 780px;
+  margin: 0.5rem 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+}
+.hero p,
+.card > p {
+  color: #697386;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+.eyebrow,
+.scenario span {
+  color: #28736d;
+  font-family: monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.card {
+  margin-top: 1.5rem;
+  padding: 2rem;
+  border: 1px solid #e0e4ea;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(28, 35, 52, 0.05);
+}
+.card h2 {
+  margin: 0.4rem 0 1rem;
+  font-size: 1.65rem;
+}
+.scenario-grid,
+.concept-grid,
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.scenario,
+.concept-grid > div,
+.metrics > div {
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: #f5f7fa;
+}
+.scenario.problem {
+  border-left: 4px solid #dd5b32;
+}
+.scenario.solution {
+  border-left: 4px solid #28736d;
+}
+.scenario h3 {
+  margin: 0.55rem 0;
+}
+.scenario p,
+.concept-grid p,
+.layer p {
+  margin: 0.35rem 0 0;
+  color: #697386;
+  line-height: 1.5;
+}
+.concept-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1.25rem 0;
+}
+.choices button {
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd2dc;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+.choices button.active {
+  color: #fff;
+  border-color: #1c2334;
+  background: #1c2334;
+}
+.layers {
+  display: grid;
+  gap: 0.6rem;
+}
+.layer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #eff7f5;
+}
+.layer.rebuilt {
+  background: #fff1e9;
+}
+.layer > span {
+  min-width: 64px;
+  font: 700 0.75rem monospace;
+  color: #28736d;
+}
+.layer.rebuilt > span {
+  color: #d9561b;
+}
+.metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.metrics strong {
+  color: #d9561b;
+  font-size: 1.8rem;
+}
+.metrics span,
+.proof-list {
+  color: #697386;
+  line-height: 1.6;
+}
+.commands pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 12px;
+  color: #e9edf5;
+  background: #1c2334;
+}
+@media (max-width: 700px) {
+  .scenario-grid,
+  .concept-grid,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 1.25rem;
+  }
+}

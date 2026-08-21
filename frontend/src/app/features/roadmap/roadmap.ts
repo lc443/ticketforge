@@ -132,7 +132,7 @@ export class Roadmap {
         {
           num: '12',
           name: 'Retries and DLQ',
-          note: 'Covered conceptually in the review; not yet confirmed wired into the workers\' code',
+          note: "Covered conceptually in the review; not yet confirmed wired into the workers' code",
           status: 'partial',
         },
         {
@@ -155,8 +155,8 @@ export class Roadmap {
         {
           num: '15',
           name: 'Docker',
-          note: 'docker-compose.yml and Dockerfile.api exist; not reviewed as its own sprint',
-          status: 'next',
+          note: 'Multi-stage API/frontend images, shared replica artifact, health-gated Compose, failover, and persistent PostgreSQL verified',
+          status: 'done',
         },
         {
           num: '16',

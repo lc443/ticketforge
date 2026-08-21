@@ -1,0 +1,117 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/docker" />
+
+  <header class="hero">
+    <span class="eyebrow">Sprint 15</span>
+    <h1>Docker: build once, run the same artifact</h1>
+    <p>
+      Turn TicketForge from a machine-dependent project into reproducible, disposable deployment
+      units.
+    </p>
+  </header>
+
+  <app-scenario-card eyebrow="Sprint 15 · verified" title="Why TicketForge needs containers">
+    <div class="scenario-grid">
+      <section class="scenario problem">
+        <span>The problem</span>
+        <h3>“It runs on my machine” is not a deployment strategy.</h3>
+        <p>
+          Host-built JARs, duplicated replica images, missing health gates, and container-local
+          database files make releases inconsistent and fragile.
+        </p>
+      </section>
+      <section class="scenario solution">
+        <span>The solution</span>
+        <h3>Build immutable images and externalize state.</h3>
+        <p>
+          Multi-stage builds compile in Docker, three APIs share one digest, health checks order
+          startup, and PostgreSQL data lives in a named volume.
+        </p>
+      </section>
+    </div>
+  </app-scenario-card>
+
+  <section class="card">
+    <span class="eyebrow">Core model</span>
+    <h2>Image ≠ container</h2>
+    <div class="concept-grid">
+      <div>
+        <strong>Image</strong>
+        <p>Read-only recipe and filesystem. Built once and identified by a digest.</p>
+      </div>
+      <div>
+        <strong>Container</strong>
+        <p>A running instance of that image with a small writable layer.</p>
+      </div>
+      <div>
+        <strong>Volume</strong>
+        <p>State with a lifecycle independent of a disposable container.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Try it</span>
+    <h2>Which layers rebuild?</h2>
+    <p>Docker reuses every unchanged layer before the first changed instruction.</p>
+    <div class="choices">
+      <button type="button" [class.active]="change() === 'source'" (click)="select('source')">
+        Java / TypeScript source
+      </button>
+      <button
+        type="button"
+        [class.active]="change() === 'dependencies'"
+        (click)="select('dependencies')"
+      >
+        pom.xml / package-lock
+      </button>
+      <button type="button" [class.active]="change() === 'nginx'" (click)="select('nginx')">
+        Nginx config only
+      </button>
+    </div>
+    <div class="layers">
+      @for (layer of layers(); track layer.name) {
+        <div class="layer" [class.rebuilt]="layer.rebuilt">
+          <span>{{ layer.rebuilt ? 'REBUILD' : 'CACHE' }}</span>
+          <div>
+            <strong>{{ layer.name }}</strong>
+            <p>{{ layer.detail }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Measured proof</span>
+    <h2>What Sprint 15 verified</h2>
+    <div class="metrics">
+      <div><strong>83 KB</strong><span>API build context, down from ~94 MB</span></div>
+      <div><strong>1 digest</strong><span>shared by api1, api2, and api3</span></div>
+      <div><strong>22 MB</strong><span>production frontend runtime image</span></div>
+      <div><strong>9 / 9</strong><span>requests survived one stopped replica</span></div>
+    </div>
+    <ul class="proof-list">
+      <li>
+        The first dead-replica encounter retried in about one second; later requests completed in
+        milliseconds.
+      </li>
+      <li>Users, events, and reservations survived a forced PostgreSQL container recreation.</li>
+      <li>
+        The frontend's same-origin <code>/api</code> proxy preserved structured backend error JSON.
+      </li>
+    </ul>
+  </section>
+
+  <section class="card commands">
+    <span class="eyebrow">Production loop</span>
+    <h2>Build, start, observe</h2>
+    <pre><code>tfdeploylocal
+tfps
+tfapilogs</code></pre>
+    <p>
+      <code>tfdeploylocal</code> builds the shared API image once and recreates all three replicas
+      from it.
+    </p>
+  </section>
+</div>

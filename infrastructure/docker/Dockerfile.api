@@ -1,5 +1,28 @@
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /workspace
+
+# Dependency metadata changes less often than source. Keeping it in an
+# earlier layer lets Docker reuse downloaded Maven dependencies.
+COPY backend/.mvn .mvn
+COPY backend/mvnw backend/pom.xml ./
+RUN ./mvnw -B dependency:go-offline
+
+COPY backend/src src
+RUN ./mvnw -B clean package -DskipTests
+
 FROM eclipse-temurin:21-jre
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system ticketforge \
+    && useradd --system --gid ticketforge --home-dir /app ticketforge
+
 WORKDIR /app
-COPY backend/target/*.jar app.jar
+COPY --from=build --chown=ticketforge:ticketforge /workspace/target/ticketforge-*.jar app.jar
+
+USER ticketforge
 EXPOSE 8080
+LABEL org.opencontainers.image.title="TicketForge API" \
+      org.opencontainers.image.description="TicketForge Spring Boot modular monolith"
 ENTRYPOINT ["java", "-jar", "app.jar"]
