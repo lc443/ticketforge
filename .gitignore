@@ -31,3 +31,6 @@ backend/out/
 
 # Kubernetes
 *.secret.yaml
+
+# Local Kubernetes credentials generated from committed examples
+infrastructure/kubernetes/base/*.local.yaml

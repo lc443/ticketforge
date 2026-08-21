@@ -1,0 +1,261 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/kubernetes-foundations" />
+
+  <header class="hero">
+    <span class="eyebrow">Sprint 18</span>
+    <h1>Kubernetes foundations</h1>
+    <p>Replace manually named containers with declared workloads, stable discovery, health evidence, and continuous reconciliation.</p>
+  </header>
+
+  <app-scenario-card eyebrow="Architecture scenario" title="One API replica disappears during ticket sales">
+    <div class="scenario-grid">
+      <section class="scenario-card problem">
+        <span class="scenario-label">The problem</span>
+        <h3>Compose encodes three instances by name.</h3>
+        <p><code>api1</code>, <code>api2</code>, and <code>api3</code> couple scaling and gateway configuration to one Docker host.</p>
+      </section>
+      <section class="scenario-card solution">
+        <span class="scenario-label">The solution</span>
+        <h3>Declare replicas and let controllers reconcile.</h3>
+        <p>One Deployment owns three interchangeable Pods while one Service discovers only ready endpoints by label.</p>
+      </section>
+    </div>
+  </app-scenario-card>
+
+  <section class="card progress-card">
+    <div>
+      <span class="eyebrow">Interactive lab progress</span>
+      <strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong>
+    </div>
+    <div class="progress-track" aria-label="Lab completion">
+      <span [style.width.%]="progress()"></span>
+    </div>
+    <p>Run each exercise in your local <code>kind-ticketforge</code> cluster, inspect the evidence, then mark it complete.</p>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Mental model</span>
+      <h2>Docker runs a container; Kubernetes maintains intent</h2>
+    </div>
+    <div class="mapping-grid">
+      <div><code>api1 · api2 · api3</code><span>Deployment with <code>replicas: 3</code></span></div>
+      <div><code>restart</code><span>Controller reconciliation and kubelet restarts</span></div>
+      <div><code>healthcheck</code><span>Startup, readiness, and liveness probes</span></div>
+      <div><code>service name</code><span>Service DNS plus label-selected endpoints</span></div>
+      <div><code>environment</code><span>ConfigMap and Secret references</span></div>
+      <div><code>compose up</code><span><code>kubectl apply</code> desired state</span></div>
+    </div>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 1 · target safety</span>
+      <h2>Create and identify the local cluster</h2>
+      <p>A stale kubeconfig context can point at a cluster that no longer exists. Always identify the target before mutation.</p>
+    </div>
+    <pre><code>kind create cluster --name ticketforge
+kubectl config current-context
+kind get clusters
+kubectl get nodes --output wide
+kubectl cluster-info</code></pre>
+    <div class="syntax-list">
+      <div><code>kind create cluster</code><p>Creates a Kubernetes control-plane node as a Docker container.</p></div>
+      <div><code>--name ticketforge</code><p>Produces cluster <code>ticketforge</code>, context <code>kind-ticketforge</code>, and node <code>ticketforge-control-plane</code>.</p></div>
+      <div><code>current-context</code><p>Shows which cluster the next <code>kubectl</code> mutation will target.</p></div>
+      <div><code>--output wide</code><p>Adds node IP, operating system, architecture, and container runtime evidence.</p></div>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">
+      {{ completed().has(1) ? 'Completed · target verified' : 'Mark target verification complete' }}
+    </button>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 2 · declarative state</span>
+      <h2>Validate, apply, and reapply the Namespace</h2>
+    </div>
+    <pre><code>kubectl apply --dry-run=server \
+  --filename infrastructure/kubernetes/base/namespace.yaml
+
+kubectl apply \
+  --filename infrastructure/kubernetes/base/namespace.yaml
+
+kubectl apply \
+  --filename infrastructure/kubernetes/base/namespace.yaml
+
+kubectl get namespace ticketforge --show-labels</code></pre>
+    <div class="syntax-list">
+      <div><code>--dry-run=server</code><p>Runs API schema and admission processing without persisting the resource.</p></div>
+      <div><code>--filename</code><p>Selects a manifest. Its short form is <code>-f</code>.</p></div>
+      <div><code>unchanged</code><p>Proves idempotency: desired and actual state already agree.</p></div>
+      <div><code>Namespace</code><p>Creates a logical resource and policy boundary; it is not a separate cluster.</p></div>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">
+      {{ completed().has(2) ? 'Completed · idempotency observed' : 'Mark Namespace exercise complete' }}
+    </button>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 3 · configuration boundary</span>
+      <h2>Separate configuration from credentials</h2>
+    </div>
+    <div class="comparison-grid">
+      <div><strong>ConfigMap</strong><p>Ports, service DNS names, and other non-sensitive runtime settings.</p></div>
+      <div><strong>Secret</strong><p>Database credentials and JWT signing material, protected with RBAC and external secret management in production.</p></div>
+    </div>
+    <pre><code>openssl rand -hex 32
+
+kubectl create secret generic ticketforge-api-secret \
+  --namespace ticketforge \
+  --from-literal=DB_USERNAME=postgres \
+  --from-literal=DB_PASSWORD='&lt;local-password&gt;' \
+  --from-literal=JWT_SECRET='&lt;64-character-value&gt;'
+
+kubectl describe secret ticketforge-api-secret \
+  --namespace ticketforge</code></pre>
+    <div class="callout">
+      <span class="callout-label">Security boundary</span>
+      <p>Kubernetes Secret values are base64-encoded, not automatically encrypted. Never commit the local file, print its YAML during normal work, or mistake its resource name for a complete security control.</p>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">
+      {{ completed().has(3) ? 'Completed · secret boundary understood' : 'Mark configuration exercise complete' }}
+    </button>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 4 · artifact transfer</span>
+      <h2>Load the application image into kind</h2>
+      <p>The Docker Desktop image store and kind node containerd store are separate runtimes.</p>
+    </div>
+    <pre><code>docker build \
+  --file infrastructure/docker/Dockerfile.api \
+  --tag ticketforge-api:k8s \
+  .
+
+kind load docker-image \
+  --name ticketforge \
+  ticketforge-api:k8s</code></pre>
+    <div class="syntax-list">
+      <div><code>--tag</code><p>Creates the exact image reference used by the Deployment.</p></div>
+      <div><code>kind load docker-image</code><p>Transfers image content into the node's <code>containerd</code> runtime.</p></div>
+      <div><code>imagePullPolicy: IfNotPresent</code><p>Uses the loaded local image; otherwise the kubelet tries the registry.</p></div>
+    </div>
+    <div class="callout">
+      <span class="callout-label">Failure observed</span>
+      <p>Multi-platform dependency images failed local transfer because Docker's lazy image store lacked referenced content. The kubelet then pulled the correct <code>linux/arm64</code> variants directly. Diagnose the runtime boundary before changing manifests.</p>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">
+      {{ completed().has(4) ? 'Completed · image loaded' : 'Mark image exercise complete' }}
+    </button>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 5 · deployment</span>
+      <h2>Render, validate, apply, and observe rollouts</h2>
+    </div>
+    <pre><code>kubectl kustomize infrastructure/kubernetes/base
+
+kubectl apply --dry-run=server \
+  --kustomize infrastructure/kubernetes/base
+
+kubectl apply \
+  --kustomize infrastructure/kubernetes/base
+
+kubectl rollout status deployment/ticketforge-api \
+  --namespace ticketforge \
+  --timeout=240s
+
+kubectl get deployments,pods,services \
+  --namespace ticketforge \
+  --output wide</code></pre>
+    <div class="syntax-list">
+      <div><code>kustomization.yaml</code><p>Composes the checked-in base resources without templating YAML as text.</p></div>
+      <div><code>rollout status</code><p>Blocks until the Deployment reaches its availability condition or the timeout proves failure.</p></div>
+      <div><code>replicas: 3</code><p>Desired state owned by the Deployment controller—not three manually named Pods.</p></div>
+      <div><code>resources</code><p>Requests guide scheduling; limits bound CPU and memory consumption.</p></div>
+    </div>
+    <div class="failure-grid">
+      <div><code>runAsNonRoot</code><p>Failed on non-numeric image users. We verified UID/GID and declared numeric identities.</p></div>
+      <div><code>readOnlyRootFilesystem</code><p>Blocked Tomcat's temporary directory. A dedicated <code>emptyDir</code> now mounts only at <code>/tmp</code>.</p></div>
+      <div><code>Kafka readiness</code><p>Service-based controller discovery deadlocked. The one-node lab controller now uses <code>localhost:9093</code>.</p></div>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">
+      {{ completed().has(5) ? 'Completed · rollout healthy' : 'Mark rollout exercise complete' }}
+    </button>
+  </section>
+
+  <section class="card lesson">
+    <div class="section-title">
+      <span class="eyebrow">Exercise 6 · evidence and failure drill</span>
+      <h2>Prove Service routing and self-healing</h2>
+    </div>
+    <pre><code>kubectl get endpointslices \
+  --namespace ticketforge \
+  --selector kubernetes.io/service-name=ticketforge-api
+
+kubectl port-forward \
+  --namespace ticketforge \
+  service/ticketforge-api 18080:8080
+
+curl --include http://127.0.0.1:18080/actuator/health
+
+kubectl delete pod &lt;one-api-pod-name&gt; \
+  --namespace ticketforge
+
+kubectl get pods \
+  --namespace ticketforge \
+  --selector app.kubernetes.io/name=ticketforge-api \
+  --watch</code></pre>
+    <div class="syntax-list">
+      <div><code>EndpointSlice</code><p>Shows the ready Pod IPs selected behind a Service.</p></div>
+      <div><code>port-forward</code><p>Creates a temporary local tunnel for development evidence; it is not production ingress.</p></div>
+      <div><code>delete pod</code><p>Removes one disposable instance. The Deployment detects actual replicas below desired replicas and creates a replacement.</p></div>
+      <div><code>--watch</code><p>Streams changes until you press <code>Ctrl+C</code>.</p></div>
+    </div>
+    <button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">
+      {{ completed().has(6) ? 'Completed · reconciliation proved' : 'Mark failure drill complete' }}
+    </button>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Architecture check</span>
+      <h2>Which component restores a deleted API Pod?</h2>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" [class.incorrect]="answer() === 'service'" (click)="selectAnswer('service')">The Service</button>
+      <button class="quiz-option" [class.correct]="answer() === 'deployment'" (click)="selectAnswer('deployment')">The Deployment controller</button>
+      <button class="quiz-option" [class.incorrect]="answer() === 'configmap'" (click)="selectAnswer('configmap')">The ConfigMap</button>
+    </div>
+    @if (answer()) {
+      <p class="quiz-result" [class.correct-text]="answer() === 'deployment'">
+        @if (answer() === 'deployment') {
+          Correct. The Deployment owns a ReplicaSet, which restores the declared replica count. The Service only discovers and routes to ready Pods.
+        } @else {
+          Not quite. A Service routes traffic and a ConfigMap stores configuration; neither owns the replica lifecycle.
+        }
+      </p>
+    }
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <span class="eyebrow">Verified evidence</span>
+      <h2>What Sprint 18 proved</h2>
+    </div>
+    <div class="evidence-grid">
+      <div><strong>3 / 3</strong><span>API replicas ready</span></div>
+      <div><strong>3</strong><span>Service endpoints</span></div>
+      <div><strong>HTTP 200</strong><span>health through Service</span></div>
+      <div><strong>1 → 3</strong><span>deleted Pod replaced</span></div>
+    </div>
+    <div class="callout">
+      <span class="callout-label">Scope boundary</span>
+      <p>PostgreSQL uses <code>emptyDir</code> and Kafka is a single development broker. Production storage, disruption budgets, multi-node scheduling, network policy, ingress, autoscaling, and packaging remain future sprints.</p>
+    </div>
+  </section>
+</div>

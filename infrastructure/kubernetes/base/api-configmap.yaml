@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketforge-api-config
+  namespace: ticketforge
+  labels:
+    app.kubernetes.io/name: ticketforge-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ticketforge
+data:
+  SERVER_PORT: "8080"
+  DB_URL: jdbc:postgresql://postgres:5432/ticketforge
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092

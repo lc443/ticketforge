@@ -119,13 +119,20 @@ export class LabIndex {
       title: 'Delivery Pipeline & Supply Chain',
       blurb: 'Automate correctness, security, immutable publication, provenance, promotion, and rollback evidence.',
       path: '/labs/cicd',
-      status: 'partial',
+      status: 'done',
+    },
+    {
+      sprint: 'Sprint 18',
+      title: 'Kubernetes Foundations',
+      blurb: 'Declare workloads, discover healthy replicas, constrain runtime access, and prove controller reconciliation.',
+      path: '/labs/kubernetes-foundations',
+      status: 'done',
     },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 18–22',
+      sprint: 'Sprints 19–22',
       title: 'Kubernetes Platform Architecture',
       blurb: 'Choose workload boundaries, health checks, networking, scaling, packaging, and operational policies.',
       status: 'planned',
