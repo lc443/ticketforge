@@ -34,6 +34,7 @@ crash.log
 .terraform/
 .tools/
 infrastructure/terraform/fundamentals/generated/
+infrastructure/terraform/state-lab/root/generated/
 
 # Kubernetes
 *.secret.yaml

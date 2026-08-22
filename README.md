@@ -212,7 +212,8 @@ You propose something. It gets challenged. Only then do you build it — and by 
 - [x] **Sprint 16** — Event Lifecycle & API Evolution
 - [ ] **Sprint 17** — CI/CD & GHCR
 - [x] **Sprints 18–22** — Kubernetes & Helm
-- [ ] **Sprints 23–25** — Terraform
+- [x] **Sprints 23–24** — Terraform fundamentals and state
+- [ ] **Sprint 25** — Terraform modules and environments
 - [ ] **Sprints 26–29** — AWS Architecture
 - [ ] **Sprints 30–32** — Observability & Reliability
 - [ ] **Sprints 33–39** — Architecture Leadership
@@ -592,9 +593,9 @@ Traffic ↑             Traffic ↓
 
 **Topics:** tfstate, remote state, locking, drift, import, state management
 
-You'll intentionally modify infrastructure by hand and make Terraform discover the drift.
+**Implemented evidence:** A pinned, loopback-only LocalStack backend bootstraps a versioned and encrypted S3-compatible bucket. Terraform adopted an existing Kubernetes namespace through import, reconciled its labels without recreation, detected a manual edit, restored declared intent, rejected a simultaneous writer with a native S3 lockfile, recorded fourteen recoverable state versions, and returned to a no-op plan. See [ADR-012](architecture/decisions/ADR-012-terraform-remote-state.md), the [Terraform state runbook](architecture/delivery/terraform-state-runbook.md), and the in-app Terraform State & Recovery lab.
 
-**Real-world example:** this is the single most common real-world Terraform footgun — someone changes something in the AWS console "just this once," and Terraform's next plan no longer matches reality. Remote state with locking (commonly an S3 bucket plus a DynamoDB lock table on AWS) exists specifically so two people can't `apply` at the same moment and corrupt the shared state file.
+**Real-world example:** someone changes a resource in the cloud console while two delivery pipelines target the same environment. Remote state provides one ownership record, native S3 lockfiles serialize writers, drift planning exposes the manual change, and object versions preserve a recovery trail. The local simulation teaches those mechanics without claiming production AWS durability or security.
 
 ### Sprint 25: Terraform Modules
 

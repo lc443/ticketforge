@@ -1,0 +1,26 @@
+import { Component, computed, signal } from '@angular/core';
+import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
+
+@Component({
+  selector: 'app-terraform-state-lab',
+  standalone: true,
+  imports: [LabBreadcrumb, ScenarioCard, TechnologyBrief],
+  templateUrl: './terraform-state-lab.html',
+  styleUrl: './terraform-state-lab.scss',
+})
+export class TerraformStateLab {
+  readonly exerciseCount = 7;
+  readonly completed = signal<Set<number>>(new Set());
+  readonly answer = signal<string | null>(null);
+  readonly progress = computed(() => Math.round(this.completed().size / this.exerciseCount * 100));
+
+  toggleExercise(step: number): void {
+    const next = new Set(this.completed());
+    next.has(step) ? next.delete(step) : next.add(step);
+    this.completed.set(next);
+  }
+
+  selectAnswer(answer: string): void { this.answer.set(answer); }
+}

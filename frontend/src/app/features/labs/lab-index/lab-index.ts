@@ -155,13 +155,18 @@ export class LabIndex {
       blurb: 'Declare typed infrastructure intent, review lifecycle plans, apply exact changes, prove idempotence, and tear down safely.',
       path: '/labs/terraform-fundamentals', status: 'done',
     },
+    {
+      sprint: 'Sprint 24', title: 'Terraform State & Recovery',
+      blurb: 'Centralize infrastructure identity, serialize writers, adopt existing resources, detect drift, and rehearse versioned recovery.',
+      path: '/labs/terraform-state', status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 24–25',
-      title: 'Terraform State & Modules',
-      blurb: 'Control remote state, locking, drift, import, reusable modules, environments, and infrastructure change governance.',
+      sprint: 'Sprint 25',
+      title: 'Terraform Modules & Environments',
+      blurb: 'Build reusable modules, compose environments, define version contracts, and govern infrastructure change.',
       status: 'planned',
     },
     {

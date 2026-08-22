@@ -1,0 +1,94 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/terraform-state" />
+  <header class="hero"><span class="eyebrow">Sprint 24</span><h1>Terraform state and recovery</h1><p>Move infrastructure identity into a shared, locked, versioned backend and rehearse the failure paths that make state an operational system.</p></header>
+  <app-technology-brief technology="Terraform state and remote backends" scenario="Two engineers must safely manage the same TicketForge infrastructure, even when changes overlap or an operator edits reality outside Terraform." definition="Terraform state records the binding between configuration addresses and real resource identities. A remote backend stores that shared record and coordinates writers." why="Without shared identity, each workstation has an incomplete view of ownership. Without locking and history, simultaneous or mistaken writes can corrupt the record used for every future plan." problem="Remote state replaces isolated local files with one controlled source of infrastructure identity, while locking prevents concurrent mutation and versioning creates a recovery trail." mentalModel="Configuration is the blueprint, reality is the building, and state is the property registry connecting each drawing label to a real asset. The backend is the secure registry office." question="Why must a team use locking and versioning together?" optionA="Locking prevents overlapping writes; versioning provides recovery after a completed bad write" optionB="Both features make provider credentials unnecessary" optionC="They guarantee that nobody can change infrastructure manually" correctOption="a" explanation="Locking protects concurrency, while versioning protects history. They address different failure modes and neither replaces access control or drift detection." />
+  <app-scenario-card eyebrow="Architecture scenario" title="The laptop state file became a team dependency"><div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>A local file cannot coordinate a delivery team.</h3><p>A second engineer may recreate an existing resource, two pipelines may overwrite state, and a lost laptop may erase the only ownership map.</p></section><section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Centralize identity, serialize writers, preserve history.</h3><p>TicketForge uses an S3-compatible backend with a native lockfile, versioning, encryption, and a rehearsed import, drift, contention, and recovery workflow.</p></section></div></app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run the command, explain the evidence in your own words, then mark the exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · backend bootstrap</span><h2>Build the registry before storing its own record</h2></div><pre data-language="bash"><code>docker compose \
+  --file infrastructure/terraform/state-lab/backend/docker-compose.yml \
+  up --detach --wait
+
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test \
+aws --endpoint-url http://localhost:4566 \
+  s3api get-bucket-versioning \
+  --bucket ticketforge-terraform-state</code></pre><div class="syntax-list"><div><code>bootstrap</code><p>The backend must exist before Terraform can initialize against it. Production commonly uses a separate foundation stack or account.</p></div><div><code>--wait</code><p>Returns only after the health check succeeds, preventing initialization against a container that is running but not ready.</p></div><div><code>versioning</code><p>Preserves prior object versions so a completed bad state write has a recovery path.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · backend verified' : 'Mark bootstrap exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · initialization</span><h2>Attach Terraform to shared state without committing credentials</h2></div><pre data-language="bash"><code>export AWS_ACCESS_KEY_ID=test
+export AWS_SECRET_ACCESS_KEY=test
+export AWS_DEFAULT_REGION=us-east-1
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  init -backend-config=backend.local.hcl
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  state list</code></pre><div class="syntax-list"><div><code>backend.local.hcl</code><p>Supplies non-secret backend settings to a partial backend declaration. Credentials stay in environment variables.</p></div><div><code>init</code><p>Connects the working directory to the remote state key and installs the pinned providers.</p></div><div><code>state list</code><p>Lists addresses Terraform already owns. An empty list means no identities are mapped yet—not that reality is empty.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · remote state attached' : 'Mark initialization exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · adoption</span><h2>Import an existing namespace without recreating it</h2></div><pre data-language="bash"><code>kubectl create namespace ticketforge-import-lab
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root plan
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  import kubernetes_namespace.import_lab ticketforge-import-lab
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  state show kubernetes_namespace.import_lab</code></pre><div class="syntax-list"><div><code>import ADDRESS ID</code><p>Binds the configuration address to an existing provider identity; it does not create the namespace.</p></div><div><code>before import</code><p>Terraform proposes creation because configuration exists but state has no identity mapping.</p></div><div><code>after import</code><p>The next plan reconciles declared attributes, such as labels, without replacing the adopted object.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · existing resource adopted' : 'Mark import exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · drift</span><h2>Choose whether intent or reality should win</h2></div><pre data-language="bash"><code># Deliberately edit generated/state-lab.json, then compare:
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  plan -refresh-only
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  plan -out=repair-drift.tfplan
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  apply repair-drift.tfplan</code></pre><div class="syntax-list"><div><code>drift</code><p>Reality changed outside Terraform, so configuration, state, and the observed object no longer agree.</p></div><div><code>-refresh-only</code><p>Shows how state would be updated to accept observed reality. Applying it is a governance decision, not a repair.</p></div><div><code>normal plan</code><p>Proposes changing reality back to declared intent. TicketForge used this path and then proved a no-op plan.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · drift decision explained' : 'Mark drift exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · contention</span><h2>Reject a second writer while an apply owns the lock</h2></div><pre data-language="bash"><code># Terminal A: deliberately hold the lock for 20 seconds.
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  apply -auto-approve \
+  -var=lock_drill_nonce=contention \
+  -var=lock_hold_seconds=20
+
+# Terminal B: expect "Error acquiring the state lock".
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  plan -lock-timeout=3s</code></pre><div class="syntax-list"><div><code>use_lockfile = true</code><p>Uses conditional S3 object creation so only one writer can own the state lock.</p></div><div><code>-lock-timeout=3s</code><p>Waits briefly for the owner, then fails safely instead of hanging or writing concurrently.</p></div><div><code>-lock=false</code><p>Disables protection and is not part of this workflow. Never use it to bypass a legitimate writer.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · concurrent writer rejected' : 'Mark lock exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · recovery</span><h2>Locate the recovery point before an emergency</h2></div><pre data-language="bash"><code>AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test \
+aws --endpoint-url http://localhost:4566 \
+  s3api list-object-versions \
+  --bucket ticketforge-terraform-state \
+  --prefix ticketforge/state-lab/terraform.tfstate
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  state pull</code></pre><div class="syntax-list"><div><code>VersionId</code><p>Identifies an immutable historical state object. Record the selected ID and justify it before recovery.</p></div><div><code>state pull</code><p>Reads the current remote state for protected backup or diagnosis; state can contain sensitive values.</p></div><div><code>restore</code><p>Recovery is followed by refresh and plan. Restoring bytes alone does not prove infrastructure and state agree.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · recovery point located' : 'Mark recovery exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 7 · controlled teardown</span><h2>Destroy managed resources before deleting their registry</h2></div><pre data-language="bash"><code>./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  plan -destroy \
+  -var=lock_drill_nonce=contention \
+  -var=lock_hold_seconds=20
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/state-lab/root \
+  destroy \
+  -var=lock_drill_nonce=contention \
+  -var=lock_hold_seconds=20
+
+docker compose \
+  --file infrastructure/terraform/state-lab/backend/docker-compose.yml \
+  down --volumes</code></pre><div class="syntax-list"><div><code>plan -destroy</code><p>Shows the ownership blast radius before deletion authority is granted.</p></div><div><code>destroy first</code><p>Keeps the ownership registry available while Terraform removes the resources it tracks.</p></div><div><code>down --volumes</code><p>Deletes this disposable local backend and every state version. Never equate this lab cleanup with a production backend deletion.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(7)" (click)="toggleExercise(7)">{{ completed().has(7) ? 'Completed · teardown order proved' : 'Mark teardown exercise complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>Engineer A holds the state lock. What should Engineer B do?</h2></div><div class="quiz-options"><button class="quiz-option" [class.correct]="answer() === 'wait'" (click)="selectAnswer('wait')">Verify the lock owner, wait or coordinate, then retry after release</button><button class="quiz-option" [class.incorrect]="answer() === 'disable'" (click)="selectAnswer('disable')">Add -lock=false so both changes can proceed</button><button class="quiz-option" [class.incorrect]="answer() === 'force'" (click)="selectAnswer('force')">Immediately force-unlock without contacting the owner</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'wait'">@if (answer() === 'wait') { Correct. The lock evidence names the owner and operation. Coordination preserves state integrity; force-unlock is reserved for a proven stale lock. } @else { Bypassing or breaking a live lock creates concurrent-writer risk and can corrupt the ownership record. }</p> }</section>
+</div>
