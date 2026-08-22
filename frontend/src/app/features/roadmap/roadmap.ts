@@ -202,8 +202,8 @@ export class Roadmap {
         {
           num: '22',
           name: 'Helm',
-          note: 'infrastructure/helm/ is empty',
-          status: 'todo',
+          note: 'Versioned application-plane chart, schema-validated environment values, server-validated renders, default-deny release test, atomic upgrade, history, and rollback evidence',
+          status: 'done',
         },
       ],
     },

@@ -1,0 +1,97 @@
+{{- if .Values.api.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ticketforge.fullname" . }}-api
+  labels:
+    {{- include "ticketforge.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 1 }
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "ticketforge.fullname" . }}-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "ticketforge.fullname" . }}-api
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: ticketforge
+    spec:
+      terminationGracePeriodSeconds: 35
+      securityContext: { runAsNonRoot: true, runAsUser: 100, runAsGroup: 101, fsGroup: 101 }
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1.37
+          command: ["sh", "-c", "until nc -z {{ .Values.config.redisHost }} {{ .Values.config.redisPort }}; do echo waiting for dependencies; sleep 2; done"]
+          securityContext: { runAsUser: 65534, runAsGroup: 65534, allowPrivilegeEscalation: false, capabilities: { drop: ["ALL"] } }
+          resources: { requests: { cpu: 10m, memory: 16Mi }, limits: { cpu: 50m, memory: 32Mi } }
+      containers:
+        - name: api
+          image: {{ printf "%s:%s" .Values.api.image.repository .Values.api.image.tag | quote }}
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          envFrom:
+            - configMapRef: { name: {{ include "ticketforge.fullname" . }}-api-config }
+            - secretRef: { name: {{ .Values.api.existingSecret }} }
+          ports: [{ name: http, containerPort: {{ .Values.api.port }} }]
+          startupProbe: { httpGet: { path: /actuator/health, port: http }, periodSeconds: 5, failureThreshold: 18 }
+          readinessProbe: { httpGet: { path: /actuator/health/readiness, port: http }, periodSeconds: 5, failureThreshold: 3 }
+          livenessProbe: { httpGet: { path: /actuator/health/liveness, port: http }, periodSeconds: 10, failureThreshold: 3 }
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: ["ALL"] } }
+          lifecycle: { preStop: { exec: { command: ["sh", "-c", "sleep 5"] } } }
+          volumeMounts: [{ name: temporary-files, mountPath: /tmp }]
+      volumes: [{ name: temporary-files, emptyDir: {} }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ticketforge.fullname" . }}-api
+  labels:
+    {{- include "ticketforge.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  selector: { app.kubernetes.io/name: {{ include "ticketforge.fullname" . }}-api }
+  ports: [{ name: http, port: {{ .Values.api.port }}, targetPort: http }]
+{{- if .Values.api.disruptionBudget.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ticketforge.fullname" . }}-api
+spec:
+  minAvailable: {{ .Values.api.disruptionBudget.minAvailable }}
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector: { matchLabels: { app.kubernetes.io/name: {{ include "ticketforge.fullname" . }}-api } }
+{{- end }}
+{{- if .Values.api.autoscaling.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ticketforge.fullname" . }}-api
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: {{ include "ticketforge.fullname" . }}-api }
+  minReplicas: {{ .Values.api.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.api.autoscaling.maxReplicas }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      selectPolicy: Max
+      policies: [{ type: Percent, value: 100, periodSeconds: 15 }, { type: Pods, value: 4, periodSeconds: 15 }]
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.api.autoscaling.scaleDownStabilizationSeconds }}
+      policies: [{ type: Percent, value: 25, periodSeconds: 60 }]
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: {{ .Values.api.autoscaling.targetCPUUtilizationPercentage }} }
+{{- end }}
+{{- end }}
+

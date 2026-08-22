@@ -1,0 +1,51 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "ticketforge.fullname" . }}-gateway
+  labels:
+    {{- include "ticketforge.labels" . | nindent 4 }}
+    app.kubernetes.io/component: edge
+spec:
+  gatewayClassName: {{ .Values.gateway.className }}
+  listeners:
+    - name: {{ ternary "https" "http" .Values.gateway.tls.enabled }}
+      {{- with .Values.gateway.hostname }}
+      hostname: {{ . | quote }}
+      {{- end }}
+      protocol: {{ ternary "HTTPS" "HTTP" .Values.gateway.tls.enabled }}
+      port: {{ ternary 443 80 .Values.gateway.tls.enabled }}
+      {{- if .Values.gateway.tls.enabled }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: {{ required "gateway.tls.secretName is required when TLS is enabled" .Values.gateway.tls.secretName }}
+      {{- end }}
+      allowedRoutes: { namespaces: { from: Same } }
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "ticketforge.fullname" . }}
+  labels:
+    {{- include "ticketforge.labels" . | nindent 4 }}
+    app.kubernetes.io/component: routing
+spec:
+  {{- with .Values.gateway.hostname }}
+  hostnames: [{{ . | quote }}]
+  {{- end }}
+  parentRefs:
+    - name: {{ include "ticketforge.fullname" . }}-gateway
+      sectionName: {{ ternary "https" "http" .Values.gateway.tls.enabled }}
+  rules:
+    {{- if .Values.api.enabled }}
+    - matches: [{ path: { type: PathPrefix, value: /api } }]
+      backendRefs: [{ name: {{ include "ticketforge.fullname" . }}-api, port: {{ .Values.api.port }} }]
+    {{- end }}
+    {{- if .Values.frontend.enabled }}
+    - matches: [{ path: { type: PathPrefix, value: / } }]
+      backendRefs: [{ name: {{ include "ticketforge.fullname" . }}-frontend, port: 80 }]
+    {{- end }}
+{{- end }}
+

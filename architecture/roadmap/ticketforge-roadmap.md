@@ -41,10 +41,10 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 ### Level 5: Kubernetes
 
 -   Sprint 18: Kubernetes fundamentals ✅ — isolated kind cluster, Kustomize base, configuration boundary, development dependencies, secured three-replica API Deployment, Service discovery, probes, and Pod replacement verified
--   Sprint 19: Production Kubernetes — persistence, application probe groups, graceful shutdown, disruption policy, environment overlays, configuration rollout, and rollback evidence
--   Sprint 20: Kubernetes networking
--   Sprint 21: Autoscaling
--   Sprint 22: Helm
+-   Sprint 19: Production Kubernetes ✅ — persistence, application probe groups, graceful shutdown, disruption policy, environment overlays, configuration rollout, and rollback evidence
+-   Sprint 20: Kubernetes networking ✅ — Service discovery, Gateway API routing, TLS design, and default-deny NetworkPolicy boundaries
+-   Sprint 21: Autoscaling ✅ — Metrics Server, measured requests, bounded HPA behavior, load evidence, recovery, and capacity failure analysis
+-   Sprint 22: Helm ✅ — application-plane chart, schema-validated environment values, server-side render validation, release test under default-deny, upgrade history, and rollback rehearsal
 
 ### Level 6: Infrastructure as Code
 
