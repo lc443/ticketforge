@@ -9,6 +9,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Modular monolith" scenario="A small team must ship event, reservation, and order behavior quickly while keeping ownership boundaries clear." definition="A modular monolith is one deployable application whose internal modules have explicit responsibilities and controlled dependencies." why="TicketForge needs business boundaries now, but it does not yet need the network, deployment, and data-consistency costs of distributed services." problem="It prevents one codebase from becoming an unstructured big ball of mud while preserving simple transactions and operations." mentalModel="Picture one well-designed house: each room has a purpose and a doorway, but you do not drive across town to move from the kitchen to the dining room." question="When should TicketForge extract a module into a service?" optionA="As soon as the module has its own folder" optionB="When evidence shows an independent scaling, ownership, or release need" optionC="Before the first production user" correctOption="b" explanation="A service boundary should solve a demonstrated organizational or runtime problem, not merely imitate a popular architecture." />
+
   <app-scenario-card
     eyebrow="Sprint 1 · already built"
     title="Why a monolith, not microservices"

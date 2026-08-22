@@ -1,10 +1,11 @@
 import { Component, computed, signal } from '@angular/core';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 @Component({
   selector: 'app-kubernetes-networking-lab', standalone: true,
-  imports: [LabBreadcrumb, ScenarioCard],
+  imports: [LabBreadcrumb, ScenarioCard, TechnologyBrief],
   templateUrl: './kubernetes-networking-lab.html',
   styleUrl: './kubernetes-networking-lab.scss',
 })
@@ -16,4 +17,3 @@ export class KubernetesNetworkingLab {
   toggleExercise(step: number): void { const next = new Set(this.completed()); next.has(step) ? next.delete(step) : next.add(step); this.completed.set(next); }
   selectAnswer(answer: string): void { this.answer.set(answer); }
 }
-

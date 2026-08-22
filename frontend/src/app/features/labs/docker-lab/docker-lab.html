@@ -10,6 +10,8 @@
     </p>
   </header>
 
+  <app-technology-brief technology="Docker, Compose, and NGINX" scenario="TicketForge works on one laptop, but production needs the same API and frontend artifacts, dependencies, network topology, and routing behavior every time." definition="Docker builds immutable filesystem/runtime images; containers run those images; Compose declares a local multi-container topology; NGINX serves static files and proxies traffic." why="Teams need a portable deployment unit and repeatable runtime contract instead of manually configuring every host." problem="It reduces environment drift, isolates dependencies, supports reproducible promotion, and gives traffic a stable entry point." mentalModel="An image is a sealed shipping container with a manifest; Compose is the port plan showing where containers connect; NGINX is the gate directing each truck to the right dock." question="Why should production promote one image digest instead of rebuilding per environment?" optionA="The tested artifact remains identical through promotion" optionB="Docker cannot build twice" optionC="Digests make containers stateful" correctOption="a" explanation="Rebuilding creates a new artifact that did not pass the earlier tests; immutable promotion preserves evidence." />
+
   <app-scenario-card eyebrow="Sprint 15 · verified" title="Why TicketForge needs containers">
     <div class="scenario-grid">
       <section class="scenario-card problem">

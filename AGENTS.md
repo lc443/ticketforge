@@ -24,6 +24,16 @@ TicketForge is a hands-on Solutions Architect curriculum, not only an applicatio
 - Maintain the roadmap as a living curriculum. Add missing architect competencies instead of treating the current list as fixed.
 - Produce artifacts appropriate to the decision: ADRs, C4 diagrams, sequence diagrams, data flows, threat models, capacity models, cost models, runbooks, DR plans, migration plans, and review presentations.
 
+## Academy lab learning standard
+
+- Every routed lab must begin with a technology-specific scenario and explicitly answer: What is the technology? Why does TicketForge need it? What problem does it solve?
+- Include a concise, intuitive mental model or analogy that explains the mechanism without replacing technical accuracy.
+- Include a separate “Explain it like I’m a kid” story using concrete, age-friendly language while preserving the technology's real boundary and behavior.
+- Follow the briefing with hands-on evidence and at least one decision-oriented quiz question with immediate correct/incorrect feedback and an explanation.
+- Prefer questions about boundaries, failure modes, tradeoffs, and appropriate use over command or vocabulary trivia.
+- Reuse the shared `TechnologyBrief` component and established lab styles so the teaching sequence is consistent across the academy.
+- Preserve deeper scenarios, exercises, and quizzes already present; the briefing is an orientation layer, not a substitute for implementation evidence.
+
 ## Docker and NGINX teaching depth
 
 - Teach Docker and NGINX from first principles and in greater depth than ordinary feature work. Do not provide only a completed file or command list.

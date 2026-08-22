@@ -9,6 +9,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Database transactions and concurrency control" scenario="One ticket remains. Two buyers read inventory as one at the same time and both try to reserve it." definition="A transaction groups operations into an atomic unit; locking or conditional writes control how concurrent transactions observe and change shared rows." why="Correct code executed concurrently can violate an invariant when decisions are based on stale reads." problem="It protects the business rule that confirmed reservations can never exceed available inventory." mentalModel="Two cashiers share the last physical ticket. A lock is the cashier holding the ticket while deciding; the other cashier must wait and then see that it is gone." question="Why does checking inventory before inserting a reservation still oversell without concurrency control?" optionA="Both requests can read the same old value before either writes" optionB="SQL cannot subtract numbers" optionC="The browser sends requests too quickly" correctOption="a" explanation="The race occurs between read and write; the invariant must be checked and changed inside one protected database decision." />
+
   <app-scenario-card
     eyebrow="Sprint 7 · already built · the core problem"
     title="Who gets the last ticket"

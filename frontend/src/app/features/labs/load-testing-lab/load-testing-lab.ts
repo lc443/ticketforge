@@ -1,6 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 type RunId = 'smoke' | 'browse';
 interface MeasuredRun {
@@ -10,7 +11,7 @@ interface MeasuredRun {
 
 @Component({
   selector: 'app-load-testing-lab', standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb], templateUrl: './load-testing-lab.html',
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief], templateUrl: './load-testing-lab.html',
   styleUrl: './load-testing-lab.scss',
 })
 export class LoadTestingLab {

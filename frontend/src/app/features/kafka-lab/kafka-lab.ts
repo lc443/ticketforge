@@ -4,6 +4,7 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ScenarioCard } from '../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../shared/components/technology-brief/technology-brief';
 
 type KafkaStage =
   | 'idle'
@@ -183,7 +184,7 @@ const QUIZ: Record<string, QuizQuestion> = {
 @Component({
   selector: 'app-kafka-lab',
   standalone: true,
-  imports: [FormsModule, ScenarioCard, LabBreadcrumb],
+  imports: [FormsModule, ScenarioCard, LabBreadcrumb, TechnologyBrief],
   templateUrl: './kafka-lab.html',
   styleUrl: './kafka-lab.scss',
 })

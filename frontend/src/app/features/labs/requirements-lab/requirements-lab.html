@@ -10,6 +10,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Requirements and architecture decisions" scenario="A stakeholder says TicketForge must be fast and never oversell, but fast and never are not measurable enough to design or test." definition="Requirements describe needed behavior and quality attributes; architecture decisions record how the system will satisfy them and which tradeoffs were accepted." why="Without an agreed target, teams optimize different things and cannot tell whether a design succeeded." problem="They turn ambiguous wishes into measurable constraints, traceable decisions, and testable acceptance evidence." mentalModel="Think of requirements as the destination and constraints on a map; architecture is the route you choose and the ADR is the note explaining why you did not take the other roads." question="A stakeholder asks for a fast reservation API. What should happen before choosing Redis?" optionA="Define a measurable latency target and workload" optionB="Add Redis because caching is fast" optionC="Split the API into microservices" correctOption="a" explanation="A technology choice is defensible only after the required outcome and operating conditions are explicit." />
+
   <app-scenario-card
     eyebrow="Sprint 0 · in progress"
     title="Why write it down before building it"

@@ -3,11 +3,12 @@
 import { Component, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 @Component({
   selector: 'app-requirements-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief],
   templateUrl: './requirements-lab.html',
   styleUrl: './requirements-lab.scss',
 })

@@ -7,6 +7,8 @@
     <p>Replace manually named containers with declared workloads, stable discovery, health evidence, and continuous reconciliation.</p>
   </header>
 
+  <app-technology-brief technology="Kubernetes orchestration" scenario="One TicketForge API container crashes during sales; operators need the declared replica count restored and traffic sent only to ready replacements." definition="Kubernetes is a control-plane system that continuously reconciles declared workload intent through resources such as Deployments, Pods, and Services." why="Manually starting, naming, connecting, and replacing containers does not scale operationally or recover consistently." problem="It automates scheduling, self-healing, rollout, stable discovery, configuration delivery, and resource policy across container hosts." mentalModel="It is a thermostat for applications: you declare three healthy replicas, controllers measure the room, and reconciliation keeps acting until observed reality matches the setting." question="A Pod is deleted while its Deployment still declares three replicas. What should happen?" optionA="The Deployment controller creates a replacement" optionB="The Service permanently lowers the desired count" optionC="The container image edits the manifest" correctOption="a" explanation="Controllers continuously compare desired and observed state; a missing managed Pod creates reconciliation work." />
+
   <app-scenario-card eyebrow="Architecture scenario" title="One API replica disappears during ticket sales">
     <div class="scenario-grid">
       <section class="scenario-card problem">

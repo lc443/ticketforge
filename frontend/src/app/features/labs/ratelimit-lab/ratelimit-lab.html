@@ -9,6 +9,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Distributed rate limiting" scenario="One client retries the reservation endpoint hundreds of times per second across three API replicas and crowds out normal buyers." definition="Rate limiting measures requests against a policy and rejects or delays traffic that exceeds an allowed budget; shared storage makes the budget consistent across replicas." why="Finite threads, database connections, and downstream capacity need protection from abuse, retry storms, and accidental loops." problem="It enforces fair use and controlled overload before excess work consumes the resources needed by healthy traffic." mentalModel="A token bucket is a jar of ride tickets: each request spends one, tickets refill at a known rate, and an empty jar means wait instead of overwhelming the ride." question="Why is one in-memory limiter per API replica insufficient?" optionA="Clients can spread traffic across replicas and multiply their allowance" optionB="Memory cannot store numbers" optionC="HTTP 429 works only with Redis" correctOption="a" explanation="A global policy needs one shared authority; otherwise each replica grants a separate budget." />
+
   <app-scenario-card
     eyebrow="Sprint 6 · already built"
     title="Why rate limit at all"

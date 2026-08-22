@@ -3,6 +3,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 interface Instance {
   id: number;
@@ -13,7 +14,7 @@ interface Instance {
 @Component({
   selector: 'app-scaling-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief],
   templateUrl: './scaling-lab.html',
   styleUrl: './scaling-lab.scss',
 })

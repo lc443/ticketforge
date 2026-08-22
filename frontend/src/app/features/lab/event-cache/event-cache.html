@@ -16,6 +16,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Redis caching" scenario="Thousands of users repeatedly open the same event page while the database performs the same read and JSON assembly each time." definition="A cache stores a reusable copy of expensive or frequently accessed data in a faster layer; Redis provides shared in-memory storage across API replicas." why="Repeated reads should not consume database connections and compute when a recent answer can safely be reused." problem="It lowers read latency and protects the source database, while introducing freshness and invalidation decisions." mentalModel="Redis is the whiteboard beside the ticket desk: reading it is fast, but whenever the official ledger changes someone must update or erase the whiteboard." question="An event is cancelled in PostgreSQL. What must happen to its cached event response?" optionA="Nothing; Redis updates itself from PostgreSQL" optionB="Evict or update it as part of the write policy" optionC="Increase its TTL so clients see it longer" correctOption="b" explanation="A cache is a separate copy; write paths need an explicit invalidation or update strategy to avoid stale business data." />
+
   <div class="card form-card">
     <div class="section-title">
       <span class="concept-label">Request</span>

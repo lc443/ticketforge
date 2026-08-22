@@ -6,6 +6,8 @@
     <p>Protect data, distinguish traffic readiness from process life, drain safely, and make releases reversible.</p>
   </header>
 
+  <app-technology-brief technology="Production Kubernetes lifecycle controls" scenario="A rollout and node drain occur while buyers are active; a running API has lost its database and an ephemeral PostgreSQL Pod is rescheduled." definition="Probes, persistent volumes, disruption budgets, rollout strategy, and graceful termination encode distinct health, data, availability, and shutdown responsibilities." why="A process being alive does not mean it can serve traffic, and a running container does not make its data durable." problem="These controls prevent traffic to unready Pods, abrupt request loss, excessive voluntary disruption, unrecoverable data loss, and unsafe releases." mentalModel="A hospital does not treat breathing, ready for patients, safe to evacuate, and records preserved as one signal. Production Kubernetes needs separate checks and procedures too." question="The database is unavailable but the API process is responsive. Which probe should fail first?" optionA="Readiness, so traffic stops without forcing a restart loop" optionB="Liveness, so Kubernetes restarts continuously" optionC="Neither, because the process has a PID" correctOption="a" explanation="Dependency failure makes the Pod unable to serve traffic, but restarting a healthy process may worsen the incident." />
+
   <app-scenario-card eyebrow="Architecture scenario" title="A release and a node drain happen during ticket sales">
     <div class="scenario-grid">
       <section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Running Pods are not enough.</h3><p>A process can run while its database is unavailable; a replacement can receive traffic too early; an ephemeral database loses sales records.</p></section>
@@ -105,4 +107,3 @@ kubectl rollout status deployment/ticketforge-api \
     @if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'readiness'">@if (answer() === 'readiness') { Correct. Stop new traffic while keeping the healthy process alive so the dependency can recover. } @else { Restarting healthy processes during a shared dependency outage creates a restart storm without repairing Redis. }</p> }
   </section>
 </div>
-

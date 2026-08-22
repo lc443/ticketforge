@@ -1,6 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 type StrategyId = 'local' | 'postgres' | 'redis';
 interface Strategy {
@@ -10,7 +11,7 @@ interface Strategy {
 
 @Component({
   selector: 'app-distributed-lock-lab', standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb], templateUrl: './distributed-lock-lab.html',
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief], templateUrl: './distributed-lock-lab.html',
   styleUrl: './distributed-lock-lab.scss',
 })
 export class DistributedLockLab {
