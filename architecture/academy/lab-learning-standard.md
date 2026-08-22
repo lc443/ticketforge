@@ -10,6 +10,7 @@ Scenario
   → Why does TicketForge need it?
   → What problem does it solve?
   → What mental model makes the mechanism intuitive?
+  → How would we explain it to a child without making it inaccurate?
   → What hands-on evidence proves it?
   → Can the learner defend the decision in a quiz?
 ```
@@ -23,7 +24,8 @@ Each routed lab renders the shared `TechnologyBrief` component near the beginnin
 3. **Need** — why the current system requires it now.
 4. **Solved problem** — the failure, cost, risk, or constraint it addresses.
 5. **Mental model** — a memorable analogy that preserves the important mechanism and boundary.
-6. **Quick check** — three choices, immediate feedback, and an explanation of the decision.
+6. **Explain it like I’m a kid** — a short concrete story with minimal jargon that remains technically honest.
+7. **Quick check** — three choices, immediate feedback, and an explanation of the decision.
 
 ## Quiz quality
 
@@ -47,6 +49,7 @@ The briefing is orientation, not completion. A lab still needs evidence appropri
 - Use quiet borders and semantic feedback colors; do not add colored card rails or a separate page visual system.
 - Keep code in language-labelled fenced/code blocks.
 - Keep the mental model concise enough to remember and technically accurate enough to reuse in an interview.
+- Keep the child explanation warm and concrete, never patronizing; use it as a bridge into the precise definition rather than a replacement for it.
 - On mobile, stack the three briefing answers while preserving their order and hierarchy.
 
 ## Coverage evidence

@@ -28,6 +28,7 @@ TicketForge is a hands-on Solutions Architect curriculum, not only an applicatio
 
 - Every routed lab must begin with a technology-specific scenario and explicitly answer: What is the technology? Why does TicketForge need it? What problem does it solve?
 - Include a concise, intuitive mental model or analogy that explains the mechanism without replacing technical accuracy.
+- Include a separate “Explain it like I’m a kid” story using concrete, age-friendly language while preserving the technology's real boundary and behavior.
 - Follow the briefing with hands-on evidence and at least one decision-oriented quiz question with immediate correct/incorrect feedback and an explanation.
 - Prefer questions about boundaries, failure modes, tradeoffs, and appropriate use over command or vocabulary trivia.
 - Reuse the shared `TechnologyBrief` component and established lab styles so the teaching sequence is consistent across the academy.
