@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["environment", "api", "frontend", "config", "gateway", "networkPolicy"],
+  "properties": {
+    "environment": { "type": "string", "enum": ["development", "production"] },
+    "nameOverride": { "type": "string" },
+    "fullnameOverride": { "type": "string" },
+    "api": { "$ref": "#/$defs/workloadApi" },
+    "frontend": { "$ref": "#/$defs/workloadFrontend" },
+    "config": {
+      "type": "object", "additionalProperties": false,
+      "required": ["serverPort", "dbUrl", "redisHost", "redisPort", "kafkaBootstrapServers"],
+      "properties": {
+        "serverPort": { "type": "string", "pattern": "^[0-9]+$" },
+        "dbUrl": { "type": "string", "minLength": 1 },
+        "redisHost": { "type": "string", "minLength": 1 },
+        "redisPort": { "type": "string", "pattern": "^[0-9]+$" },
+        "kafkaBootstrapServers": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gateway": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "className", "hostname", "tls"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "className": { "type": "string", "minLength": 1 },
+        "hostname": { "type": "string" },
+        "tls": {
+          "type": "object", "additionalProperties": false,
+          "required": ["enabled", "secretName"],
+          "properties": { "enabled": { "type": "boolean" }, "secretName": { "type": "string" } }
+        }
+      }
+    },
+    "networkPolicy": { "type": "object", "additionalProperties": false, "required": ["enabled"], "properties": { "enabled": { "type": "boolean" } } }
+  },
+  "$defs": {
+    "image": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "tag", "pullPolicy"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requests", "limits"],
+      "properties": {
+        "requests": { "type": "object", "required": ["cpu", "memory"], "properties": { "cpu": { "type": "string" }, "memory": { "type": "string" } }, "additionalProperties": false },
+        "limits": { "type": "object", "required": ["cpu", "memory"], "properties": { "cpu": { "type": "string" }, "memory": { "type": "string" } }, "additionalProperties": false }
+      }
+    },
+    "workloadApi": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "replicaCount", "image", "port", "existingSecret", "resources", "autoscaling", "disruptionBudget"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "replicaCount": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "image": { "$ref": "#/$defs/image" },
+        "port": { "type": "integer", "minimum": 1024, "maximum": 65535 },
+        "existingSecret": { "type": "string", "minLength": 1 },
+        "resources": { "$ref": "#/$defs/resources" },
+        "autoscaling": {
+          "type": "object", "additionalProperties": false,
+          "required": ["enabled", "minReplicas", "maxReplicas", "targetCPUUtilizationPercentage", "scaleDownStabilizationSeconds"],
+          "properties": {
+            "enabled": { "type": "boolean" }, "minReplicas": { "type": "integer", "minimum": 1 }, "maxReplicas": { "type": "integer", "minimum": 1 },
+            "targetCPUUtilizationPercentage": { "type": "integer", "minimum": 1, "maximum": 100 },
+            "scaleDownStabilizationSeconds": { "type": "integer", "minimum": 0, "maximum": 3600 }
+          }
+        },
+        "disruptionBudget": {
+          "type": "object", "additionalProperties": false, "required": ["enabled", "minAvailable"],
+          "properties": { "enabled": { "type": "boolean" }, "minAvailable": { "type": "integer", "minimum": 1 } }
+        }
+      }
+    },
+    "workloadFrontend": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "replicaCount", "image", "port", "resources"],
+      "properties": {
+        "enabled": { "type": "boolean" }, "replicaCount": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "image": { "$ref": "#/$defs/image" }, "port": { "type": "integer", "minimum": 1024, "maximum": 65535 },
+        "resources": { "$ref": "#/$defs/resources" }
+      }
+    }
+  }
+}
+

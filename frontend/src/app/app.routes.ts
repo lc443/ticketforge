@@ -167,6 +167,10 @@ export const routes: Routes = [
         path: 'labs/kubernetes-autoscaling',
         loadComponent: () => import('./features/labs/kubernetes-autoscaling-lab/kubernetes-autoscaling-lab').then((m) => m.KubernetesAutoscalingLab),
       },
+      {
+        path: 'labs/helm-packaging',
+        loadComponent: () => import('./features/labs/helm-packaging-lab/helm-packaging-lab').then((m) => m.HelmPackagingLab),
+      },
 
       {
         path: 'lab/cache',

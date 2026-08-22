@@ -1,0 +1,10 @@
+TicketForge {{ .Chart.AppVersion }} is managed by Helm release {{ .Release.Name }}.
+
+Inspect the release:
+  helm status {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+  helm get values {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+  helm get manifest {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+
+Run chart tests:
+  helm test {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+

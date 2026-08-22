@@ -145,15 +145,14 @@ export class LabIndex {
       blurb: 'Connect resource requests to HPA math, prove bounded scale-out and scale-in, and diagnose node-capacity collapse.',
       path: '/labs/kubernetes-autoscaling', status: 'done',
     },
+    {
+      sprint: 'Sprint 22', title: 'Helm Release Packaging',
+      blurb: 'Package application resources, validate environment contracts, and prove upgrade, test, and rollback behavior.',
+      path: '/labs/helm-packaging', status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
-    {
-      sprint: 'Sprint 22',
-      title: 'Kubernetes Platform Architecture',
-      blurb: 'Choose workload boundaries, health checks, networking, scaling, packaging, and operational policies.',
-      status: 'planned',
-    },
     {
       sprint: 'Sprints 23–25',
       title: 'Infrastructure as Code',

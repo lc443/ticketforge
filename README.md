@@ -211,7 +211,7 @@ You propose something. It gets challenged. Only then do you build it — and by 
 - [ ] **Sprint 15** — Docker
 - [x] **Sprint 16** — Event Lifecycle & API Evolution
 - [ ] **Sprint 17** — CI/CD & GHCR
-- [ ] **Sprints 18–22** — Kubernetes & Helm
+- [x] **Sprints 18–22** — Kubernetes & Helm
 - [ ] **Sprints 23–25** — Terraform
 - [ ] **Sprints 26–29** — AWS Architecture
 - [ ] **Sprints 30–32** — Observability & Reliability
@@ -570,7 +570,9 @@ Traffic ↑             Traffic ↓
 
 ### Sprint 22: Helm
 
-**Topics:** templates, values files, environment configuration
+**Topics:** chart boundaries, templates, values files, JSON schema, release ownership, tests, upgrades, and rollback
+
+**Implemented evidence:** One versioned chart packages the stateless API/frontend plane while keeping data services, controllers, credentials, and certificate issuance on independent lifecycles. Development and production values passed lint, schema checks, rendering, and Kubernetes server-side validation. An intentionally invalid replica bound was rejected before rendering. A disposable release completed install, upgrade, test under default-deny networking, history inspection, and rollback. See [ADR-010](architecture/decisions/ADR-010-helm-application-packaging.md), the [Helm release runbook](architecture/delivery/helm-release-runbook.md), and the in-app Helm Release Packaging lab.
 
 **Why it matters:** the closest thing Kubernetes has to a package manager. Once your YAML sprawls across dev/staging/prod, hand-editing it stops scaling — same reason nobody manages Node dependencies by hand-copying files.
 

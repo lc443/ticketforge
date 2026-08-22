@@ -1,0 +1,55 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/helm-packaging" />
+  <header class="hero"><span class="eyebrow">Sprint 22</span><h1>Helm release packaging</h1><p>Package Kubernetes application intent, validate environment contracts, and rehearse safe upgrade and rollback.</p></header>
+  <app-scenario-card eyebrow="Architecture scenario" title="TicketForge must promote one application across environments"><div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Copied YAML drifts and loses release history.</h3><p>Hand-edited development and production manifests can silently diverge. Operators need validation, ownership, repeatable upgrades, and a known recovery path.</p></section><section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Package the stateless application plane as a versioned release.</h3><p>Templates define stable structure, values define environment policy, schema rejects invalid configuration, and Helm records an auditable release history.</p></section></div></app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run each command, inspect the evidence, then mark the exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · package boundary</span><h2>Read the chart contract before rendering it</h2></div><pre data-language="bash"><code>helm show chart infrastructure/helm/ticketforge
+helm show values infrastructure/helm/ticketforge
+find infrastructure/helm/ticketforge -maxdepth 2 -type f | sort</code></pre><div class="syntax-list"><div><code>Chart.yaml</code><p>Identifies the package and versions the chart separately from the application.</p></div><div><code>values.yaml</code><p>Contains safe development defaults; it is configuration input, not another template.</p></div><div><code>boundary</code><p>The chart owns API/frontend application resources. Data services, controllers, Secrets, and certificate issuance remain platform concerns.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · boundary understood' : 'Mark package exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · values contract</span><h2>Reject unsafe inputs before Kubernetes sees them</h2></div><pre data-language="bash"><code>helm lint infrastructure/helm/ticketforge
+
+# This must fail because maxReplicas cannot be zero.
+helm template invalid infrastructure/helm/ticketforge \
+  --set api.autoscaling.maxReplicas=0</code></pre><div class="syntax-list"><div><code>values.schema.json</code><p>Validates types, required fields, enums, ranges, and unknown properties before rendering.</p></div><div><code>helm lint</code><p>Checks chart structure and renders templates against the default values.</p></div><div><code>negative test</code><p>A rejected configuration is evidence that the guardrail works—not a failed sprint.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · invalid value rejected' : 'Mark validation exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · environment rendering</span><h2>Compare policy without copying templates</h2></div><pre data-language="bash"><code>helm template ticketforge-dev infrastructure/helm/ticketforge \
+  > /tmp/ticketforge-dev.yaml
+
+helm template ticketforge-prod infrastructure/helm/ticketforge \
+  --values infrastructure/helm/ticketforge/values-production.yaml \
+  > /tmp/ticketforge-prod.yaml
+
+kubectl apply --dry-run=server --filename /tmp/ticketforge-dev.yaml
+kubectl apply --dry-run=server --filename /tmp/ticketforge-prod.yaml</code></pre><div class="syntax-list"><div><code>--values</code><p>Overlays production policy such as replica bounds, images, hostname, and TLS onto one template set.</p></div><div><code>helm template</code><p>Renders locally without creating a release, making output reviewable in CI.</p></div><div><code>--dry-run=server</code><p>Asks the live API server to validate resource schemas and admission without persisting them.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · renders validated' : 'Mark rendering exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · release lifecycle</span><h2>Install and upgrade atomically</h2></div><pre data-language="bash"><code>kubectl create namespace ticketforge-helm-test
+
+helm upgrade --install ticketforge-chart-test \
+  infrastructure/helm/ticketforge \
+  --namespace ticketforge-helm-test \
+  --set fullnameOverride=ticketforge-test \
+  --set api.enabled=false \
+  --set frontend.replicaCount=1 \
+  --set gateway.enabled=false \
+  --wait --atomic --timeout=180s
+
+helm status ticketforge-chart-test --namespace ticketforge-helm-test</code></pre><div class="syntax-list"><div><code>upgrade --install</code><p>Creates a missing release or reconciles an existing one, giving automation one idempotent command.</p></div><div><code>--wait</code><p>Waits for workloads to become ready instead of reporting success immediately after submission.</p></div><div><code>--atomic</code><p>Deletes a failed install or rolls back a failed upgrade, bounded by the timeout.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · release deployed' : 'Mark lifecycle exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · release test</span><h2>Test through the declared network boundary</h2></div><pre data-language="bash"><code>helm test ticketforge-chart-test \
+  --namespace ticketforge-helm-test \
+  --logs --timeout=120s
+
+kubectl get networkpolicy --namespace ticketforge-helm-test</code></pre><div class="syntax-list"><div><code>helm.sh/hook: test</code><p>Creates an ephemeral Pod that checks the frontend Service after deployment.</p></div><div><code>--logs</code><p>Returns test output with the release result; TicketForge prints <strong>healthy</strong>.</p></div><div><code>least privilege</code><p>Default-deny remains enabled; one narrow policy allows only labelled chart-test Pods to the frontend port.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · test succeeded' : 'Mark test exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · recovery</span><h2>Inspect history, roll back, and clean up</h2></div><pre data-language="bash"><code>helm history ticketforge-chart-test --namespace ticketforge-helm-test
+helm rollback ticketforge-chart-test 1 \
+  --namespace ticketforge-helm-test \
+  --wait --timeout=180s
+
+helm uninstall ticketforge-chart-test --namespace ticketforge-helm-test
+kubectl delete namespace ticketforge-helm-test</code></pre><div class="syntax-list"><div><code>history</code><p>Shows numbered revisions and whether each install, upgrade, or rollback succeeded.</p></div><div><code>rollback</code><p>Creates a new revision from an earlier chart state; it does not reverse database migrations or external side effects.</p></div><div><code>uninstall</code><p>Deletes release-owned resources. The disposable namespace prevents collisions with the Kustomize-managed development stack.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · recovery rehearsed' : 'Mark recovery exercise complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>Why are PostgreSQL, Kafka, Secrets, and the Gateway controller outside this chart?</h2></div><div class="quiz-options"><button class="quiz-option" [class.correct]="answer() === 'lifecycle'" (click)="selectAnswer('lifecycle')">They have different owners and lifecycles</button><button class="quiz-option" [class.incorrect]="answer() === 'helm-limit'" (click)="selectAnswer('helm-limit')">Helm cannot create those resources</button><button class="quiz-option" [class.incorrect]="answer() === 'yaml'" (click)="selectAnswer('yaml')">They do not use YAML</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'lifecycle'">@if (answer() === 'lifecycle') { Correct. A stateless application rollback must not casually roll back durable data, cluster controllers, credentials, or certificate infrastructure. } @else { Helm can render Kubernetes YAML for these resources; the reason is independent ownership, risk, and lifecycle. }</p> }</section>
+</div>
