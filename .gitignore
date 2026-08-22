@@ -27,7 +27,13 @@ backend/out/
 # Terraform
 *.tfstate
 *.tfstate.*
+*.tfplan
+*.tfvars
+.terraform.tfstate.lock.info
+crash.log
 .terraform/
+.tools/
+infrastructure/terraform/fundamentals/generated/
 
 # Kubernetes
 *.secret.yaml

@@ -1,0 +1,64 @@
+<div class="lab-container">
+  <app-lab-breadcrumb path="/labs/terraform-fundamentals" />
+  <header class="hero"><span class="eyebrow">Sprint 23</span><h1>Terraform fundamentals</h1><p>Translate infrastructure intent into validated configuration, review a plan, and prove a complete resource lifecycle.</p></header>
+  <app-scenario-card eyebrow="Architecture scenario" title="A new TicketForge environment must be reproducible"><div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The problem</span><h3>Runbooks describe actions, not durable intent.</h3><p>Manual commands create snowflakes, hide ownership, and make reviewers guess what an infrastructure change will do.</p></section><section class="scenario-card solution"><span class="scenario-label">The solution</span><h3>Declare intent and review the execution plan.</h3><p>Terraform combines typed inputs, provider resources, dependencies, state, and outputs so creation, change, and destruction follow one reviewable lifecycle.</p></section></div></app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Interactive lab progress</span><strong>{{ completed().size }} / {{ exerciseCount }} exercises</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Run each command, explain its evidence, then mark the exercise complete.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · toolchain</span><h2>Verify the execution boundary</h2></div><pre data-language="bash"><code>./.tools/terraform version
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  init</code></pre><div class="syntax-list"><div><code>-chdir</code><p>Changes Terraform's working directory before it loads configuration and state.</p></div><div><code>init</code><p>Initializes the backend and installs providers; it does not create managed resources.</p></div><div><code>.terraform.lock.hcl</code><p>Commits exact provider selections and checksums so collaborators resolve the same dependencies.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · toolchain initialized' : 'Mark toolchain exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · configuration language</span><h2>Trace inputs through the dependency graph</h2></div><pre data-language="hcl"><code>data "local_file" "helm_chart" &#123;
+  filename = "$&#123;path.module&#125;/../../helm/ticketforge/Chart.yaml"
+&#125;
+
+resource "local_file" "environment_catalog" &#123;
+  filename = "$&#123;path.module&#125;/generated/$&#123;var.environment&#125;/environment.json"
+  content  = jsonencode(local.environment_catalog)
+&#125;</code></pre><div class="syntax-list"><div><code>data</code><p>Reads something that already exists; it does not claim lifecycle ownership of the Helm chart.</p></div><div><code>resource</code><p>Declares an object Terraform creates, observes, updates, and destroys.</p></div><div><code>references</code><p>Expressions form dependency edges; Terraform derives ordering instead of relying on filename order.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · graph traced' : 'Mark configuration exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · quality gates</span><h2>Format, validate, and reject unsafe input</h2></div><pre data-language="bash"><code>./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  fmt -check -recursive
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  validate
+
+# Expected failure: below the two-replica availability floor.
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  plan -var=api_replicas=1</code></pre><div class="syntax-list"><div><code>fmt -check</code><p>Checks canonical HCL formatting without rewriting files.</p></div><div><code>validate</code><p>Checks configuration structure and provider schemas without proposing infrastructure changes.</p></div><div><code>validation</code><p>Moves architecture constraints into executable input contracts with useful errors.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · guardrail proved' : 'Mark validation exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · reviewed change</span><h2>Save a plan and apply exactly that plan</h2></div><pre data-language="bash"><code>./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  plan -out=tfplan
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  apply tfplan
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  output</code></pre><div class="syntax-list"><div><code>plan -out</code><p>Saves the reviewed execution plan instead of recalculating actions during apply.</p></div><div><code>apply tfplan</code><p>Executes the saved proposal and records resulting resource identity in state.</p></div><div><code>output</code><p>Publishes stable values for people, pipelines, or another Terraform configuration.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · plan applied' : 'Mark apply exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · change semantics</span><h2>Compare no-op, update, and replacement</h2></div><pre data-language="bash"><code># Same desired state: expect "No changes."
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals plan
+
+# Valid capacity change: inspect before applying.
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  plan -var=api_replicas=4</code></pre><div class="syntax-list"><div><code>no-op</code><p>Proves idempotence: declared intent, state, and observed reality agree.</p></div><div><code>~</code><p>An in-place update preserves resource identity while changing attributes.</p></div><div><code>-/+</code><p>Replacement destroys and recreates identity; production plans require blast-radius review.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · lifecycle compared' : 'Mark change exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 6 · controlled teardown</span><h2>Review destruction before approving it</h2></div><pre data-language="bash"><code>./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  plan -destroy
+
+./.tools/terraform \
+  -chdir=infrastructure/terraform/fundamentals \
+  destroy</code></pre><div class="syntax-list"><div><code>plan -destroy</code><p>Previews deletions before authority is granted; inspect exact addresses and counts.</p></div><div><code>destroy</code><p>Removes resources tracked by this state, not arbitrary files or infrastructure.</p></div><div><code>state</code><p>Connects resource addresses to real identity. Sprint 24 examines why local state is unsafe for team coordination.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(6)" (click)="toggleExercise(6)">{{ completed().has(6) ? 'Completed · teardown verified' : 'Mark destroy exercise complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>Why review and save a Terraform plan before production apply?</h2></div><div class="quiz-options"><button class="quiz-option" [class.correct]="answer() === 'change'" (click)="selectAnswer('change')">It exposes exact lifecycle actions and freezes the reviewed proposal</button><button class="quiz-option" [class.incorrect]="answer() === 'backup'" (click)="selectAnswer('backup')">It creates a backup of every resource</button><button class="quiz-option" [class.incorrect]="answer() === 'state'" (click)="selectAnswer('state')">It removes the need for state</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'change'">@if (answer() === 'change') { Correct. Reviewers can see create, update, replacement, and destruction before apply executes that exact saved plan. } @else { A plan is a proposed change set; it is neither a resource backup nor a replacement for state. }</p> }</section>
+</div>

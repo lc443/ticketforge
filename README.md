@@ -584,6 +584,8 @@ Traffic ↑             Traffic ↓
 
 **Topics:** providers, resources, variables, outputs, locals, data sources. Master `terraform init`, `plan`, `apply`, `destroy`.
 
+**Implemented evidence:** A pinned Terraform root module reads the Sprint 22 Helm chart as existing data, derives an environment contract with typed variables and locals, manages a generated catalog, and publishes outputs. Formatting and validation passed; the initial plan/apply created two resources; a repeated plan proved idempotence; a 3→4 capacity change exposed update-versus-replacement behavior; a one-replica input failed the availability guardrail; and destroy removed only the two managed resources. See [ADR-011](architecture/decisions/ADR-011-terraform-learning-boundary.md), the [Terraform fundamentals runbook](architecture/delivery/terraform-fundamentals-runbook.md), and the in-app Terraform Fundamentals lab.
+
 **Why it matters:** declarative infrastructure is what turns "environments" from hand-configured snowflakes into something reproducible and diffable — you can look at a pull request and know exactly what will change in AWS before it happens.
 
 ### Sprint 24: Terraform State

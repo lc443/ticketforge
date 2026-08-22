@@ -150,13 +150,18 @@ export class LabIndex {
       blurb: 'Package application resources, validate environment contracts, and prove upgrade, test, and rollback behavior.',
       path: '/labs/helm-packaging', status: 'done',
     },
+    {
+      sprint: 'Sprint 23', title: 'Terraform Fundamentals',
+      blurb: 'Declare typed infrastructure intent, review lifecycle plans, apply exact changes, prove idempotence, and tear down safely.',
+      path: '/labs/terraform-fundamentals', status: 'done',
+    },
   ];
 
   futureLabs: LabEntry[] = [
     {
-      sprint: 'Sprints 23–25',
-      title: 'Infrastructure as Code',
-      blurb: 'Control state, drift, reusable modules, environments, and infrastructure change governance.',
+      sprint: 'Sprints 24–25',
+      title: 'Terraform State & Modules',
+      blurb: 'Control remote state, locking, drift, import, reusable modules, environments, and infrastructure change governance.',
       status: 'planned',
     },
     {

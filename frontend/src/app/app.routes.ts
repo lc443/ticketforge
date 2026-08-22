@@ -171,6 +171,10 @@ export const routes: Routes = [
         path: 'labs/helm-packaging',
         loadComponent: () => import('./features/labs/helm-packaging-lab/helm-packaging-lab').then((m) => m.HelmPackagingLab),
       },
+      {
+        path: 'labs/terraform-fundamentals',
+        loadComponent: () => import('./features/labs/terraform-fundamentals-lab/terraform-fundamentals-lab').then((m) => m.TerraformFundamentalsLab),
+      },
 
       {
         path: 'lab/cache',
