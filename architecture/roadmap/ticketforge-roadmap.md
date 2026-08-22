@@ -48,7 +48,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 
 ### Level 6: Infrastructure as Code
 
--   Sprint 23: Terraform fundamentals
+-   Sprint 23: Terraform fundamentals ✅ — pinned toolchain/provider lock, typed inputs, data/resource dependency graph, saved plan/apply, no-op idempotence, update/replacement evidence, validation guardrail, outputs, and controlled destroy
 -   Sprint 24: Terraform state
 -   Sprint 25: Terraform modules
 

@@ -213,8 +213,8 @@ export class Roadmap {
         {
           num: '23',
           name: 'Terraform Fundamentals',
-          note: 'infrastructure/terraform/ is empty',
-          status: 'todo',
+          note: 'Pinned CLI/provider contract, typed variables, data/local/resource graph, saved plans, create/update/replacement/no-op behavior, outputs, validation failure, and destroy evidence',
+          status: 'done',
         },
         {
           num: '24',
