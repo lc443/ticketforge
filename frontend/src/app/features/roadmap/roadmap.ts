@@ -218,9 +218,9 @@ export class Roadmap {
         },
         {
           num: '24',
-          name: 'Terraform State',
-          note: 'Remote state, locking, drift',
-          status: 'todo',
+          name: 'Terraform State & Recovery',
+          note: 'Versioned remote identity, native lock contention, import adoption, drift reconciliation, recovery procedure, and ordered teardown',
+          status: 'done',
         },
         {
           num: '25',

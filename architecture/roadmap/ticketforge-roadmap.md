@@ -49,7 +49,7 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 ### Level 6: Infrastructure as Code
 
 -   Sprint 23: Terraform fundamentals ✅ — pinned toolchain/provider lock, typed inputs, data/resource dependency graph, saved plan/apply, no-op idempotence, update/replacement evidence, validation guardrail, outputs, and controlled destroy
--   Sprint 24: Terraform state
+-   Sprint 24: Terraform state ✅ — loopback S3-compatible backend, native lockfile, encryption and version history, import adoption, drift decision, contention failure, recovery procedure, and controlled teardown
 -   Sprint 25: Terraform modules
 
 ### Level 7: AWS

@@ -30,4 +30,5 @@ export const LAB_NAV: LabNavEntry[] = [
   { sprint: 'Sprint 21', title: 'Kubernetes Autoscaling', path: '/labs/kubernetes-autoscaling' },
   { sprint: 'Sprint 22', title: 'Helm Release Packaging', path: '/labs/helm-packaging' },
   { sprint: 'Sprint 23', title: 'Terraform Fundamentals', path: '/labs/terraform-fundamentals' },
+  { sprint: 'Sprint 24', title: 'Terraform State & Recovery', path: '/labs/terraform-state' },
 ];

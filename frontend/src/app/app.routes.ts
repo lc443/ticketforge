@@ -175,6 +175,10 @@ export const routes: Routes = [
         path: 'labs/terraform-fundamentals',
         loadComponent: () => import('./features/labs/terraform-fundamentals-lab/terraform-fundamentals-lab').then((m) => m.TerraformFundamentalsLab),
       },
+      {
+        path: 'labs/terraform-state',
+        loadComponent: () => import('./features/labs/terraform-state-lab/terraform-state-lab').then((m) => m.TerraformStateLab),
+      },
 
       {
         path: 'lab/cache',

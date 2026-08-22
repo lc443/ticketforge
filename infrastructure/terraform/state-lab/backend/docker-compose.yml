@@ -1,0 +1,23 @@
+services:
+  terraform-state:
+    image: localstack/localstack:4.14.0
+    container_name: ticketforge-terraform-state
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      SERVICES: s3
+      PERSISTENCE: "1"
+      DEBUG: "0"
+    volumes:
+      - terraform-state-data:/var/lib/localstack
+      - ./init:/etc/localstack/init/ready.d:ro
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:4566/_localstack/health"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  terraform-state-data:

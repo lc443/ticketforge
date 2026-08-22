@@ -22,6 +22,7 @@ const KID_EXPLANATIONS: Record<string, string> = {
   'Horizontal Pod Autoscaler': 'A store opens more checkout lanes when lines grow and closes them slowly when the store becomes quiet. It also has a rule saying the smallest and largest number of lanes allowed.',
   'Helm': 'A chart is one LEGO instruction book, while values choose colors and how many pieces to use for each model. You reuse the instructions instead of drawing a new book for every room.',
   'Terraform infrastructure as code': 'You give a builder a blueprint and a list of what is already built. The builder checks the real site, tells you exactly what it wants to add or remove, and waits for approval before changing anything.',
+  'Terraform state and remote backends': 'The blueprint calls a room “Kitchen,” but the builder needs a registry that says which real room that name means. The registry office lets only one builder change the book at a time and keeps old pages in case someone writes the wrong thing.',
 };
 
 @Component({
