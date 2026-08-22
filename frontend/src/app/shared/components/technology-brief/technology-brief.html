@@ -1,0 +1,32 @@
+<section class="technology-brief">
+  <div class="brief-heading">
+    <span class="eyebrow">Technology briefing</span>
+    <h2>{{ technology() }}</h2>
+  </div>
+
+  <div class="scenario">
+    <span class="label">TicketForge scenario</span>
+    <p>{{ scenario() }}</p>
+  </div>
+
+  <div class="answer-grid">
+    <article><span class="label">What is it?</span><p>{{ definition() }}</p></article>
+    <article><span class="label">Why do we need it?</span><p>{{ why() }}</p></article>
+    <article><span class="label">What problem does it solve?</span><p>{{ problem() }}</p></article>
+  </div>
+
+  <div class="mental-model"><span class="label">Picture it like this</span><p>{{ mentalModel() }}</p></div>
+
+  <div class="brief-quiz">
+    <span class="label">Quick check</span>
+    <h3>{{ question() }}</h3>
+    <div class="options">
+      <button type="button" [class.correct]="selected() === 'a' && correctOption() === 'a'" [class.incorrect]="selected() === 'a' && correctOption() !== 'a'" (click)="choose('a')">{{ optionA() }}</button>
+      <button type="button" [class.correct]="selected() === 'b' && correctOption() === 'b'" [class.incorrect]="selected() === 'b' && correctOption() !== 'b'" (click)="choose('b')">{{ optionB() }}</button>
+      <button type="button" [class.correct]="selected() === 'c' && correctOption() === 'c'" [class.incorrect]="selected() === 'c' && correctOption() !== 'c'" (click)="choose('c')">{{ optionC() }}</button>
+    </div>
+    @if (selected()) {
+      <p class="feedback" [class.correct-text]="isCorrect()"><strong>{{ isCorrect() ? 'Correct.' : 'Try again.' }}</strong> {{ explanation() }}</p>
+    }
+  </div>
+</section>

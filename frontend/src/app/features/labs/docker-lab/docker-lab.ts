@@ -1,13 +1,14 @@
 import { Component, computed, signal } from '@angular/core';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 type ChangeKind = 'source' | 'dependencies' | 'nginx';
 
 @Component({
   selector: 'app-docker-lab',
   standalone: true,
-  imports: [LabBreadcrumb, ScenarioCard],
+  imports: [LabBreadcrumb, ScenarioCard, TechnologyBrief],
   templateUrl: './docker-lab.html',
   styleUrl: './docker-lab.scss',
 })

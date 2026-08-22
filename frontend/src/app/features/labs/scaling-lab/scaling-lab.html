@@ -9,6 +9,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Horizontal scaling and load balancing" scenario="One TicketForge API process reaches capacity and a process crash should not take reservations offline." definition="Horizontal scaling runs multiple interchangeable application instances; a load balancer distributes requests only to healthy instances." why="One larger process has a ceiling and remains one failure domain. Multiple stateless replicas add capacity and redundancy." problem="It reduces single-instance bottlenecks and lets traffic continue while a replica fails or is replaced." mentalModel="Think of opening more checkout lanes: one coordinator sends each shopper to an open lane, and closing one lane does not close the store." question="What must move out of one API process before replicas are interchangeable?" optionA="Shared session and coordination state" optionB="All Java classes" optionC="HTTP route names" correctOption="a" explanation="Process-local state makes behavior depend on which replica receives the next request; shared state or stateless tokens preserve continuity." />
+
   <app-scenario-card
     eyebrow="Sprint 4 · already built"
     title="Why stateless instances behind a load balancer"

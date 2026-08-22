@@ -7,6 +7,8 @@
     <p>Turn “add edit and delete” into an ownership, data-retention, concurrency, and support design.</p>
   </header>
 
+  <app-technology-brief technology="REST resource lifecycle and API evolution" scenario="An organizer wants to edit or delete an event after customers have reservations, while older clients still use the current response shape." definition="Lifecycle design defines valid resource states and transitions; API evolution changes contracts while preserving ownership, history, invariants, and client compatibility." why="CRUD verbs alone do not answer who may change data, what happens to dependent records, or how stale clients behave." problem="It prevents destructive business changes, lost updates, broken clients, and erased audit history." mentalModel="An event is not a disposable note; it is a case file. Before changing or closing it, check who owns it, what records reference it, which version you read, and what history must remain." question="A sold event should disappear from future sales but remain visible in reservation history. Which design fits?" optionA="Hard-delete every related row" optionB="Transition the event to a cancelled state" optionC="Return HTTP 200 without changing data" correctOption="b" explanation="A state transition stops new behavior while preserving referential integrity and historical evidence." />
+
   <app-scenario-card eyebrow="Architecture scenario" title="A sold event must be cancelled">
     <div class="scenario-grid">
       <section class="scenario-card problem">

@@ -3,6 +3,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 type Mode = 'monolith' | 'microservices';
 
@@ -27,7 +28,7 @@ interface RunStep extends Step {
 @Component({
   selector: 'app-monolith-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief],
   templateUrl: './monolith-lab.html',
   styleUrl: './monolith-lab.scss',
 })

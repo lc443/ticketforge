@@ -4,6 +4,8 @@
     <span class="badge ok">Built · real k6 results</span><h1>Load Testing Lab</h1>
     <p>Real traffic, measured thresholds, and the first evidence-backed TicketForge bottleneck.</p></div></header>
 
+  <app-technology-brief technology="Load testing with k6" scenario="A concert announcement sends hundreds of buyers to TicketForge at once; a single manual request still looks fast." definition="Load testing generates controlled traffic and measures throughput, latency distributions, errors, saturation, and business outcomes against thresholds." why="Functional tests prove a path can work, not how it behaves under concurrent demand or where capacity ends." problem="It replaces performance guesses with repeatable evidence and exposes bottlenecks before real customers do." mentalModel="It is a fire drill for software: create a controlled crowd, watch every exit and alarm, then fix the dangerous part before an actual emergency." question="A run has 15 ms p95 latency but 80% of reservations return 429. Is it healthy?" optionA="Yes, latency is below 20 ms" optionB="No, business success and error thresholds failed" optionC="Yes, rate limiting means the test does not count" correctOption="b" explanation="Fast rejection is still rejection; performance evidence must include customer outcomes, not latency alone." />
+
   <app-scenario-card eyebrow="Sprint 3 · measured against TicketForge" title="Why measure before optimizing">
     <div class="scenario-grid">
       <div class="scenario-card problem"><span class="scenario-label">The problem</span>

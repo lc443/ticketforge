@@ -5,13 +5,14 @@ import { JsonPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 type Role = 'CUSTOMER' | 'ADMIN';
 
 @Component({
   selector: 'app-auth-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb, JsonPipe, RouterLink],
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief, JsonPipe, RouterLink],
   templateUrl: './auth-lab.html',
   styleUrl: './auth-lab.scss',
 })

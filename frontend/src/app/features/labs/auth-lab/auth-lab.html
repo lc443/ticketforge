@@ -9,6 +9,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Authentication, JWT, and authorization" scenario="A customer can view events, but only the event owner should edit one and only an administrator should perform platform operations." definition="Authentication proves who a caller is; a signed JWT carries trusted identity claims; authorization decides whether that identity may perform this action on this resource." why="The API cannot trust browser controls or an email supplied in the request body to protect accounts and business operations." problem="It creates a verifiable trust chain from credentials to identity to a server-side access decision." mentalModel="Authentication is showing your ID at the venue door; authorization is the wristband that determines whether you can enter general admission, backstage, or the control room." question="The UI hides the Delete Event button from customers. Is the event protected?" optionA="Yes, invisible buttons cannot be clicked" optionB="Only if the API independently checks identity, role, and ownership" optionC="Yes, if the route uses HTTPS" correctOption="b" explanation="The browser is outside the trust boundary; every protected API operation must enforce its own authorization." />
+
   <app-scenario-card
     eyebrow="Sprint 2 · already built"
     title="Why JWT instead of server sessions"

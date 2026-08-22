@@ -108,6 +108,8 @@
     </div>
   </header>
 
+  <app-technology-brief technology="Apache Kafka event streaming" scenario="A successful reservation must trigger email, analytics, and future integrations, but a slow email provider must not hold the customer request open." definition="Kafka is a distributed, durable, ordered log. Producers append records to topics and independent consumer groups process and replay them at their own pace." why="TicketForge needs durable asynchronous integration without coupling the reservation transaction to every downstream service's availability." problem="It buffers bursts, decouples producers from consumers, supports replay, and gives each integration independent progress." mentalModel="Kafka is a durable conveyor belt with numbered positions: producers place packages on it, each worker team keeps its own bookmark, and a failed worker can resume from the last confirmed package." question="A consumer sends an email and crashes before committing its offset. What must the design expect?" optionA="The message may be delivered again, so the side effect needs idempotency" optionB="Kafka permanently deletes the record" optionC="The producer automatically refunds the order" correctOption="a" explanation="At-least-once delivery can repeat processing; consumers must make repeated handling safe." />
+
   <app-scenario-card
     eyebrow="Sprint 9–14 · already built"
     title="Why the reservation needed Kafka"

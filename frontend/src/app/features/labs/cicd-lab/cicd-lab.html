@@ -10,6 +10,8 @@
     </p>
   </header>
 
+  <app-technology-brief technology="CI/CD and software supply-chain controls" scenario="A pull request changes API code; the team must know it compiles, passes tests, contains no blocked vulnerabilities, and produces the exact artifact later deployed." definition="Continuous integration automatically validates changes; continuous delivery creates and promotes release-ready artifacts; supply-chain controls record origin, contents, signatures, and provenance." why="Manual build and deployment steps are inconsistent, slow to review, and easy to bypass under pressure." problem="It creates repeatable quality gates and a traceable chain from source commit to immutable production artifact." mentalModel="It is an airport security lane for code: identity, baggage contents, safety checks, and destination are recorded before the sealed package can move to the next gate." question="Why publish an image only after tests and scans pass?" optionA="So the registry contains artifacts that crossed the declared trust gates" optionB="Because tests run only inside registries" optionC="Because source commits cannot be reviewed" correctOption="a" explanation="Publication changes an artifact's trust and availability; failed candidates should never enter the promotion path." />
+
   <app-scenario-card
     eyebrow="Delivery scenario"
     title="A green laptop build is not release evidence"

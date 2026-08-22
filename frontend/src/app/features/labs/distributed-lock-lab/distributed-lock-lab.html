@@ -4,6 +4,8 @@
     <span class="badge ok">Built · decision verified</span><h1>Distributed Locking Lab</h1>
     <p>The best distributed lock is the one that protects the data in the system where it already lives.</p></div></header>
 
+  <app-technology-brief technology="Distributed locking" scenario="Three API replicas can simultaneously process buyers for the same last ticket, so a Java synchronized block on one replica cannot coordinate the others." definition="A distributed lock uses a shared authority to grant temporary exclusive ownership of a critical operation across processes or machines." why="Horizontal replicas have independent memory; coordination that exists in only one JVM disappears at the process boundary." problem="It serializes a narrow critical section across replicas when shared-data transactions alone cannot express the required coordination." mentalModel="It is one numbered key kept at a central desk: every worker can ask for it, only one holds it, and stale or lost keys need expiry and ownership rules." question="Why is a PostgreSQL row lock preferred for TicketForge inventory today?" optionA="It coordinates through the same transaction that owns inventory" optionB="Redis cannot store keys" optionC="Java does not support locks" correctOption="a" explanation="Keeping coordination beside the protected data avoids a split-brain decision between lock ownership and database state." />
+
   <app-scenario-card eyebrow="Sprint 8 · one ticket across three replicas" title="Where should coordination live?">
     <div class="scenario-recap"><p>
       A Java <code>synchronized</code> lock belongs to one JVM. TicketForge has three JVMs, so local locks cannot protect shared inventory.

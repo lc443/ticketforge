@@ -3,6 +3,7 @@
 import { Component, OnDestroy, signal } from '@angular/core';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { LabBreadcrumb } from '../../../shared/components/lab-breadcrumb/lab-breadcrumb';
+import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
 
 const CAPACITY = 5;
 const REFILL_MS = 1500;
@@ -10,7 +11,7 @@ const REFILL_MS = 1500;
 @Component({
   selector: 'app-ratelimit-lab',
   standalone: true,
-  imports: [ScenarioCard, LabBreadcrumb],
+  imports: [ScenarioCard, LabBreadcrumb, TechnologyBrief],
   templateUrl: './ratelimit-lab.html',
   styleUrl: './ratelimit-lab.scss',
 })
