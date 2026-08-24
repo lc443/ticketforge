@@ -20,6 +20,7 @@
 
   <section class="overview-grid" aria-label="Certification progress overview">
     <article class="metric"><span>Study plan</span><strong>{{ completedCount() }} / 21</strong><small>{{ planProgress() }}% complete</small></article>
+    <article class="metric xp-metric"><span>Experience</span><strong>{{ xp() }} XP</strong><small>{{ passedQuizModules() }} quiz modules passed · {{ maximumXp() }} XP available</small></article>
     <article class="metric"><span>Exam domains</span><strong>4</strong><small>official weighted areas</small></article>
     <article class="metric"><span>Readiness</span><strong>{{ readiness() }}%</strong><small>labs and assessments still required</small></article>
     <article class="metric"><span>Next action</span><strong>Lab Zero</strong><a routerLink="/academy/aws/cloud-practitioner/lab-zero">Secure the account →</a></article>

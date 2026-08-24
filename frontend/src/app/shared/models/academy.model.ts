@@ -19,6 +19,9 @@ export interface CertificationProgress {
   completedExercises: number;
   requiredExercises: number;
   progressPercent: number;
+  xp: number;
+  maximumXp: number;
+  passedQuizModules: number;
   exercises: AcademyExerciseProgress[];
   certificate: AcademyCertificate | null;
 }

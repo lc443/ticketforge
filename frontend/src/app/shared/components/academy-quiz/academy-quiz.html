@@ -22,7 +22,7 @@
   @if (!submitted()) {
     <button class="submit" type="button" [disabled]="answered() !== questions().length" (click)="submit()">Score quiz</button>
   } @else {
-    <div class="result" [class.passed]="passed()"><div><span>{{ passed() ? 'Passed' : 'Needs review' }}</span><strong>{{ correct() }} / {{ questions().length }} · {{ score() }}%</strong></div><button type="button" (click)="retry()">Try again</button></div>
+    <div class="result" [class.passed]="passed()"><div><span>{{ passed() ? 'Passed · module contributes 25 XP once' : 'Needs review · 0 quiz XP' }}</span><strong>{{ correct() }} / {{ questions().length }} · {{ score() }}%</strong></div><button type="button" (click)="retry()">Try again</button></div>
     <p class="save-state">{{ saving() ? 'Saving attempt…' : saveMessage() }}</p>
   }
 </section>

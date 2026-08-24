@@ -8,6 +8,9 @@ public record CertificationProgressResponse(
         int completedExercises,
         int requiredExercises,
         int progressPercent,
+        int xp,
+        int maximumXp,
+        int passedQuizModules,
         List<ExerciseProgressResponse> exercises,
         CertificateResponse certificate
 ) {}

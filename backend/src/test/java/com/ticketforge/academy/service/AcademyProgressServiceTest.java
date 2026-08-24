@@ -5,6 +5,7 @@ import com.ticketforge.academy.entity.AcademyCertificate;
 import com.ticketforge.academy.entity.AcademyExerciseProgress;
 import com.ticketforge.academy.repository.AcademyCertificateRepository;
 import com.ticketforge.academy.repository.AcademyExerciseProgressRepository;
+import com.ticketforge.academy.repository.AcademyQuizAttemptRepository;
 import com.ticketforge.auth.entity.Role;
 import com.ticketforge.auth.entity.User;
 import com.ticketforge.auth.repository.UserRepository;
@@ -30,6 +31,7 @@ class AcademyProgressServiceTest {
 
     @Mock AcademyExerciseProgressRepository progressRepository;
     @Mock AcademyCertificateRepository certificateRepository;
+    @Mock AcademyQuizAttemptRepository quizAttemptRepository;
     @Mock UserRepository userRepository;
     @InjectMocks AcademyProgressService service;
 

@@ -84,11 +84,12 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 -   Sprint 41: Academy foundations 🟡 — certification hub, CLF-C02 path, AWS safety labs, authenticated PostgreSQL exercise tracking, and immutable Academy completion records built; prerequisites, reviewed evidence, privacy lifecycle, and verifiable credentials remain
 -   Sprint 42: Complete CLF-C02 curriculum ✅ — all 21 days now provide direct instruction, TicketForge scenarios, intuitive and child-friendly explanations, service boundaries, exercises, evidence expectations, quizzes, navigation, and authenticated completion
 -   Sprint 43: Formative Academy quizzes ✅ — three TicketForge scenario questions per module, feedback, scoring, retries, authenticated attempt history, and explicit assessment-integrity boundaries
--   Sprint 44: Competency and evidence graph — connect labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable skills
--   Sprint 45: Assessments and practical exams — server-owned scenarios, rubrics, attempts, scoring, feedback, and mastery thresholds
--   Sprint 46: Verifiable academy credentials — evidence-backed certificates, unique IDs, QR verification, renewal, and revocation
--   Sprint 47: Blueprint OS integration — identity, transcripts, evidence APIs, credential synchronization, consent, and public profiles
--   Sprint 48: External certification preparation — official objective mapping, study plans, readiness checks, and renewal tracking; begin with AWS Solutions Architect Associate
+-   Sprint 44: Academy XP ✅ — server-derived exercise and distinct passed-module points, anti-farming rules, visible totals, and explicit separation from readiness and credentials
+-   Sprint 45: Competency and evidence graph — connect labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable skills
+-   Sprint 46: Assessments and practical exams — server-owned scenarios, rubrics, attempts, scoring, feedback, and mastery thresholds
+-   Sprint 47: Verifiable academy credentials — evidence-backed certificates, unique IDs, QR verification, renewal, and revocation
+-   Sprint 48: Blueprint OS integration — identity, transcripts, evidence APIs, credential synchronization, consent, and public profiles
+-   Sprint 49: External certification preparation — official objective mapping, study plans, readiness checks, and renewal tracking; begin with AWS Solutions Architect Associate
 
 ## Architecture Artifacts
 

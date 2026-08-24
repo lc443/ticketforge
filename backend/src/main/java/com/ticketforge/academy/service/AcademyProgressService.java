@@ -23,6 +23,7 @@ public class AcademyProgressService {
 
     private final AcademyExerciseProgressRepository progressRepository;
     private final AcademyCertificateRepository certificateRepository;
+    private final com.ticketforge.academy.repository.AcademyQuizAttemptRepository quizAttemptRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -109,6 +110,14 @@ public class AcademyProgressService {
                 .map(this::exerciseResponse)
                 .toList();
         int completed = (int) rows.stream().filter(AcademyExerciseProgress::isCompleted).count();
+        int passedQuizModules = (int) quizAttemptRepository
+                .findAllByUserIdAndCertificationIdOrderBySubmittedAtDesc(learner.getId(), certificationId).stream()
+                .filter(com.ticketforge.academy.entity.AcademyQuizAttempt::isPassed)
+                .map(com.ticketforge.academy.entity.AcademyQuizAttempt::getModuleId)
+                .distinct()
+                .count();
+        int xp = completed * 10 + passedQuizModules * 25;
+        int maximumXp = requirements.size() * 10 + 21 * 25;
         CertificateResponse certificate = certificateRepository
                 .findByUserIdAndCertificationId(learner.getId(), certificationId)
                 .map(this::certificateResponse)
@@ -120,6 +129,9 @@ public class AcademyProgressService {
                 completed,
                 requirements.size(),
                 Math.round(completed * 100f / requirements.size()),
+                xp,
+                maximumXp,
+                passedQuizModules,
                 exercises,
                 certificate
         );

@@ -22,6 +22,9 @@ export class CloudPractitioner implements OnInit {
   readonly certificate = signal<AcademyCertificate | null>(null);
   readonly syncError = signal<string | null>(null);
   readonly loading = signal(true);
+  readonly xp = signal(0);
+  readonly maximumXp = signal(845);
+  readonly passedQuizModules = signal(0);
   readonly completedCount = computed(() => this.completedDays().size);
   readonly planProgress = computed(() => Math.round(this.completedCount() / this.studyPlan.length * 100));
   readonly readiness = computed(() => Math.min(100, Math.round(this.planProgress() * 0.5)));
@@ -33,6 +36,7 @@ export class CloudPractitioner implements OnInit {
       next: (progress) => {
         this.applyProgress(progress.exercises.filter((item) => item.completed).map((item) => item.exerciseId));
         this.certificate.set(progress.certificate);
+        this.applyXp(progress);
         this.loading.set(false);
       },
       error: (error) => {
@@ -52,6 +56,7 @@ export class CloudPractitioner implements OnInit {
       next: (progress) => {
         this.applyProgress(progress.exercises.filter((item) => item.completed).map((item) => item.exerciseId));
         this.certificate.set(progress.certificate);
+        this.applyXp(progress);
       },
       error: (error) => this.syncError.set(apiErrorMessage(error, 'Could not save your progress.')),
     });
@@ -65,4 +70,9 @@ export class CloudPractitioner implements OnInit {
   }
 
   private dayExerciseId(day: number): string { return `study-day-${String(day).padStart(2, '0')}`; }
+  private applyXp(progress: { xp: number; maximumXp: number; passedQuizModules: number }): void {
+    this.xp.set(progress.xp);
+    this.maximumXp.set(progress.maximumXp);
+    this.passedQuizModules.set(progress.passedQuizModules);
+  }
 }
