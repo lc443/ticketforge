@@ -30,6 +30,16 @@ Scenario
   → Remediate mistakes
 ```
 
+## Writing and teaching style
+
+- Begin with a direct sentence that tells the learner what they will understand or do.
+- Use TicketForge as the default application example. Introduce another example only when it explains the boundary better.
+- Present a concrete TicketForge problem before introducing a list of services or technical terms.
+- Write complete sentences for scenarios, explanations, instructions, and completion criteria. Short labels are appropriate for navigation, status, and scanning.
+- Define necessary technical language in plain words. Do not replace a precise term with a vague slogan.
+- Tell the learner exactly what an exercise proves. Avoid broad phrases such as “produce evidence” unless the required evidence is named immediately.
+- Prefer “TicketForge must survive one Availability Zone failure” over “design for resilience.” The first statement gives the learner a measurable problem.
+
 ## AWS account safety gate
 
 No resource-creating AWS lab should precede Lab Zero. The learner must:

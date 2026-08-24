@@ -43,6 +43,7 @@ This increment introduces the certification-study boundary and authenticated lea
 - The rebuilt shared API image was applied to `api1`, `api2`, and `api3`; all three replicas became healthy and returned the same structured `401` from the Academy endpoint without a token.
 - PostgreSQL contains `academy_exercise_progress` and `academy_certificates` after application startup.
 - Browser verification confirmed `/academy` remains public while a signed-out request for the tracked CLF-C02 path redirects to `/login`.
+- Academy introductions, study-day instructions, and the first two modules use direct sentences and concrete TicketForge scenarios instead of framework-heavy learning language.
 
 ## Remaining Sprint 41 work
 
