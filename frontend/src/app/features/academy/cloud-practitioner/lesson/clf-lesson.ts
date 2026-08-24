@@ -20,7 +20,7 @@ export class ClfLesson implements OnInit {
   readonly saving = signal(false);
   readonly syncError = signal<string | null>(null);
   readonly previousRoute = computed(() => this.day() === 3
-    ? '/academy/aws/cloud-practitioner/lab-zero'
+    ? '/academy/aws/cloud-practitioner/cloud-foundations'
     : `/academy/aws/cloud-practitioner/day/${this.day() - 1}`);
   readonly nextRoute = computed(() => this.day() < 21
     ? `/academy/aws/cloud-practitioner/day/${this.day() + 1}`

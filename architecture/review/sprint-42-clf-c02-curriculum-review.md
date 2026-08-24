@@ -33,6 +33,14 @@ The page records completion as `study-day-XX` through the authenticated Academy 
 7. Answer a decision-oriented quiz with immediate feedback.
 8. Save completion to the learner record.
 
+The lesson arrows form one continuous route:
+
+```text
+Study plan → Lab Zero → Cloud Foundations → Day 3 → … → Day 21 → Study plan
+```
+
+Lab Zero is the safety prerequisite, Cloud Foundations is the first certification lesson, and every following page provides both backward and forward navigation. On narrow screens, the two arrows stack vertically instead of compressing the labels.
+
 ## Verification
 
 ```bash
@@ -51,6 +59,8 @@ study plan: 21 ordered, unique days (1-21)
 
 Route navigation was implemented with reactive route state. This matters because Angular reuses the lesson component when `/day/3` changes to `/day/4`; reading the route only during construction would leave stale Day 3 content on the screen.
 
+Deep-link and source checks confirmed that every arrow target maps to an authenticated Academy route and that Day 21 returns to the study plan.
+
 ## Boundaries and next work
 
 - Completion is currently learner-attested.
@@ -58,4 +68,3 @@ Route navigation was implemented with reactive route state. This matters because
 - Evidence text tells the learner what to produce, but evidence upload and reviewer approval come in the competency-and-evidence sprint.
 - Timed attempt history, rubrics, domain scoring, and mastery thresholds come in the assessment sprint.
 - TicketForge Academy completion is not an AWS-issued certification.
-
