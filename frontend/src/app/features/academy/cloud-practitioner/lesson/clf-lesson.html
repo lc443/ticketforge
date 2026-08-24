@@ -1,0 +1,49 @@
+<div class="lab-container">
+  <nav class="academy-breadcrumb" aria-label="Academy navigation"><a routerLink="/academy">Academy</a><span>/</span><a routerLink="/academy/aws/cloud-practitioner">CLF-C02</a><span>/</span><span>Day {{ day() }}</span></nav>
+
+  @if (lesson(); as current) {
+    <header class="hero"><span class="eyebrow">CLF-C02 · Day {{ current.day }} · {{ current.domain }}</span><h1>{{ current.title }}</h1><p>{{ current.intro }}</p></header>
+    @if (syncError()) { <p class="sync-state error" role="alert">{{ syncError() }}</p> }
+
+    <app-technology-brief
+      [technology]="current.technology"
+      [scenario]="current.scenario"
+      [definition]="current.definition"
+      [why]="current.why"
+      [problem]="current.problem"
+      [mentalModel]="current.mentalModel"
+      [kidExplanationOverride]="current.kid"
+      [question]="current.question"
+      [optionA]="current.options[0]"
+      [optionB]="current.options[1]"
+      [optionC]="current.options[2]"
+      [correctOption]="current.correct"
+      [explanation]="current.answer"
+    />
+
+    <section class="card lesson-section">
+      <div class="section-title"><span class="eyebrow">Important boundaries</span><h2>How the choices differ</h2></div>
+      <div class="concept-grid">
+        @for (concept of current.concepts; track concept.name) {
+          <article><code>{{ concept.name }}</code><p>{{ concept.explanation }}</p><strong>TicketForge:</strong><p>{{ concept.ticketforge }}</p></article>
+        }
+      </div>
+    </section>
+
+    <section class="card lesson-section">
+      <div class="section-title"><span class="eyebrow">Your exercise</span><h2>{{ current.task }}</h2></div>
+      <ol>@for (step of current.steps; track step) { <li>{{ step }}</li> }</ol>
+      <div class="proof"><span>What completion proves</span><p>{{ current.proof }}</p></div>
+      <button class="exercise-toggle" [class.complete]="complete()" type="button" [disabled]="saving()" (click)="toggleCompletion()">
+        {{ saving() ? 'Saving…' : complete() ? 'Completed · saved to your learner record' : 'Mark this lesson complete' }}
+      </button>
+    </section>
+
+    <nav class="lesson-nav" aria-label="Lesson navigation">
+      <a [routerLink]="previousRoute()">← Previous lesson</a>
+      <a [routerLink]="nextRoute()">{{ day() === 21 ? 'Return to study plan' : 'Next lesson' }} →</a>
+    </nav>
+  } @else {
+    <section class="card missing"><h1>Lesson not found</h1><p>This Cloud Practitioner day is not part of the current curriculum.</p><a routerLink="/academy/aws/cloud-practitioner">Return to the study plan →</a></section>
+  }
+</div>

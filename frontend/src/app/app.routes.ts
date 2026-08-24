@@ -87,6 +87,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/academy/cloud-foundations/cloud-foundations').then((m) => m.CloudFoundations),
         canActivate: [authGuard],
       },
+      {
+        path: 'academy/aws/cloud-practitioner/day/:day',
+        loadComponent: () => import('./features/academy/cloud-practitioner/lesson/clf-lesson').then((m) => m.ClfLesson),
+        canActivate: [authGuard],
+      },
 
       {
         path: 'labs/requirements',

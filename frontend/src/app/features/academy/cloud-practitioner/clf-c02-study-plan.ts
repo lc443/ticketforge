@@ -31,3 +31,9 @@ export const CLF_C02_STUDY_PLAN: StudyDay[] = [
   { day: 20, week: 3, title: 'Review only the remaining gaps', focus: 'Study the weak domains and service pairs identified by the timed exam.', domain: 'Review', evidence: 'Reach at least 80% on a new assessment that does not reuse the same questions.' },
   { day: 21, week: 3, title: 'Decide whether you are ready', focus: 'Review your domain coverage, lab completion, cleanup, explanations, and practice scores before scheduling the exam.', domain: 'Assessment', evidence: 'Make a go or no-go decision and support it with your recorded results.' },
 ];
+
+for (const lesson of CLF_C02_STUDY_PLAN) {
+  if (!lesson.route && lesson.day >= 3) {
+    lesson.route = `/academy/aws/cloud-practitioner/day/${lesson.day}`;
+  }
+}

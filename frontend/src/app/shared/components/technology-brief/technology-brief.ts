@@ -40,7 +40,8 @@ export class TechnologyBrief {
   readonly why = input.required<string>();
   readonly problem = input.required<string>();
   readonly mentalModel = input.required<string>();
-  readonly kidExplanation = computed(() => KID_EXPLANATIONS[this.technology()] ?? 'Start with a real problem, choose one helper for that problem, and check that the helper behaves the way you expected.');
+  readonly kidExplanationOverride = input<string>();
+  readonly kidExplanation = computed(() => this.kidExplanationOverride() ?? KID_EXPLANATIONS[this.technology()] ?? 'Start with a real problem, choose one helper for that problem, and check that the helper behaves the way you expected.');
   readonly question = input.required<string>();
   readonly optionA = input.required<string>();
   readonly optionB = input.required<string>();
