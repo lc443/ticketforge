@@ -740,9 +740,11 @@ TicketForge now has two connected learning tracks:
 - **Architecture Engineering** preserves the implementation, failure, operational, and decision evidence produced by each TicketForge sprint.
 - **Certification Academy** maps official certification domains to study modules, original scenario questions, safe cloud labs, remediation, and readiness gates.
 
-The first certification path is **AWS Certified Cloud Practitioner (CLF-C02)**. The Academy includes a reusable certification catalog, the four officially weighted CLF-C02 domains, the authored 21-day study plan, an AWS account-safety gate, and a Cloud Foundations module. Progress is currently stored in the browser; server-backed learner profiles and portable transcripts remain Sprint 41 work.
+The first certification path is **AWS Certified Cloud Practitioner (CLF-C02)**. The Academy includes a reusable certification catalog, the four officially weighted CLF-C02 domains, the authored 21-day study plan, an AWS account-safety gate, and a Cloud Foundations module. Exercise completion is assigned from the JWT principal and stored in PostgreSQL, so a learner's progress follows their account rather than one browser. Completing the current 32 requirements creates one TicketForge Academy completion record; it is explicitly not an AWS-issued certification.
 
 AWS resource-creating exercises must follow [the certification learning standard](architecture/academy/certification-learning-standard.md): verify identity and Region, declare cost and duration, tag resources, record dependencies, delete them, and query again to prove absence. See [ADR-013](architecture/decisions/ADR-013-ticketforge-academy-platform.md) for the platform boundary.
+
+Use the [learner progress and completion records lab](architecture/academy/learner-progress-lab.md) to trace authenticated ownership, inspect the schema and request flow, exercise the API, and test invalid exercise handling.
 
 The original [Cloud Practitioner roadmap](aws-cloud-practitioner-roadmap.md) remains the authored curriculum source while the application turns it into an interactive evidence path.
 

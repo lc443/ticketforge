@@ -79,6 +79,16 @@ Reading completion is not certification readiness. The Academy tracks these sepa
 
 The initial CLF-C02 gate requires all domains, required labs, service-tradeoff explanations, remediation of recorded weak areas, multiple quality practice scores around 80% or better, and one reviewed timed exam.
 
+## Learner ownership and completion records
+
+- Progress writes derive the learner from the validated authentication principal; clients never select a progress owner.
+- One progress row exists per learner, certification, and recognized exercise.
+- Unchecking retains the row and historical first/last completion timestamps.
+- The current CLF-C02 implementation requires 21 study checkpoints, six Lab Zero controls, and five Cloud Foundations exercises.
+- Meeting all 32 current requirements issues one immutable TicketForge Academy completion record.
+- A TicketForge completion record is not an AWS certification. Verifiable evidence, review, revocation, renewal, and public validation remain separate credential-governance capabilities.
+- See [the learner progress lab](learner-progress-lab.md) for the request flow, schema, commands, and ownership quiz.
+
 ## Source governance
 
 - Store the certification code and the official exam guide used for mapping.

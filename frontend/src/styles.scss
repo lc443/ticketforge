@@ -122,3 +122,43 @@ button {
 .academy-section {
   margin-top: 44px;
 }
+
+.sync-state {
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  font: 12px var(--font-mono);
+}
+
+.sync-state.error {
+  color: var(--danger);
+}
+
+.certificate-card {
+  margin-bottom: 20px;
+  border-color: var(--done);
+}
+
+.certificate-card h2 {
+  margin: 8px 0;
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.certificate-card p {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+.certificate-card div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  color: var(--ink-soft);
+  font: 10px var(--font-mono);
+}
+
+.certificate-card code {
+  color: var(--done);
+}

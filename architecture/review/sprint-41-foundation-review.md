@@ -2,7 +2,7 @@
 
 ## Scope
 
-This increment introduces the certification-study boundary inside TicketForge. It does not complete server-backed learner profiles, assessment integrity, credentials, or Blueprint OS integration.
+This increment introduces the certification-study boundary and authenticated learner progress inside TicketForge. It does not complete assessment integrity, evidence review, verifiable public credentials, or Blueprint OS integration.
 
 ## Implemented
 
@@ -11,7 +11,10 @@ This increment introduces the certification-study boundary inside TicketForge. I
 - Current, next, and planned certification catalog
 - CLF-C02 dashboard with four official weighted domains
 - Evidence-oriented 21-day study plan derived from the authored roadmap
-- Browser-persisted study-day completion with input validation
+- Server-persisted study-day and lab completion assigned from the JWT principal
+- Historical first/last completion timestamps retained when current status changes
+- Server-owned 32-exercise CLF-C02 requirement catalog
+- Idempotent TicketForge Academy certificate-of-completion issuance
 - Conservative readiness score that cannot reach 100% from reading completion alone
 - AWS Lab Zero for root, daily identity, CLI scope, cost, tags, and cleanup controls
 - Cloud Foundations module covering cloud value, AWS geography, shared responsibility, and resilient placement
@@ -23,7 +26,8 @@ This increment introduces the certification-study boundary inside TicketForge. I
 - Engineering sprint progress and certification readiness are related but different data models.
 - External exam objectives need version governance because codes, weights, and in-scope services change.
 - AWS lab safety is a platform concern, not repeated disclaimer text.
-- Local browser progress is acceptable for the first private iteration but cannot support portable transcripts, verified evidence, multiple devices, or public credentials.
+- Authenticated database progress supports multiple devices, but self-attested checkboxes are not verified evidence.
+- Academy completion and official external certification are different claims and must remain visibly separate.
 - Cost budgets and anomaly detection are detective controls; cleanup and least privilege remain necessary.
 
 ## Verification evidence
@@ -34,11 +38,15 @@ This increment introduces the certification-study boundary inside TicketForge. I
 - Lab Zero returned immediate `Try again.` and `Correct.` explanations for wrong and right quiz choices.
 - At a 390 × 844 viewport, the hamburger exposed the Academy route, closed after navigation, and the document remained exactly 390 pixels wide.
 - Repository checks found no AWS access-key-shaped value, private key, or generated JavaScript source in the change set.
+- Four Academy service tests verify authenticated ownership, exercise allowlisting, final-requirement issuance, and no certificate reissuance; ten existing event-service tests also pass.
+- The production frontend build and backend package complete successfully; only the pre-existing Kafka stylesheet warning remains.
+- The rebuilt shared API image was applied to `api1`, `api2`, and `api3`; all three replicas became healthy and returned the same structured `401` from the Academy endpoint without a token.
+- PostgreSQL contains `academy_exercise_progress` and `academy_certificates` after application startup.
+- Browser verification confirmed `/academy` remains public while a signed-out request for the tracked CLF-C02 path redirects to `/login`.
 
 ## Remaining Sprint 41 work
 
-- Authenticated learner profile and server-backed progress
 - Module prerequisites and unlock policy
 - Evidence submission model
-- Credential honesty and issuance policy
+- Downloadable verification, administrative review, renewal, and revocation
 - Data lifecycle, privacy, export, and deletion requirements

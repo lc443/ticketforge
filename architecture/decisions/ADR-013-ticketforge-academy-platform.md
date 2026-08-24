@@ -18,7 +18,10 @@ TicketForge already teaches architecture by building and breaking a real system.
 - Convert the authored 21-day roadmap into an interactive, evidence-oriented study plan.
 - Require Lab Zero before AWS resource-creating exercises.
 - Add one initial Cloud Foundations module to prove the shared teaching pattern.
-- Store early progress locally in the learner's browser; treat server-synchronized profiles, assessment integrity, and portable credentials as future platform work.
+- Store exercise progress in PostgreSQL and derive ownership exclusively from the validated JWT principal.
+- Preserve current exercise state plus first, last, and latest-update timestamps; do not delete history when an exercise is unchecked.
+- Issue one immutable TicketForge Academy completion record when the server-owned requirement catalog is satisfied.
+- Treat evidence review, assessment integrity, downloadable/verifiable credentials, revocation, renewal, and public validation as future platform work.
 
 ## Alternatives
 
@@ -38,14 +41,16 @@ Deferred. One TicketForge shell lets certification learning reference the system
 
 - New certification paths can reuse navigation, status, domain, and card structures.
 - The Academy can map certification concepts directly to TicketForge evidence.
-- Local progress is simple and private but is tied to one browser and is not yet auditable.
+- Progress follows the authenticated learner across browsers and devices and cannot be assigned through a client-supplied user ID.
+- Database uniqueness and a per-learner write lock protect exercise and certificate invariants during concurrent requests.
+- Completion records are Academy credentials, not claims that an external provider awarded its certification.
 - AWS labs need explicit identity, cost, cleanup, and credential-handling standards.
 - Official exam changes require curriculum version review.
 
 ## Initial success criteria
 
 - Academy hub, CLF-C02 dashboard, Lab Zero, and Cloud Foundations routes load independently.
-- The 21-day plan preserves completion after reload.
+- Study-day and lab exercise completion survives reload and is returned from the authenticated learner's backend record.
 - Mobile and desktop navigation expose Academy correctly.
 - Quiz feedback distinguishes correct and incorrect architectural reasoning.
 - No lab requests or stores AWS credentials.

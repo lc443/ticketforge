@@ -6,6 +6,18 @@
     <p>{{ certification.purpose }}</p>
   </header>
 
+  @if (loading()) { <p class="sync-state">Loading your learner record…</p> }
+  @if (syncError()) { <p class="sync-state error" role="alert">{{ syncError() }}</p> }
+
+  @if (certificate(); as award) {
+    <section class="card certificate-card" aria-label="Certificate of completion">
+      <span class="eyebrow">Credential earned</span>
+      <h2>{{ award.title }}</h2>
+      <p>This records completion of the TicketForge Academy learning path. It is not an AWS-issued certification.</p>
+      <div><code>{{ award.certificateNumber }}</code><span>Completed {{ award.completedAt | date:'mediumDate' }}</span></div>
+    </section>
+  }
+
   <section class="overview-grid" aria-label="Certification progress overview">
     <article class="metric"><span>Study plan</span><strong>{{ completedCount() }} / 21</strong><small>{{ planProgress() }}% complete</small></article>
     <article class="metric"><span>Exam domains</span><strong>4</strong><small>official weighted areas</small></article>
@@ -42,7 +54,7 @@
   </section>
 
   <section class="academy-section" aria-labelledby="plan-title">
-    <div class="section-heading"><span class="eyebrow">Three-week path</span><h2 id="plan-title">Learn → prove → explain → remediate</h2><p>Mark a day complete only after producing its evidence. Your progress is stored in this browser.</p></div>
+    <div class="section-heading"><span class="eyebrow">Three-week path</span><h2 id="plan-title">Learn → prove → explain → remediate</h2><p>Mark a day complete only after producing its evidence. The authenticated learner record follows you across browsers and devices.</p></div>
     @for (week of [1, 2, 3]; track week) {
       <div class="week-block">
         <div class="week-heading"><span class="eyebrow">Week {{ week }}</span><strong>{{ week === 1 ? 'Foundations' : week === 2 ? 'Architecture & services' : 'Security, cost & readiness' }}</strong></div>

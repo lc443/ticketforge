@@ -75,14 +75,17 @@ export const routes: Routes = [
       {
         path: 'academy/aws/cloud-practitioner',
         loadComponent: () => import('./features/academy/cloud-practitioner/cloud-practitioner').then((m) => m.CloudPractitioner),
+        canActivate: [authGuard],
       },
       {
         path: 'academy/aws/cloud-practitioner/lab-zero',
         loadComponent: () => import('./features/academy/lab-zero/lab-zero').then((m) => m.LabZero),
+        canActivate: [authGuard],
       },
       {
         path: 'academy/aws/cloud-practitioner/cloud-foundations',
         loadComponent: () => import('./features/academy/cloud-foundations/cloud-foundations').then((m) => m.CloudFoundations),
+        canActivate: [authGuard],
       },
 
       {

@@ -346,7 +346,7 @@ export class Roadmap {
         {
           num: '41',
           name: 'Academy Foundations',
-          note: 'Certification hub, reusable path model, CLF-C02 weighted dashboard, 21-day evidence plan, AWS safety gate, and first learning module; server-backed learner profiles remain',
+          note: 'Certification hub, CLF-C02 path, AWS safety labs, authenticated PostgreSQL exercise tracking, and immutable Academy completion records; reviewed evidence and verifiable credentials remain',
           status: 'partial',
         },
         {
