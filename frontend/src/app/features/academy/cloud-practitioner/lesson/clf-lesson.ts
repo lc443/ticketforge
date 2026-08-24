@@ -3,12 +3,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { AcademyProgressService } from '../../../../core/services/academy-progress.service';
 import { TechnologyBrief } from '../../../../shared/components/technology-brief/technology-brief';
+import { AcademyQuiz, AcademyQuizQuestion } from '../../../../shared/components/academy-quiz/academy-quiz';
 import { CLF_C02_LESSONS } from '../clf-c02-lessons';
 
 @Component({
   selector: 'app-clf-lesson',
   standalone: true,
-  imports: [RouterLink, TechnologyBrief],
+  imports: [RouterLink, TechnologyBrief, AcademyQuiz],
   templateUrl: './clf-lesson.html',
   styleUrl: './clf-lesson.scss',
 })
@@ -16,6 +17,15 @@ export class ClfLesson implements OnInit {
   private readonly certificationId = 'aws-clf-c02';
   readonly day = signal(0);
   readonly lesson = computed(() => CLF_C02_LESSONS.find((item) => item.day === this.day()));
+  readonly quizQuestions = computed<AcademyQuizQuestion[]>(() => {
+    const lesson = this.lesson();
+    if (!lesson) return [];
+    return [
+      { question: lesson.question, options: lesson.options, correct: lesson.correct, explanation: lesson.answer },
+      { question: `Which choice best matches this TicketForge need? ${lesson.concepts[1].ticketforge}`, options: [lesson.concepts[0].name, lesson.concepts[1].name, lesson.concepts[2].name], correct: 'b', explanation: lesson.concepts[1].explanation },
+      { question: `Which choice best matches this TicketForge need? ${lesson.concepts[2].ticketforge}`, options: [lesson.concepts[0].name, lesson.concepts[1].name, lesson.concepts[2].name], correct: 'c', explanation: lesson.concepts[2].explanation },
+    ];
+  });
   readonly complete = signal(false);
   readonly saving = signal(false);
   readonly syncError = signal<string | null>(null);

@@ -4,8 +4,9 @@ import { apiErrorMessage } from '../../../core/http/api-error';
 import { AcademyProgressService } from '../../../core/services/academy-progress.service';
 import { ScenarioCard } from '../../../shared/components/scenario-card/scenario-card';
 import { TechnologyBrief } from '../../../shared/components/technology-brief/technology-brief';
+import { AcademyQuiz, AcademyQuizQuestion } from '../../../shared/components/academy-quiz/academy-quiz';
 
-@Component({ selector: 'app-cloud-foundations', standalone: true, imports: [RouterLink, ScenarioCard, TechnologyBrief], templateUrl: './cloud-foundations.html', styleUrl: './cloud-foundations.scss' })
+@Component({ selector: 'app-cloud-foundations', standalone: true, imports: [RouterLink, ScenarioCard, TechnologyBrief, AcademyQuiz], templateUrl: './cloud-foundations.html', styleUrl: './cloud-foundations.scss' })
 export class CloudFoundations implements OnInit {
   private readonly certificationId = 'aws-clf-c02';
   private readonly exerciseIds = [
@@ -18,6 +19,11 @@ export class CloudFoundations implements OnInit {
   readonly answer = signal<string | null>(null);
   readonly syncError = signal<string | null>(null);
   readonly progress = computed(() => Math.round(this.completed().size / this.exerciseCount * 100));
+  readonly quizQuestions: AcademyQuizQuestion[] = [
+    { question: 'Two API instances run in one Availability Zone. What failure can still stop both?', options: ['One instance process failure only', 'The shared Availability Zone failure', 'A CloudFront cache miss'], correct: 'b', explanation: 'Instance redundancy inside one AZ does not remove the shared AZ failure domain.' },
+    { question: 'Which statement describes elasticity?', options: ['Capacity expands and contracts with demand', 'Every workload runs in three Regions', 'AWS owns all customer data permissions'], correct: 'a', explanation: 'Elasticity changes capacity with demand; it is not the same as availability or shared responsibility.' },
+    { question: 'Who configures TicketForge IAM permissions when using Amazon S3?', options: ['AWS alone', 'The customer', 'The edge location'], correct: 'b', explanation: 'AWS secures the cloud infrastructure; the customer owns identities, access, data, and workload configuration.' },
+  ];
 
   constructor(private academyProgress: AcademyProgressService) {}
 

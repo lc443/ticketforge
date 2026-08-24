@@ -19,4 +19,11 @@ export class AcademyProgressService {
       { completed },
     );
   }
+
+  recordQuizAttempt(certificationId: string, moduleId: string, correctAnswers: number, totalQuestions: number) {
+    return this.http.post(
+      `${API_BASE}/academy/certifications/${certificationId}/quizzes/${moduleId}/attempts`,
+      { correctAnswers, totalQuestions },
+    );
+  }
 }

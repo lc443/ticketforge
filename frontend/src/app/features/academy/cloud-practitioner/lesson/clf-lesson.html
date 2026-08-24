@@ -19,6 +19,7 @@
       [optionC]="current.options[2]"
       [correctOption]="current.correct"
       [explanation]="current.answer"
+      [showQuiz]="false"
     />
 
     <section class="card lesson-section">
@@ -38,6 +39,8 @@
         {{ saving() ? 'Saving…' : complete() ? 'Completed · saved to your learner record' : 'Mark this lesson complete' }}
       </button>
     </section>
+
+    <app-academy-quiz [title]="'Day ' + current.day + ' decision quiz'" [moduleId]="'study-day-' + (current.day < 10 ? '0' : '') + current.day" [questions]="quizQuestions()" />
 
     <nav class="lesson-nav" aria-label="Lesson navigation">
       <a [routerLink]="previousRoute()">← Previous lesson</a>

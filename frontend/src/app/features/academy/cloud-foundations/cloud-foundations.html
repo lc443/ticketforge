@@ -45,6 +45,8 @@ Open questions: Region, RTO, RPO, latency, cost, data residency</code></pre><div
 
   <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>TicketForge must survive one AZ outage, but not a full regional disaster. What is the minimum matching placement?</h2></div><div class="quiz-options"><button class="quiz-option" [class.incorrect]="answer() === 'instance'" (click)="selectAnswer('instance')">Several instances in one AZ</button><button class="quiz-option" [class.correct]="answer() === 'az'" (click)="selectAnswer('az')">Healthy application and data capacity across at least two AZs in one Region</button><button class="quiz-option" [class.incorrect]="answer() === 'regions'" (click)="selectAnswer('regions')">Three Regions are always mandatory</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'az'">@if (answer() === 'az') { Correct. The placement matches the stated AZ-failure requirement without assuming the cost and complexity of multi-Region recovery. } @else { Match architecture to the failure requirement: instance redundancy within one AZ does not survive the AZ, while mandatory multi-Region exceeds this stated requirement. }</p> }</section>
 
+  <app-academy-quiz title="Cloud Foundations quiz" moduleId="cloud-foundations" [questions]="quizQuestions" />
+
   <nav class="lesson-nav" aria-label="Lesson navigation">
     <a routerLink="/academy/aws/cloud-practitioner/lab-zero">← Lab Zero</a>
     <a routerLink="/academy/aws/cloud-practitioner/day/3">Day 3 · Compute →</a>

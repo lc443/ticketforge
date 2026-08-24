@@ -48,6 +48,7 @@ export class TechnologyBrief {
   readonly optionC = input.required<string>();
   readonly correctOption = input.required<OptionId>();
   readonly explanation = input.required<string>();
+  readonly showQuiz = input(true);
   readonly selected = signal<OptionId | null>(null);
 
   choose(option: OptionId): void { this.selected.set(option); }
