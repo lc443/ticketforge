@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE } from './api-base';
-import { CertificationProgress } from '../../shared/models/academy.model';
+import { AcademyQuizAttempt, CertificationProgress } from '../../shared/models/academy.model';
 
 @Injectable({ providedIn: 'root' })
 export class AcademyProgressService {
@@ -21,9 +21,13 @@ export class AcademyProgressService {
   }
 
   recordQuizAttempt(certificationId: string, moduleId: string, correctAnswers: number, totalQuestions: number) {
-    return this.http.post(
+    return this.http.post<AcademyQuizAttempt>(
       `${API_BASE}/academy/certifications/${certificationId}/quizzes/${moduleId}/attempts`,
       { correctAnswers, totalQuestions },
     );
+  }
+
+  getQuizAttempts(certificationId: string) {
+    return this.http.get<AcademyQuizAttempt[]>(`${API_BASE}/academy/certifications/${certificationId}/quiz-attempts`);
   }
 }

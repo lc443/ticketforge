@@ -25,3 +25,13 @@ export interface CertificationProgress {
   exercises: AcademyExerciseProgress[];
   certificate: AcademyCertificate | null;
 }
+
+export interface AcademyQuizAttempt {
+  id: number;
+  moduleId: string;
+  correctAnswers: number;
+  totalQuestions: number;
+  scorePercent: number;
+  passed: boolean;
+  submittedAt: string;
+}

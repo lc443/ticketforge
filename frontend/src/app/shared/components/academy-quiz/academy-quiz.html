@@ -1,5 +1,7 @@
 <section class="card academy-quiz">
   <div class="quiz-heading"><div><span class="eyebrow">Module quiz</span><h2>{{ title() }}</h2></div><strong>{{ answered() }} / {{ questions().length }} answered</strong></div>
+  @if (attempts().length) { <div class="score-history" aria-label="Saved quiz score summary"><div><span>Latest score</span><strong>{{ latestAttempt()?.scorePercent }}%</strong></div><div><span>Best score</span><strong>{{ bestScore() }}%</strong></div><div><span>Saved attempts</span><strong>{{ attempts().length }}</strong></div></div> }
+  @if (historyError()) { <p class="save-state error" role="alert">{{ historyError() }}</p> }
   @for (item of questions(); track $index; let questionIndex = $index) {
     <article class="quiz-question">
       <span class="question-number">Question {{ questionIndex + 1 }}</span>
@@ -20,9 +22,9 @@
     </article>
   }
   @if (!submitted()) {
-    <button class="submit" type="button" [disabled]="answered() !== questions().length" (click)="submit()">Score quiz</button>
+    <div class="quiz-actions"><button class="reset" type="button" [disabled]="answered() === 0" (click)="retry()">Reset answers</button><button class="submit" type="button" [disabled]="answered() !== questions().length" (click)="submit()">Score quiz</button></div>
   } @else {
-    <div class="result" [class.passed]="passed()"><div><span>{{ passed() ? 'Passed · module contributes 25 XP once' : 'Needs review · 0 quiz XP' }}</span><strong>{{ correct() }} / {{ questions().length }} · {{ score() }}%</strong></div><button type="button" (click)="retry()">Try again</button></div>
+    <div class="result" [class.passed]="passed()"><div><span>{{ passed() ? 'Passed · module contributes 25 XP once' : 'Needs review · 0 quiz XP' }}</span><strong>{{ correct() }} / {{ questions().length }} · {{ score() }}%</strong></div><button type="button" (click)="retry()">Reset quiz</button></div>
     <p class="save-state">{{ saving() ? 'Saving attempt…' : saveMessage() }}</p>
   }
 </section>
