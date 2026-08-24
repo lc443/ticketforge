@@ -1,0 +1,65 @@
+<div class="academy-container">
+  <nav class="academy-breadcrumb" aria-label="Academy navigation"><a routerLink="/academy">Academy</a><span>/</span><span>AWS · CLF-C02</span></nav>
+  <header class="hero">
+    <span class="eyebrow">{{ certification.provider }} · {{ certification.level }} · {{ certification.code }}</span>
+    <h1>{{ certification.title }}</h1>
+    <p>{{ certification.purpose }}</p>
+  </header>
+
+  <section class="overview-grid" aria-label="Certification progress overview">
+    <article class="metric"><span>Study plan</span><strong>{{ completedCount() }} / 21</strong><small>{{ planProgress() }}% complete</small></article>
+    <article class="metric"><span>Exam domains</span><strong>4</strong><small>official weighted areas</small></article>
+    <article class="metric"><span>Readiness</span><strong>{{ readiness() }}%</strong><small>labs and assessments still required</small></article>
+    <article class="metric"><span>Next action</span><strong>Lab Zero</strong><a routerLink="/academy/aws/cloud-practitioner/lab-zero">Secure the account →</a></article>
+  </section>
+
+  <section class="card progress-card">
+    <div><span class="eyebrow">Path progress</span><strong>{{ planProgress() }}%</strong></div>
+    <div class="progress-track"><span [style.width.%]="planProgress()"></span></div>
+    <p>Study-plan completion contributes only half of readiness. Hands-on evidence, cleanup, explanations, and practice results provide the rest.</p>
+  </section>
+
+  <section class="academy-section" aria-labelledby="domain-title">
+    <div class="section-heading"><span class="eyebrow">Official exam blueprint</span><h2 id="domain-title">Four domains, weighted by the real exam</h2><p>Spend more effort where the exam places more scored content, while still closing every domain gap.</p></div>
+    <div class="domain-grid">
+      @for (domain of domains; track domain.id) {
+        <article class="domain-card">
+          <div class="domain-head"><span>{{ domain.weight }}%</span><strong>{{ domain.name }}</strong></div>
+          <div class="weight-track"><span [style.width.%]="domain.weight"></span></div>
+          <p>{{ domain.summary }}</p>
+          <div class="evidence"><span>Readiness evidence</span>{{ domain.evidence }}</div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="academy-section" aria-labelledby="start-title">
+    <div class="section-heading"><span class="eyebrow">Start here</span><h2 id="start-title">Safety before service creation</h2><p>Your first AWS resource should not come before identity and cost controls.</p></div>
+    <div class="start-grid">
+      <a class="start-card priority" routerLink="/academy/aws/cloud-practitioner/lab-zero"><span>Required first</span><h3>Lab Zero · Safe AWS Account</h3><p>Protect root, establish daily identity, verify CLI scope, create budgets and anomaly monitoring, and define cleanup evidence.</p><strong>Open safety lab →</strong></a>
+      <a class="start-card" routerLink="/academy/aws/cloud-practitioner/cloud-foundations"><span>Day 1</span><h3>Cloud Foundations</h3><p>Understand Regions, Availability Zones, edge locations, elasticity, resilience, and shared responsibility through TicketForge.</p><strong>Open first module →</strong></a>
+    </div>
+  </section>
+
+  <section class="academy-section" aria-labelledby="plan-title">
+    <div class="section-heading"><span class="eyebrow">Three-week path</span><h2 id="plan-title">Learn → prove → explain → remediate</h2><p>Mark a day complete only after producing its evidence. Your progress is stored in this browser.</p></div>
+    @for (week of [1, 2, 3]; track week) {
+      <div class="week-block">
+        <div class="week-heading"><span class="eyebrow">Week {{ week }}</span><strong>{{ week === 1 ? 'Foundations' : week === 2 ? 'Architecture & services' : 'Security, cost & readiness' }}</strong></div>
+        <div class="day-list">
+          @for (day of daysForWeek(week); track day.day) {
+            <article class="day" [class.complete]="completedDays().has(day.day)">
+              <button type="button" (click)="toggleDay(day.day)" [attr.aria-label]="(completedDays().has(day.day) ? 'Mark incomplete: ' : 'Mark complete: ') + day.title"><span aria-hidden="true">{{ completedDays().has(day.day) ? '✓' : day.day }}</span></button>
+              <div><div class="day-meta"><span>Day {{ day.day }}</span><small>{{ day.domain }}</small></div><h3>{{ day.title }}</h3><p>{{ day.focus }}</p><div class="day-evidence"><strong>Evidence:</strong> {{ day.evidence }}</div>@if (day.route) { <a [routerLink]="day.route">Open module →</a> }</div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="card readiness-card">
+    <div class="section-title"><span class="eyebrow">Definition of ready</span><h2>Exam scheduling is an evidence-based decision</h2></div>
+    <div class="readiness-grid"><span>All four domains covered</span><span>Required labs and cleanup verified</span><span>Service tradeoffs explained aloud</span><span>Weak-area journal remediated</span><span>Multiple quality scores at 80%+</span><span>One timed full exam reviewed</span></div>
+  </section>
+</div>

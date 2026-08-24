@@ -346,8 +346,8 @@ export class Roadmap {
         {
           num: '41',
           name: 'Academy Foundations',
-          note: 'Tracks, modules, lessons, prerequisites, learner profiles, progress, and an honest credential policy',
-          status: 'todo',
+          note: 'Certification hub, reusable path model, CLF-C02 weighted dashboard, 21-day evidence plan, AWS safety gate, and first learning module; server-backed learner profiles remain',
+          status: 'partial',
         },
         {
           num: '42',

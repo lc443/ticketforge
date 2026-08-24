@@ -23,6 +23,8 @@ const KID_EXPLANATIONS: Record<string, string> = {
   'Helm': 'A chart is one LEGO instruction book, while values choose colors and how many pieces to use for each model. You reuse the instructions instead of drawing a new book for every room.',
   'Terraform infrastructure as code': 'You give a builder a blueprint and a list of what is already built. The builder checks the real site, tells you exactly what it wants to add or remove, and waits for approval before changing anything.',
   'Terraform state and remote backends': 'The blueprint calls a room “Kitchen,” but the builder needs a registry that says which real room that name means. The registry office lets only one builder change the book at a time and keeps old pages in case someone writes the wrong thing.',
+  'AWS account safety and cost guardrails': 'A workshop has a master key, worker badges, price alarms, and labels on every tool. We lock away the master key, use our own badge, and count every borrowed tool before going home.',
+  'AWS global infrastructure and cloud foundations': 'Imagine AWS has groups of strong buildings in cities around the world. We put helpers in more than one building so one broken building does not close the whole ticket shop.',
 };
 
 @Component({

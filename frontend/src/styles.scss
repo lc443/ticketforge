@@ -105,3 +105,20 @@ a {
 button {
   font-family: var(--font-body);
 }
+
+.academy-breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  color: var(--ink-soft);
+  font: 11px var(--font-mono);
+}
+
+.academy-breadcrumb a {
+  color: var(--stamp);
+  text-decoration: none;
+}
+
+.academy-section {
+  margin-top: 44px;
+}
