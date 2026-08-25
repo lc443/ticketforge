@@ -1,22 +1,22 @@
 <section class="technology-brief">
   <div class="brief-heading">
-    <span class="eyebrow">Technology briefing</span>
+    <span class="eyebrow">Learn the idea</span>
     <h2>{{ technology() }}</h2>
   </div>
 
   <div class="scenario">
-    <span class="label">TicketForge scenario</span>
+    <span class="label">A real situation</span>
     <p>{{ scenario() }}</p>
   </div>
 
   <div class="answer-grid">
-    <article><span class="label">What is it?</span><p>{{ definition() }}</p></article>
-    <article><span class="label">Why do we need it?</span><p>{{ why() }}</p></article>
-    <article><span class="label">What problem does it solve?</span><p>{{ problem() }}</p></article>
+    <article><span class="label">What does this mean?</span><p>{{ definition() }}</p></article>
+    <article><span class="label">Why would anyone use it?</span><p>{{ why() }}</p></article>
+    <article><span class="label">What problem goes away?</span><p>{{ problem() }}</p></article>
   </div>
 
-  <div class="mental-model"><span class="label">Picture it like this</span><p>{{ mentalModel() }}</p></div>
-  <div class="kid-explanation"><span class="label">Explain it like I’m a kid</span><p>{{ kidExplanation() }}</p></div>
+  <div class="mental-model"><span class="label">Everyday comparison</span><p>{{ mentalModel() }}</p></div>
+  <div class="kid-explanation"><span class="label">Even simpler</span><p>{{ kidExplanation() }}</p></div>
 
   @if (showQuiz()) { <div class="brief-quiz">
     <span class="label">Quick check</span>

@@ -5,6 +5,11 @@
     <header class="hero"><span class="eyebrow">CLF-C02 · Day {{ current.day }} · {{ current.domain }}</span><h1>{{ current.title }}</h1><p>{{ current.intro }}</p></header>
     @if (syncError()) { <p class="sync-state error" role="alert">{{ syncError() }}</p> }
 
+    <section class="card beginner-start">
+      <div><span class="eyebrow">Start here · no technical background required</span><h2>What you will be able to explain</h2><p>By the end of this lesson, you will understand <strong>{{ current.technology }}</strong>, recognize when it fits a real situation, and separate it from similar AWS choices.</p></div>
+      <ol class="lesson-flow" aria-label="Lesson order"><li><span>1</span>Learn the idea</li><li><span>2</span>See an example</li><li><span>3</span>Compare choices</li><li><span>4</span>Practice</li><li><span>5</span>Take the quiz</li></ol>
+    </section>
+
     <app-technology-brief
       [technology]="current.technology"
       [scenario]="current.scenario"
@@ -23,24 +28,25 @@
     />
 
     <section class="card lesson-section">
-      <div class="section-title"><span class="eyebrow">Important boundaries</span><h2>How the choices differ</h2></div>
+      <div class="section-title"><span class="eyebrow">Learn the choices one at a time</span><h2>What each term means and when to use it</h2><p>Do not memorize the names by themselves. Connect each name to the problem it solves.</p></div>
       <div class="concept-grid">
-        @for (concept of current.concepts; track concept.name) {
-          <article><code>{{ concept.name }}</code><p>{{ concept.explanation }}</p><strong>TicketForge:</strong><p>{{ concept.ticketforge }}</p></article>
+        @for (concept of current.concepts; track concept.name; let conceptNumber = $index) {
+          <article><div class="concept-heading"><span>{{ conceptNumber + 1 }}</span><h3>{{ concept.name }}</h3></div><strong>In simple words</strong><p>{{ concept.explanation }}</p><strong>When TicketForge would use it</strong><p>{{ concept.ticketforge }}</p></article>
         }
       </div>
+      <div class="exam-memory"><span>Exam strategy</span><p>Read the situation before looking at the AWS service names. Find the important clue—such as shared files, interruption tolerance, audit history, or a failure requirement—then choose the service whose job matches that clue.</p></div>
     </section>
 
     <section class="card lesson-section">
-      <div class="section-title"><span class="eyebrow">Your exercise</span><h2>{{ current.task }}</h2></div>
+      <div class="section-title"><span class="eyebrow">Guided practice</span><h2>{{ current.task }}</h2><p>You do not need to write application code. Follow each step, write your answer in your own words, and compare it with the lesson concepts.</p></div>
       <ol>@for (step of current.steps; track step) { <li>{{ step }}</li> }</ol>
-      <div class="proof"><span>What completion proves</span><p>{{ current.proof }}</p></div>
+      <div class="proof"><span>How to know you understand it</span><p>{{ current.proof }}</p></div>
       <button class="exercise-toggle" [class.complete]="complete()" type="button" [disabled]="saving()" (click)="toggleCompletion()">
         {{ saving() ? 'Saving…' : complete() ? 'Completed · saved to your learner record' : 'Mark this lesson complete' }}
       </button>
     </section>
 
-    <app-academy-quiz [title]="'Day ' + current.day + ' decision quiz'" [moduleId]="'study-day-' + (current.day < 10 ? '0' : '') + current.day" [questions]="quizQuestions()" />
+    <app-academy-quiz [title]="'Day ' + current.day + ' exam practice'" [moduleId]="'study-day-' + (current.day < 10 ? '0' : '') + current.day" [questions]="quizQuestions()" />
 
     <nav class="lesson-nav" aria-label="Lesson navigation">
       <a [routerLink]="previousRoute()">← Previous lesson</a>

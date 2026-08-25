@@ -1,5 +1,5 @@
 <section class="card academy-quiz">
-  <div class="quiz-heading"><div><span class="eyebrow">Module quiz</span><h2>{{ title() }}</h2></div><strong>{{ answered() }} / {{ questions().length }} answered</strong></div>
+  <div class="quiz-heading"><div><span class="eyebrow">Exam practice</span><h2>{{ title() }}</h2><p>Use the clues in each situation. A wrong answer is useful: the explanation shows you how AWS expects you to separate similar choices.</p></div><strong>{{ answered() }} / {{ questions().length }} answered</strong></div>
   @if (attempts().length) { <div class="score-history" aria-label="Saved quiz score summary"><div><span>Latest score</span><strong>{{ latestAttempt()?.scorePercent }}%</strong></div><div><span>Best score</span><strong>{{ bestScore() }}%</strong></div><div><span>Saved attempts</span><strong>{{ attempts().length }}</strong></div></div> }
   @if (historyError()) { <p class="save-state error" role="alert">{{ historyError() }}</p> }
   @for (item of questions(); track $index; let questionIndex = $index) {

@@ -86,11 +86,12 @@ Build -\> Break -\> Observe -\> Improve -\> Document.
 -   Sprint 43: Formative Academy quizzes ✅ — three TicketForge scenario questions per module, feedback, scoring, retries, authenticated attempt history, and explicit assessment-integrity boundaries
 -   Sprint 44: Academy XP ✅ — server-derived exercise and distinct passed-module points, anti-farming rules, visible totals, and explicit separation from readiness and credentials
 -   Sprint 45: Quiz score history and reset ✅ — visible latest/best scores, retained attempt counts, non-destructive answer reset, and route-safe module history
--   Sprint 46: Competency and evidence graph — connect labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable skills
--   Sprint 47: Assessments and practical exams — server-owned scenarios, rubrics, attempts, scoring, feedback, and mastery thresholds
--   Sprint 48: Verifiable academy credentials — evidence-backed certificates, unique IDs, QR verification, renewal, and revocation
--   Sprint 49: Blueprint OS integration — identity, transcripts, evidence APIs, credential synchronization, consent, and public profiles
--   Sprint 50: External certification preparation — official objective mapping, study plans, readiness checks, and renewal tracking; begin with AWS Solutions Architect Associate
+-   Sprint 46: Beginner-first AWS Academy ✅ — zero-assumption onboarding, plain-language concept sequence, everyday comparisons, guided practice, exam clue coaching, and honest readiness guidance
+-   Sprint 47: Competency and evidence graph — connect labs, tests, ADRs, reviews, failure drills, and portfolio artifacts to measurable skills
+-   Sprint 48: Assessments and practical exams — server-owned scenarios, rubrics, attempts, scoring, feedback, and mastery thresholds
+-   Sprint 49: Verifiable academy credentials — evidence-backed certificates, unique IDs, QR verification, renewal, and revocation
+-   Sprint 50: Blueprint OS integration — identity, transcripts, evidence APIs, credential synchronization, consent, and public profiles
+-   Sprint 51: External certification preparation — official objective mapping, study plans, readiness checks, and renewal tracking; begin with AWS Solutions Architect Associate
 
 ## Architecture Artifacts
 

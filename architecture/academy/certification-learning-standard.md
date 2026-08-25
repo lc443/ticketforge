@@ -32,6 +32,15 @@ Scenario
 
 ## Writing and teaching style
 
+The Certification Academy assumes no programming, cloud, networking, or IT work experience. A learner should never need outside technical knowledge merely to understand the explanation. Hands-on activities may use the AWS Console or commands, but the lesson must teach every required action and must not confuse certification knowledge with application-development skill.
+
+- Introduce ideas in this order: the human or business problem, an everyday comparison, the AWS term, a TicketForge example, nearby choices, guided practice, and exam-style questions.
+- Define a term before using it to explain another term. Expand an acronym the first time it appears.
+- Use one new idea per paragraph. Prefer ordinary words, then place the precise AWS term beside them.
+- Explain what the learner should notice in an exam scenario. Point out clue words and also explain why the tempting alternatives do not fit.
+- State whether an activity needs an AWS account, may create a charge, requires code, or is only a written decision exercise.
+- Never imply that course completion guarantees an AWS exam pass. Readiness must use fresh practice results, corrected mistakes, and the learner's ability to explain choices.
+
 - Begin with a direct sentence that tells the learner what they will understand or do.
 - Use TicketForge as the default application example. Introduce another example only when it explains the boundary better.
 - Present a concrete TicketForge problem before introducing a list of services or technical terms.
