@@ -346,8 +346,8 @@ export class Roadmap {
         {
           num: '41',
           name: 'Academy Foundations',
-          note: 'Tracks, modules, lessons, prerequisites, learner profiles, progress, and an honest credential policy',
-          status: 'todo',
+          note: 'Certification hub, CLF-C02 path, AWS safety labs, authenticated PostgreSQL exercise tracking, and immutable Academy completion records; reviewed evidence and verifiable credentials remain',
+          status: 'partial',
         },
         {
           num: '42',

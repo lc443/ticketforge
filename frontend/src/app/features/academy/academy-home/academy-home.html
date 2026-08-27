@@ -1,0 +1,62 @@
+<div class="academy-container">
+  <header class="hero">
+    <span class="eyebrow">TicketForge Academy</span>
+    <h1>Learn AWS from the beginning</h1>
+    <p>You do not need a technology or programming background. TicketForge Academy explains each idea in everyday language, shows why a business would use it, and prepares you to recognize the same idea on the AWS exam.</p>
+  </header>
+
+  <section class="card academy-model" aria-labelledby="academy-loop-title">
+    <div class="section-title"><span class="eyebrow">How every lesson works</span><h2 id="academy-loop-title">Start simple, then practice the exam decision</h2></div>
+    <div class="learning-loop" aria-label="Academy learning loop">
+      <span>Plain idea</span><b>→</b><span>Everyday example</span><b>→</b><span>AWS name</span><b>→</b><span>TicketForge scenario</span><b>→</b><span>Guided practice</span><b>→</b><span>Exam questions</span>
+    </div>
+    <p>We introduce the problem before the product name. You will learn what the service does, when people choose it, what similar services do differently, and which words in an exam question point toward the right answer.</p>
+  </section>
+
+  <section class="audience-section" aria-labelledby="before-title">
+    <div class="section-heading"><span class="eyebrow">Before you begin</span><h2 id="before-title">What you need—and what you do not</h2></div>
+    <div class="audience-grid">
+      <article><span>01</span><h3>No coding required</h3><p>Cloud Practitioner tests cloud ideas, AWS services, security, and cost. You will not be asked to build an application during the exam.</p></article>
+      <article><span>02</span><h3>New words are expected</h3><p>Every technical term is introduced with a plain definition and an example. You are not expected to know the vocabulary before the lesson.</p></article>
+      <article><span>03</span><h3>Practice matters</h3><p>You will answer scenario questions, review why each choice is right or wrong, retain your scores, and revisit weak topics before scheduling the exam.</p></article>
+    </div>
+  </section>
+
+  <section class="path-section" aria-labelledby="certification-path-title">
+    <div class="section-heading">
+      <span class="eyebrow">Certification paths</span>
+      <h2 id="certification-path-title">Choose what you want to prepare for</h2>
+      <p>Start with AWS Cloud Practitioner. It teaches the basic language of cloud computing before you move into technical architecture certifications.</p>
+    </div>
+
+    <div class="path-grid">
+      @for (path of paths; track path.id) {
+        @if (path.route) {
+          <a class="path-card" [routerLink]="path.route">
+            <ng-container *ngTemplateOutlet="pathContent; context: { $implicit: path }" />
+          </a>
+        } @else {
+          <article class="path-card planned">
+            <ng-container *ngTemplateOutlet="pathContent; context: { $implicit: path }" />
+          </article>
+        }
+        <ng-template #pathContent let-item>
+          <div class="path-head"><span class="provider">{{ item.provider }} · {{ item.code }}</span><span class="status" [class.current]="item.status === 'current'" [class.next]="item.status === 'next'">{{ statusText(item.status) }}</span></div>
+          <h3>{{ item.title }}</h3>
+          <span class="level">{{ item.level }}</span>
+          <p>{{ item.purpose }}</p>
+          <div class="next-action"><span>Next action</span><strong>{{ item.nextAction }}</strong></div>
+          @if (item.route) { <span class="open-path">Open certification path →</span> }
+        </ng-template>
+      }
+    </div>
+  </section>
+
+  <section class="card boundary-card">
+    <div class="section-title"><span class="eyebrow">Two learning tracks</span><h2>Certification study does not require engineering experience</h2></div>
+    <div class="boundary-grid">
+      <div><strong>Certification Academy</strong><p>Begin here if you are new to technology. Learn AWS concepts, answer exam-style scenarios, track quiz scores, and build confidence one lesson at a time.</p><span>Begin with AWS Cloud Practitioner.</span></div>
+      <div><strong>TicketForge engineering labs</strong><p>Use these later when you want deeper hands-on experience with software, Docker, Kubernetes, Terraform, reliability, and architecture decisions.</p><a routerLink="/labs">Browse engineering labs →</a></div>
+    </div>
+  </section>
+</div>

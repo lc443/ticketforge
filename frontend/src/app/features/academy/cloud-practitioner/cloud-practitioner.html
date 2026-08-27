@@ -1,0 +1,85 @@
+<div class="academy-container">
+  <nav class="academy-breadcrumb" aria-label="Academy navigation"><a routerLink="/academy">Academy</a><span>/</span><span>AWS · CLF-C02</span></nav>
+  <header class="hero">
+    <span class="eyebrow">{{ certification.provider }} · {{ certification.level }} · {{ certification.code }}</span>
+    <h1>{{ certification.title }}</h1>
+    <p>{{ certification.purpose }}</p>
+  </header>
+
+  <section class="card readiness-card">
+    <div class="section-title"><span class="eyebrow">New to technology? Begin here.</span><h2>This path starts at zero</h2></div>
+    <p>You do not need programming, networking, or cloud experience. We introduce one idea at a time, explain new words before using them, and use everyday situations before showing AWS product names.</p>
+    <div class="readiness-grid"><span>Understand the person or business problem</span><span>Learn which AWS choice solves it and why</span><span>Practice with TicketForge and exam-style situations</span></div>
+  </section>
+
+  @if (loading()) { <p class="sync-state">Loading your learner record…</p> }
+  @if (syncError()) { <p class="sync-state error" role="alert">{{ syncError() }}</p> }
+
+  @if (certificate(); as award) {
+    <section class="card certificate-card" aria-label="Certificate of completion">
+      <span class="eyebrow">Credential earned</span>
+      <h2>{{ award.title }}</h2>
+      <p>This records completion of the TicketForge Academy learning path. It is not an AWS-issued certification.</p>
+      <div><code>{{ award.certificateNumber }}</code><span>Completed {{ award.completedAt | date:'mediumDate' }}</span></div>
+    </section>
+  }
+
+  <section class="overview-grid" aria-label="Certification progress overview">
+    <article class="metric"><span>Study plan</span><strong>{{ completedCount() }} / 21</strong><small>{{ planProgress() }}% complete</small></article>
+    <article class="metric xp-metric"><span>Experience</span><strong>{{ xp() }} XP</strong><small>{{ passedQuizModules() }} quiz modules passed · {{ maximumXp() }} XP available</small></article>
+    <article class="metric"><span>Exam domains</span><strong>4</strong><small>official weighted areas</small></article>
+    <article class="metric"><span>Readiness</span><strong>{{ readiness() }}%</strong><small>labs and assessments still required</small></article>
+    <article class="metric"><span>Next action</span><strong>Lab Zero</strong><a routerLink="/academy/aws/cloud-practitioner/lab-zero">Secure the account →</a></article>
+  </section>
+
+  <section class="card progress-card">
+    <div><span class="eyebrow">Path progress</span><strong>{{ planProgress() }}%</strong></div>
+    <div class="progress-track"><span [style.width.%]="planProgress()"></span></div>
+    <p>Reading introduces the words. Practice teaches you how to choose between similar answers. Complete the guided activities, explain choices in your own words, and use fresh quiz scores to decide when you are ready.</p>
+  </section>
+
+  <section class="academy-section" aria-labelledby="domain-title">
+    <div class="section-heading"><span class="eyebrow">What the exam covers</span><h2 id="domain-title">Four groups of knowledge</h2><p>A domain is simply a group of related exam topics. The percentage is the approximate share of scored questions from that group. A larger percentage means you should spend more study time there.</p></div>
+    <div class="domain-grid">
+      @for (domain of domains; track domain.id) {
+        <article class="domain-card">
+          <div class="domain-head"><span>{{ domain.weight }}%</span><strong>{{ domain.name }}</strong></div>
+          <div class="weight-track"><span [style.width.%]="domain.weight"></span></div>
+          <p>{{ domain.summary }}</p>
+          <div class="evidence"><span>How you will prove you understand it</span>{{ domain.evidence }}</div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="academy-section" aria-labelledby="start-title">
+    <div class="section-heading"><span class="eyebrow">Your first two steps</span><h2 id="start-title">Learn the cloud, then enter AWS safely</h2><p>Cloud Foundations explains the basic idea without requiring an AWS account. Lab Zero then shows how to protect a real account and avoid surprise charges before creating anything.</p></div>
+    <div class="start-grid">
+      <a class="start-card priority" routerLink="/academy/aws/cloud-practitioner/cloud-foundations"><span>Step 1 · no AWS account needed</span><h3>Cloud Foundations</h3><p>Learn what cloud computing means and why AWS separates its locations into Regions and Availability Zones.</p><strong>Learn the basics →</strong></a>
+      <a class="start-card" routerLink="/academy/aws/cloud-practitioner/lab-zero"><span>Step 2 · before a hands-on lab</span><h3>Lab Zero · Secure the account</h3><p>Protect the all-powerful root user, create a safer daily sign-in, and add warnings that help you notice unexpected spending.</p><strong>Prepare the AWS account →</strong></a>
+    </div>
+  </section>
+
+  <section class="academy-section" aria-labelledby="plan-title">
+    <div class="section-heading"><span class="eyebrow">Your 21-day plan</span><h2 id="plan-title">Learn one manageable topic each day</h2><p>Open the lesson, learn the plain-language idea, complete its guided practice, and take the quiz. Mark it complete only when you can explain the answer without copying the lesson.</p></div>
+    @for (week of [1, 2, 3]; track week) {
+      <div class="week-block">
+        <div class="week-heading"><span class="eyebrow">Week {{ week }}</span><strong>{{ week === 1 ? 'Foundations' : week === 2 ? 'Architecture & services' : 'Security, cost & readiness' }}</strong></div>
+        <div class="day-list">
+          @for (day of daysForWeek(week); track day.day) {
+            <article class="day" [class.complete]="completedDays().has(day.day)">
+              <button type="button" (click)="toggleDay(day.day)" [attr.aria-label]="(completedDays().has(day.day) ? 'Mark incomplete: ' : 'Mark complete: ') + day.title"><span aria-hidden="true">{{ completedDays().has(day.day) ? '✓' : day.day }}</span></button>
+              <div><div class="day-meta"><span>Day {{ day.day }}</span><small>{{ day.domain }}</small></div><h3>{{ day.title }}</h3><p>{{ day.focus }}</p><div class="day-evidence"><strong>Your understanding check:</strong> {{ day.evidence }}</div>@if (day.route) { <a [routerLink]="day.route">Open lesson →</a> }</div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="card readiness-card">
+    <div class="section-title"><span class="eyebrow">Before you schedule the exam</span><h2>Confirm that you can use what you learned</h2></div>
+    <p>No course can guarantee an exam pass. These checks give you evidence that you understand the material instead of relying on a feeling.</p>
+    <div class="readiness-grid"><span>Studied all four topic groups</span><span>Completed safe hands-on activities</span><span>Can explain why one service fits better than another</span><span>Reviewed every repeated mistake</span><span>Reached 80%+ on several fresh practices</span><span>Completed and reviewed one timed full exam</span></div>
+  </section>
+</div>

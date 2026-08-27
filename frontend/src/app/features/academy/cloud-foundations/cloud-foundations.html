@@ -1,0 +1,55 @@
+<div class="lab-container">
+  <nav class="academy-breadcrumb" aria-label="Academy navigation"><a routerLink="/academy">Academy</a><span>/</span><a routerLink="/academy/aws/cloud-practitioner">CLF-C02</a><span>/</span><span>Cloud Foundations</span></nav>
+  <header class="hero"><span class="eyebrow">CLF-C02 · Day 1 · Cloud Concepts</span><h1>Understand where TicketForge runs in AWS</h1><p>Learn what Regions, Availability Zones, and edge locations are, then use them to decide how TicketForge should handle traffic, failures, latency, and recovery.</p></header>
+  @if (syncError()) { <p class="sync-state error" role="alert">{{ syncError() }}</p> }
+  <section class="card"><div class="section-title"><span class="eyebrow">Before the AWS names</span><h2>The cloud means renting technology over the internet</h2></div><p>TicketForge needs computers to run the application and places to store information. Instead of buying and maintaining all of that equipment, it can rent services from AWS. A Region is the broad geographic area you choose. An Availability Zone is an isolated location inside that Region, so one location can fail without automatically stopping every location.</p></section>
+  <app-technology-brief technology="AWS Regions and Availability Zones" scenario="TicketForge is selling tickets for a major event. If one AWS data-center location fails, customers must still be able to view the event and reserve tickets." definition="A Region is an AWS geographic area. Each Region contains multiple isolated Availability Zones. An Availability Zone is one or more data centers designed to fail independently from the other zones in that Region." why="TicketForge needs more than several server copies. Those copies must run in separate failure locations if the application is expected to survive an Availability Zone outage." problem="Regions and Availability Zones give the architect clear boundaries for availability, latency, data location, disaster recovery, and cost." mentalModel="A Region is a city. Availability Zones are separate, protected buildings in that city. Putting two TicketForge servers in one building does not help when the entire building loses power." question="Does deploying two EC2 instances in one Availability Zone protect TicketForge from an AZ failure?" optionA="No; both instances share the same AZ failure domain" optionB="Yes; two instances always mean multi-AZ" optionC="Yes; EC2 automatically moves both instances to another Region" correctOption="a" explanation="Two instances protect against one instance failing. To protect against an Availability Zone failure, TicketForge must have healthy capacity in another Availability Zone." />
+  <app-scenario-card eyebrow="TicketForge scenario" title="A sold-out event cannot depend on one building"><div class="scenario-grid"><section class="scenario-card problem"><span class="scenario-label">The requirement</span><h3>One facility failure must not stop ticket sales.</h3><p>Running three API instances in one AZ increases instance redundancy but leaves one shared facility failure domain.</p></section><section class="scenario-card solution"><span class="scenario-label">The architecture response</span><h3>Distribute healthy capacity across AZs.</h3><p>A regional load balancer routes to capacity in multiple AZs; data services need their own Multi-AZ and recovery decisions.</p></section></div></app-scenario-card>
+  <section class="card progress-card"><div><span class="eyebrow">Module progress</span><strong>{{ completed().size }} / {{ exerciseCount }}</strong></div><div class="progress-track"><span [style.width.%]="progress()"></span></div><p>Complete each exercise only after you can explain the boundary without reading the answer. Completion is saved to your signed-in learner record.</p></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 1 · cloud value</span><h2>Separate scalability, elasticity, and high availability</h2></div><pre data-language="text"><code>Scalability    → capacity can grow to handle greater demand
+Elasticity     → capacity expands and contracts with demand
+High availability → service remains usable through expected failures
+Fault tolerance   → service continues with little or no interruption</code></pre><div class="syntax-list"><div><code>scalability</code><p>Answers whether the design can grow; vertical and horizontal approaches have different ceilings.</p></div><div><code>elasticity</code><p>Adds time and automation: resources track changing demand rather than remaining permanently sized for peak.</p></div><div><code>availability</code><p>Depends on eliminating critical single failure domains, not merely adding more instances.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(1)" (click)="toggleExercise(1)">{{ completed().has(1) ? 'Completed · concepts distinguished' : 'Mark cloud-value exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 2 · geography</span><h2>Trace Region, Availability Zone, and edge boundaries</h2></div><pre data-language="text"><code>AWS global infrastructure
+├── Region: geographic service boundary
+│   ├── Availability Zone A: isolated facilities
+│   ├── Availability Zone B: isolated facilities
+│   └── Availability Zone C: isolated facilities
+└── Edge location: selected services closer to users</code></pre><div class="syntax-list"><div><code>Region</code><p>Drives latency, service availability, legal/data-residency choices, price, and disaster-recovery design.</p></div><div><code>Availability Zone</code><p>An isolated regional failure domain connected to other AZs with low-latency networking.</p></div><div><code>edge</code><p>Supports services such as content delivery and DNS; it is not a synonym for an AZ or a full application Region.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(2)" (click)="toggleExercise(2)">{{ completed().has(2) ? 'Completed · geography traced' : 'Mark geography exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 3 · account observation</span><h2>Inspect Regions without creating a resource</h2></div><pre data-language="bash"><code>aws sts get-caller-identity \
+  --profile ticketforge-lab
+
+aws ec2 describe-regions \
+  --profile ticketforge-lab \
+  --query 'Regions[].RegionName' \
+  --output table</code></pre><div class="syntax-list"><div><code>preflight first</code><p>Identity evidence precedes every AWS command so you know which account receives the action.</p></div><div><code>--query</code><p>Uses a JMESPath expression to select Region names from the larger API response.</p></div><div><code>read-only</code><p>This observation creates no EC2 instance; an API call to the EC2 service is not the same as provisioning compute.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(3)" (click)="toggleExercise(3)">{{ completed().has(3) ? 'Completed · Regions observed' : 'Mark AWS observation complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 4 · shared responsibility</span><h2>Assign responsibility by service model</h2></div><pre data-language="text"><code>AWS responsibility      → security OF the cloud
+Customer responsibility → security IN the cloud
+
+EC2: customer manages more OS and workload controls
+RDS: AWS manages more database infrastructure operations
+S3: customer still owns data classification, access, and configuration</code></pre><div class="syntax-list"><div><code>shared</code><p>The boundary changes by service; moving to a managed service changes responsibilities rather than eliminating them.</p></div><div><code>AWS</code><p>Protects physical facilities, hardware, and underlying cloud infrastructure.</p></div><div><code>customer</code><p>Still owns identities, data, access choices, workload configuration, and other controls defined by the service.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(4)" (click)="toggleExercise(4)">{{ completed().has(4) ? 'Completed · responsibility assigned' : 'Mark responsibility exercise complete' }}</button></section>
+
+  <section class="card lesson"><div class="section-title"><span class="eyebrow">Exercise 5 · architecture defense</span><h2>Explain a resilient TicketForge placement</h2></div><pre data-language="text"><code>Users
+  ↓
+Regional load balancer
+  ├── AZ A → TicketForge API replicas
+  └── AZ B → TicketForge API replicas
+              ↓
+       Multi-AZ data design
+
+Open questions: Region, RTO, RPO, latency, cost, data residency</code></pre><div class="syntax-list"><div><code>multi-AZ</code><p>Addresses an AZ-scale failure inside one Region; it is not automatically a multi-Region disaster-recovery plan.</p></div><div><code>RTO / RPO</code><p>Define acceptable recovery time and data loss so resilience decisions can be measured.</p></div><div><code>tradeoff</code><p>Additional failure-domain independence improves resilience but adds cost and operational decisions.</p></div></div><button class="exercise-toggle" [class.complete]="completed().has(5)" (click)="toggleExercise(5)">{{ completed().has(5) ? 'Completed · architecture defended' : 'Mark architecture exercise complete' }}</button></section>
+
+  <section class="card"><div class="section-title"><span class="eyebrow">Architecture check</span><h2>TicketForge must survive one AZ outage, but not a full regional disaster. What is the minimum matching placement?</h2></div><div class="quiz-options"><button class="quiz-option" [class.incorrect]="answer() === 'instance'" (click)="selectAnswer('instance')">Several instances in one AZ</button><button class="quiz-option" [class.correct]="answer() === 'az'" (click)="selectAnswer('az')">Healthy application and data capacity across at least two AZs in one Region</button><button class="quiz-option" [class.incorrect]="answer() === 'regions'" (click)="selectAnswer('regions')">Three Regions are always mandatory</button></div>@if (answer()) { <p class="quiz-result" [class.correct-text]="answer() === 'az'">@if (answer() === 'az') { Correct. The placement matches the stated AZ-failure requirement without assuming the cost and complexity of multi-Region recovery. } @else { Match architecture to the failure requirement: instance redundancy within one AZ does not survive the AZ, while mandatory multi-Region exceeds this stated requirement. }</p> }</section>
+
+  <app-academy-quiz title="Cloud Foundations quiz" moduleId="cloud-foundations" [questions]="quizQuestions" />
+
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a routerLink="/academy/aws/cloud-practitioner/lab-zero">← Lab Zero</a>
+    <a routerLink="/academy/aws/cloud-practitioner/day/3">Day 3 · Compute →</a>
+  </nav>
+</div>

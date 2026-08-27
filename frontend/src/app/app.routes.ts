@@ -69,6 +69,31 @@ export const routes: Routes = [
       },
 
       {
+        path: 'academy',
+        loadComponent: () => import('./features/academy/academy-home/academy-home').then((m) => m.AcademyHome),
+      },
+      {
+        path: 'academy/aws/cloud-practitioner',
+        loadComponent: () => import('./features/academy/cloud-practitioner/cloud-practitioner').then((m) => m.CloudPractitioner),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'academy/aws/cloud-practitioner/lab-zero',
+        loadComponent: () => import('./features/academy/lab-zero/lab-zero').then((m) => m.LabZero),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'academy/aws/cloud-practitioner/cloud-foundations',
+        loadComponent: () => import('./features/academy/cloud-foundations/cloud-foundations').then((m) => m.CloudFoundations),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'academy/aws/cloud-practitioner/day/:day',
+        loadComponent: () => import('./features/academy/cloud-practitioner/lesson/clf-lesson').then((m) => m.ClfLesson),
+        canActivate: [authGuard],
+      },
+
+      {
         path: 'labs/requirements',
         loadComponent: () =>
           import('./features/labs/requirements-lab/requirements-lab').then(
